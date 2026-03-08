@@ -23,6 +23,7 @@ export default function PayrollDeductions() {
   const total = deductions.reduce((s: number, d: any) => s + d.deduction_amount, 0);
   const scheduled = deductions.filter((d: any) => d.status === "Scheduled");
   const processed = deductions.filter((d: any) => d.status === "Processed");
+  const { paginatedItems: paginatedDeductions, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(deductions);
 
   return (
     <div>
