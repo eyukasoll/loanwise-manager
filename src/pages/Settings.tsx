@@ -27,6 +27,7 @@ import { Progress } from "@/components/ui/progress";
 const fiscalMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export default function Settings() {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const { canEdit } = usePermissions();
   const [loading, setLoading] = useState(true);
