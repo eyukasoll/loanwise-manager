@@ -140,8 +140,8 @@ export default function Disbursements() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDisburseOpen(false)}>Cancel</Button>
-            <Button onClick={handleDisburse} disabled={updateMut.isPending || genSchedule.isPending}>Confirm Disbursement</Button>
+            <Button variant="outline" onClick={() => setDisburseOpen(false)}>{t.cancel}</Button>
+            <Button onClick={handleDisburse} disabled={updateMut.isPending || genSchedule.isPending}>{t.confirmDisbursement}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

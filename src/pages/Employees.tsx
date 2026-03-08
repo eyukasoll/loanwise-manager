@@ -284,9 +284,9 @@ export default function Employees() {
             </div>
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setFormOpen(false)}>{t.cancel}</Button>
             <Button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}>
-              {editingId ? "Update" : "Create"} Employee
+              {editingId ? t.updateEmployee : t.createEmployee}
             </Button>
           </DialogFooter>
         </DialogContent>
