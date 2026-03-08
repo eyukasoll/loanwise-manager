@@ -132,7 +132,7 @@ export default function Applications() {
         )}
       </div>
 
-      <ApplicationDetailDialog selected={selected} onClose={() => setSelected(null)} />
+      <ApplicationDetailDialog selected={selected} onClose={() => setSelected(null)} canEdit={canEdit("Applications")} canDelete={canDelete("Applications")} />
 
       {/* New Application */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
