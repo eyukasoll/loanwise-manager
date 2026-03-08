@@ -208,7 +208,7 @@ export default function Savings() {
                 </Select>
               </div>
               <div>
-                <Label>Transaction Type</Label>
+                <Label>{t.transactionType}</Label>
                 <Select value={form.transaction_type} onValueChange={v => setForm(f => ({ ...f, transaction_type: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
