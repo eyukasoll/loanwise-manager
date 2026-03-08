@@ -486,6 +486,7 @@ function ChangePasswordTab({ toast }: { toast: ReturnType<typeof useToast>["toas
 }
 
 
+const backupTables = [
   { key: "employees", label: "Employees", description: "All employee records" },
   { key: "loan_applications", label: "Loan Applications", description: "All loan application data" },
   { key: "loan_types", label: "Loan Types", description: "Loan type configurations" },
