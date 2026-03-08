@@ -234,12 +234,12 @@ export default function Savings() {
                 </SelectContent>
               </Select>
             </div>
-            <div><Label>Receipt Number</Label><Input value={form.receipt_number} onChange={e => setForm(f => ({ ...f, receipt_number: e.target.value }))} className="mt-1" /></div>
-            <div><Label>Remarks</Label><Input value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} className="mt-1" /></div>
+            <div><Label>{t.receiptNumber}</Label><Input value={form.receipt_number} onChange={e => setForm(f => ({ ...f, receipt_number: e.target.value }))} className="mt-1" /></div>
+            <div><Label>{t.remarks}</Label><Input value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} className="mt-1" /></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={createMut.isPending}>Save</Button>
+            <Button variant="outline" onClick={() => setFormOpen(false)}>{t.cancel}</Button>
+            <Button onClick={handleSave} disabled={createMut.isPending}>{t.save}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
