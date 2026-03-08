@@ -17,7 +17,7 @@ const navItems = [
   { labelKey: "navLoanTypes", icon: Settings, path: "/loan-types", module: "Loan Types" },
   { labelKey: "navApplications", icon: FileText, path: "/applications", module: "Applications" },
   { labelKey: "navApprovals", icon: CheckCircle, path: "/approvals", module: "Approvals" },
-  { labelKey: "navGuaranteeApprovals", icon: UserCheck, path: "/guarantee-approvals", module: "Approvals" },
+  { labelKey: "navGuaranteeApprovals", icon: UserCheck, path: "/guarantee-approvals", module: "Guarantee Approvals" },
   { labelKey: "navDisbursements", icon: Banknote, path: "/disbursements", module: "Disbursements" },
   { labelKey: "navRepaymentSchedule", icon: CalendarCheck, path: "/repayments", module: "Repayment Schedule" },
   { labelKey: "navPayrollDeductions", icon: CreditCard, path: "/deductions", module: "Payroll Deductions" },
