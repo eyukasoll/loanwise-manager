@@ -6,6 +6,7 @@ import {
   Settings, ChevronLeft, ChevronRight, Building2, LogOut
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/" },
