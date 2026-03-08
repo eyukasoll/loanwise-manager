@@ -67,7 +67,7 @@ export default function Permissions() {
   const getPerm = (role: string, module: string) =>
     permissions.find((p) => p.role === role && p.module === module);
 
-  const togglePerm = (role: string, module: string, action: keyof Pick<PermRow, "can_view" | "can_create" | "can_edit" | "can_delete">) => {
+  const togglePerm = (role: string, module: string, action: keyof Omit<PermRow, "id" | "role" | "module">) => {
     setPermissions((prev) =>
       prev.map((p) =>
         p.role === role && p.module === module
