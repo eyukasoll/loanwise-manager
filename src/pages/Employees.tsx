@@ -139,52 +139,55 @@ export default function Employees() {
               <table className="w-full text-sm">
                  <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employeeId}</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.name}</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.department}</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.position}</th>
-                    <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.salary}</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.status}</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.guarantee}</th>
-                    <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">{t.actions}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((emp: any) => (
-                    <tr key={emp.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                      <td className="px-5 py-3 font-mono text-xs">{emp.employee_id}</td>
-                      <td className="px-5 py-3 font-medium">{emp.full_name}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
-                      <td className="px-5 py-3 text-right">{fmt(emp.monthly_salary)}</td>
-                      <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
-                      <td className="px-5 py-3">
-                        {guaranteedIds.has(emp.id) ? (
-                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{t.guaranteed}</span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">{t.free}</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
-                        {canEdit("Employees") && <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>}
-                        {canEdit("Employees") && emp.email && (
-                          <Button variant="ghost" size="icon" title="Resend Credentials" onClick={() => handleResendCredentials(emp)} disabled={resendingId === emp.id}>
-                            <RefreshCw className={`w-4 h-4 text-primary ${resendingId === emp.id ? "animate-spin" : ""}`} />
-                          </Button>
-                        )}
-                        {canDelete("Employees") && <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
-                      </td>
-                    </tr>
-                  ))}
-                  {filtered.length === 0 && (
-                    <tr><td colSpan={8} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                     <th className="text-left px-3 py-3 font-medium text-muted-foreground text-xs w-10">#</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employeeId}</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.name}</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.department}</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.position}</th>
+                     <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.salary}</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.status}</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.guarantee}</th>
+                     <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">{t.actions}</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {paginatedItems.map((emp: any, idx: number) => (
+                     <tr key={emp.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                       <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                       <td className="px-5 py-3 font-mono text-xs">{emp.employee_id}</td>
+                       <td className="px-5 py-3 font-medium">{emp.full_name}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
+                       <td className="px-5 py-3 text-right">{fmt(emp.monthly_salary)}</td>
+                       <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
+                       <td className="px-5 py-3">
+                         {guaranteedIds.has(emp.id) ? (
+                           <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{t.guaranteed}</span>
+                         ) : (
+                           <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">{t.free}</span>
+                         )}
+                       </td>
+                       <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
+                         <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
+                         {canEdit("Employees") && <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>}
+                         {canEdit("Employees") && emp.email && (
+                           <Button variant="ghost" size="icon" title="Resend Credentials" onClick={() => handleResendCredentials(emp)} disabled={resendingId === emp.id}>
+                             <RefreshCw className={`w-4 h-4 text-primary ${resendingId === emp.id ? "animate-spin" : ""}`} />
+                           </Button>
+                         )}
+                         {canDelete("Employees") && <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
+                       </td>
+                     </tr>
+                   ))}
+                   {filtered.length === 0 && (
+                     <tr><td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
+                   )}
+                 </tbody>
+               </table>
+             </div>
+             <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+           </div>
+         )}
       </div>
 
       {/* View Dialog */}
