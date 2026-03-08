@@ -85,6 +85,9 @@ export default function LoanApplicationDocument({ open, onClose, loan }: Props) 
         <div ref={printRef} style={{ fontFamily: "'Segoe UI', sans-serif", fontSize: "13px", color: "#1a1a1a", lineHeight: "1.5" }}>
           {/* Header */}
           <div className="header" style={{ textAlign: "center", borderBottom: "3px double #1a1a1a", paddingBottom: "14px", marginBottom: "20px" }}>
+            {company?.logo_url && (
+              <img src={company.logo_url} alt={companyName} style={{ height: "48px", margin: "0 auto 8px", objectFit: "contain" }} />
+            )}
             <h1 style={{ fontSize: "20px", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "2px" }}>{companyName}</h1>
             <h2 style={{ fontSize: "15px", fontWeight: 600, color: "#333", marginBottom: "2px" }}>Loan Application Form</h2>
             {companyAddr && <p style={{ fontSize: "11px", color: "#888" }}>{companyAddr}</p>}
