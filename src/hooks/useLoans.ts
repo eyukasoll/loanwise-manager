@@ -653,7 +653,6 @@ export function useGuaranteedEmployeeIds() {
   return useQuery({
     queryKey: ["guaranteed_employee_ids"],
     queryFn: async () => {
-      // Get guarantor employee_ids for loans in active statuses
       const { data: activeLoans, error: lErr } = await supabase
         .from("loan_applications")
         .select("id")
@@ -670,6 +669,23 @@ export function useGuaranteedEmployeeIds() {
 
       return new Set((guarantors || []).map(g => g.employee_id));
     },
+  });
+}
+
+export function useUpdateGuarantor() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string; status: string; approved_by?: string; approved_at?: string }) => {
+      const { error } = await supabase
+        .from("loan_guarantors")
+        .update(updates as any)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["all_loan_guarantors"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 

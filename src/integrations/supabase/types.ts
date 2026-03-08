@@ -345,22 +345,31 @@ export type Database = {
       }
       loan_guarantors: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           employee_id: string
           id: string
           loan_application_id: string
+          status: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           employee_id: string
           id?: string
           loan_application_id: string
+          status?: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           employee_id?: string
           id?: string
           loan_application_id?: string
+          status?: string
         }
         Relationships: [
           {
