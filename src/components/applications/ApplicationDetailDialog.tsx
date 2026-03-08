@@ -3,9 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, ShieldOff, Printer } from "lucide-react";
+import { ShieldOff, Printer } from "lucide-react";
 import { toast } from "sonner";
-import GuaranteeDeactivationCertificate from "./GuaranteeDeactivationCertificate";
 import LoanApplicationDocument from "./LoanApplicationDocument";
 
 interface Props {
@@ -15,7 +14,6 @@ interface Props {
 
 export default function ApplicationDetailDialog({ selected, onClose }: Props) {
   const [guarantors, setGuarantors] = useState<any[]>([]);
-  const [certGuarantor, setCertGuarantor] = useState<any>(null);
   const [docOpen, setDocOpen] = useState(false);
 
   useEffect(() => {
@@ -38,8 +36,6 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
     }
     toast.success(`Guarantor ${guarantor.employees?.full_name} released`);
     setGuarantors(prev => prev.filter(g => g.id !== guarantor.id));
-    // Show the certificate
-    setCertGuarantor(guarantor);
   };
 
   const isClosedOrPaid = selected && ["Closed", "Cancelled", "Rejected"].includes(selected.status);
@@ -89,32 +85,22 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
                           <span className="font-medium">{g.employees?.full_name}</span>{" "}
                           <span className="text-muted-foreground text-xs">({g.employees?.employee_id})</span>
                         </span>
-                        <div className="flex items-center gap-1">
+                        {isClosedOrPaid && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 text-xs"
-                            onClick={() => setCertGuarantor(g)}
+                            className="h-7 text-xs text-destructive hover:text-destructive"
+                            onClick={() => handleDeactivate(g)}
                           >
-                            <FileText className="w-3.5 h-3.5 mr-1" /> Certificate
+                            <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
                           </Button>
-                          {isClosedOrPaid && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 text-xs text-destructive hover:text-destructive"
-                              onClick={() => handleDeactivate(g)}
-                            >
-                              <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
-                            </Button>
-                          )}
-                        </div>
+                        )}
                       </div>
                     ))}
                   </div>
                   {isClosedOrPaid && guarantors.length > 0 && (
                     <p className="text-xs text-muted-foreground mt-2 border-t border-border/50 pt-2">
-                      Loan is {selected.status.toLowerCase()} — guarantors can be released and deactivation certificates generated.
+                      Loan is {selected.status.toLowerCase()} — guarantors can be released.
                     </p>
                   )}
                 </div>
@@ -123,14 +109,6 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Deactivation Certificate */}
-      <GuaranteeDeactivationCertificate
-        open={!!certGuarantor}
-        onClose={() => setCertGuarantor(null)}
-        loan={selected}
-        guarantor={certGuarantor}
-      />
 
       {/* Loan Application Document */}
       <LoanApplicationDocument
