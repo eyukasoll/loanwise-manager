@@ -31,6 +31,7 @@ export default function Disbursements() {
 
   const openDisburse = (loan: any) => { setSelectedLoan(loan); setDisburseOpen(true); };
 
+  const handleDisburse = () => {
     if (!selectedLoan) return;
     updateMut.mutate({
       id: selectedLoan.id,
