@@ -71,6 +71,7 @@ export type Database = {
           smtp_host: string | null
           smtp_password: string | null
           smtp_port: number | null
+          stamp_url: string | null
           tin_number: string | null
           updated_at: string
           website: string | null
@@ -98,6 +99,7 @@ export type Database = {
           smtp_host?: string | null
           smtp_password?: string | null
           smtp_port?: number | null
+          stamp_url?: string | null
           tin_number?: string | null
           updated_at?: string
           website?: string | null
@@ -125,6 +127,7 @@ export type Database = {
           smtp_host?: string | null
           smtp_password?: string | null
           smtp_port?: number | null
+          stamp_url?: string | null
           tin_number?: string | null
           updated_at?: string
           website?: string | null
