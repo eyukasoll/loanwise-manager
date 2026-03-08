@@ -57,7 +57,7 @@ export default function Disbursements() {
 
   return (
     <div>
-      <TopBar title="Disbursements" subtitle="Process and track loan disbursements" />
+      <TopBar title={t.disTitle} subtitle={t.disSubtitle} />
       <div className="p-6 animate-fade-in space-y-6">
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>

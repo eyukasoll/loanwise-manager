@@ -135,7 +135,7 @@ export default function Applications() {
 
   return (
     <div>
-      <TopBar title="Loan Applications" subtitle="View and manage all loan applications" />
+      <TopBar title={t.appTitle} subtitle={t.appSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">

@@ -90,7 +90,7 @@ export default function LoanTypes() {
 
   return (
     <div>
-      <TopBar title="Loan Types" subtitle="Configure loan type settings" />
+      <TopBar title={t.ltTitle} subtitle={t.ltSubtitle} />
       <div className="p-6 animate-fade-in">
         {canCreate("Loan Types") && (
           <div className="flex justify-end mb-4">

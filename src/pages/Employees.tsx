@@ -112,7 +112,7 @@ export default function Employees() {
 
   return (
     <div>
-      <TopBar title="Employees" subtitle="Manage employee records" />
+      <TopBar title={t.empTitle} subtitle={t.empSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <div className="relative">

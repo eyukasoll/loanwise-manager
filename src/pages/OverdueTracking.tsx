@@ -21,7 +21,7 @@ export default function OverdueTracking() {
 
   return (
     <div>
-      <TopBar title="Overdue Tracking" subtitle="Monitor overdue and defaulting loans" />
+      <TopBar title={t.odTitle} subtitle={t.odSubtitle} />
       <div className="p-6 animate-fade-in space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard label="Overdue Loans" value={overdueLoans.length} icon={AlertTriangle} variant="destructive" />

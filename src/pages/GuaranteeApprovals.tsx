@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import GuaranteeApprovalDocument from "@/components/applications/GuaranteeApprovalDocument";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 function GuarantorStatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {

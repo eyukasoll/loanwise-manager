@@ -195,7 +195,7 @@ export default function GuaranteeDeactivation() {
 
   return (
     <div>
-      <TopBar title="Guarantee Deactivation" subtitle="Manage and release employee guarantees" />
+      <TopBar title={t.gdTitle} subtitle={t.gdSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">

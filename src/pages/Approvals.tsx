@@ -36,7 +36,7 @@ export default function Approvals() {
 
   return (
     <div>
-      <TopBar title="Loan Approvals" subtitle="Review and approve loan applications" />
+      <TopBar title={t.aprTitle} subtitle={t.aprSubtitle} />
       <div className="p-6 animate-fade-in">
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>

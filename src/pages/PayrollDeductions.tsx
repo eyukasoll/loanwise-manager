@@ -24,7 +24,7 @@ export default function PayrollDeductions() {
 
   return (
     <div>
-      <TopBar title="Payroll Deductions" subtitle="Monthly salary deduction schedule" />
+      <TopBar title={t.pdTitle} subtitle={t.pdSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">

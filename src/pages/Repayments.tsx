@@ -20,7 +20,7 @@ export default function Repayments() {
 
   return (
     <div>
-      <TopBar title="Repayment Schedule" subtitle="View loan repayment schedules" />
+      <TopBar title={t.repTitle} subtitle={t.repSubtitle} />
       <div className="p-6 animate-fade-in space-y-4">
         <div className="flex items-center gap-3">
           <label className="text-sm font-medium">Select Loan:</label>

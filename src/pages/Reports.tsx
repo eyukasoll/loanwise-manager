@@ -35,7 +35,7 @@ export default function Reports() {
 
   return (
     <div>
-      <TopBar title="Reports" subtitle="Operational, financial, and management reports" />
+      <TopBar title={t.rptTitle} subtitle={t.rptSubtitle} />
       <div className="p-6 animate-fade-in">
         <Tabs defaultValue="operational">
           <TabsList className="mb-6">

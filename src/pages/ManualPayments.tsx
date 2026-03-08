@@ -30,7 +30,7 @@ export default function ManualPayments() {
 
   return (
     <div>
-      <TopBar title="Manual Payments" subtitle="Record manual loan repayments" />
+      <TopBar title={t.mpTitle} subtitle={t.mpSubtitle} />
       <div className="p-6 animate-fade-in">
         {canCreate("Manual Payments") && (
           <div className="flex justify-end mb-4">
