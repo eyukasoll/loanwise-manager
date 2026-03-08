@@ -18,15 +18,40 @@ export default function Applications() {
   const { data: applications = [], isLoading } = useLoanApplications(statusFilter);
   const { data: employees = [] } = useEmployees();
   const { data: loanTypesData = [] } = useLoanTypes();
+  const { data: savingsData = [] } = useSavingsTransactions();
   const createMut = useCreateLoanApplication();
   const { canCreate } = usePermissions();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [savingsMultiplier, setSavingsMultiplier] = useState(3);
   const [form, setForm] = useState({
     employee_id: "", loan_type_id: "", requested_amount: 0,
     repayment_period_months: 12, purpose: "", proposed_start_date: "", remarks: "",
   });
+
+  // Fetch savings multiplier from settings
+  useEffect(() => {
+    supabase.from("company_settings").select("savings_multiplier").limit(1).single().then(({ data }) => {
+      if (data && (data as any).savings_multiplier) setSavingsMultiplier(Number((data as any).savings_multiplier));
+    });
+  }, []);
+
+  // Compute employee savings balances
+  const employeeSavingsBalance = useMemo(() => {
+    const map = new Map<string, number>();
+    savingsData.forEach((t: any) => {
+      const curr = map.get(t.employee_id) || 0;
+      map.set(t.employee_id, t.transaction_type === "Deposit" ? curr + Number(t.amount) : curr - Number(t.amount));
+    });
+    return map;
+  }, [savingsData]);
+
+  // Get max amount for savings-based loan
+  const selectedLoanType = loanTypesData.find((t: any) => t.id === form.loan_type_id);
+  const isSavingsBased = selectedLoanType?.is_savings_based;
+  const savingsBalance = employeeSavingsBalance.get(form.employee_id) || 0;
+  const savingsMaxAmount = isSavingsBased ? savingsBalance * savingsMultiplier : null;
 
   const filtered = applications.filter((l: any) => {
     const name = l.employees?.full_name || "";
