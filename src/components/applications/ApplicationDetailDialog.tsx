@@ -63,30 +63,13 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
                   <p className="font-medium text-sm text-amber-700 dark:text-amber-400 mb-2">Guarantors</p>
                   <div className="space-y-2">
                     {guarantors.map((g: any, i: number) => (
-                      <div key={g.id} className="flex items-center justify-between text-sm">
-                        <span>
-                          <span className="text-muted-foreground">{i + 1}.</span>{" "}
-                          <span className="font-medium">{g.employees?.full_name}</span>{" "}
-                          <span className="text-muted-foreground text-xs">({g.employees?.employee_id})</span>
-                        </span>
-                        {isClosedOrPaid && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 text-xs text-destructive hover:text-destructive"
-                            onClick={() => handleDeactivate(g)}
-                          >
-                            <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
-                          </Button>
-                        )}
+                      <div key={g.id} className="text-sm">
+                        <span className="text-muted-foreground">{i + 1}.</span>{" "}
+                        <span className="font-medium">{g.employees?.full_name}</span>{" "}
+                        <span className="text-muted-foreground text-xs">({g.employees?.employee_id})</span>
                       </div>
                     ))}
                   </div>
-                  {isClosedOrPaid && guarantors.length > 0 && (
-                    <p className="text-xs text-muted-foreground mt-2 border-t border-border/50 pt-2">
-                      Loan is {selected.status.toLowerCase()} — guarantors can be released.
-                    </p>
-                  )}
                 </div>
               )}
             </div>
