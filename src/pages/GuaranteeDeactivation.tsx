@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { fmt } from "@/lib/currency";
 import { toast } from "sonner";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 
 function useAllGuarantees() {
   return useQuery({
@@ -44,6 +45,7 @@ const ACTIVE_STATUSES = ["Submitted", "Under Review", "Pending Approval", "Appro
 export default function GuaranteeDeactivation() {
   const { data: guarantees = [], isLoading } = useAllGuarantees();
   const { data: employees = [] } = useEmployees();
+  const { settings: company } = useCompanySettings();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -395,7 +397,11 @@ export default function GuaranteeDeactivation() {
           {releaseDoc && (
             <div ref={printRef}>
               <div style={{ textAlign: "center", borderBottom: "3px solid #1a1a1a", paddingBottom: 16, marginBottom: 24 }}>
-                <h1 style={{ fontSize: 22, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 1 }}>Guarantee Release Document</h1>
+                {company?.logo_url && (
+                  <img src={company.logo_url} alt={company?.company_name || ""} style={{ height: 48, margin: "0 auto 8px", objectFit: "contain" as const }} />
+                )}
+                <h1 style={{ fontSize: 22, margin: "0 0 4px", textTransform: "uppercase" as const, letterSpacing: 1 }}>{company?.company_name || "Addis Microfinance"}</h1>
+                <h2 style={{ fontSize: 16, margin: 0, color: "#555", fontWeight: "normal" }}>Guarantee Release Document</h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12, color: "#888" }}>Date: {releaseDoc.date} | Ref: {releaseDoc.refNo}</p>
               </div>
 
@@ -453,7 +459,13 @@ export default function GuaranteeDeactivation() {
                 </div>
               </div>
 
-              <div style={{ textAlign: "center", marginTop: 40, padding: 12, border: "2px dashed #aaa", fontSize: 12, color: "#888" }}>Company Stamp / Seal</div>
+              <div style={{ textAlign: "center", marginTop: 40, padding: 12, border: "2px dashed #aaa", fontSize: 12, color: "#888" }}>
+                {company?.stamp_url ? (
+                  <img src={company.stamp_url} alt="Company Stamp" style={{ height: 80, margin: "0 auto", objectFit: "contain" as const }} />
+                ) : (
+                  "Company Stamp / Seal"
+                )}
+              </div>
               <div style={{ fontSize: 11, color: "#888", marginTop: 24, textAlign: "right" }}>Reference: {releaseDoc.refNo}</div>
             </div>
           )}
