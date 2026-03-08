@@ -483,6 +483,16 @@ export default function GuaranteeDeactivation() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Deactivation Certificate Dialog */}
+      {certGuarantee && (
+        <GuaranteeDeactivationCertificate
+          open={!!certGuarantee}
+          onClose={() => setCertGuarantee(null)}
+          loan={certGuarantee.loan_applications}
+          guarantor={certGuarantee}
+        />
+      )}
     </div>
   );
 }
