@@ -3,8 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, FileText, CheckCircle, Calculator, Banknote,
   CalendarCheck, CreditCard, HandCoins, AlertTriangle, BarChart3,
-  Settings, ChevronLeft, ChevronRight, Building2
+  Settings, ChevronLeft, ChevronRight, Building2, LogOut
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/" },
@@ -23,6 +24,7 @@ const navItems = [
 export default function AppSidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { user, signOut } = useAuth();
 
   return (
     <aside
@@ -60,13 +62,30 @@ export default function AppSidebar() {
         })}
       </nav>
 
-      {/* Collapse toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center justify-center h-12 border-t border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-      >
-        {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-      </button>
+      {/* User & Sign out */}
+      <div className="border-t border-sidebar-border">
+        {!collapsed && user && (
+          <div className="px-4 py-2 text-xs text-sidebar-foreground truncate opacity-70">
+            {user.email}
+          </div>
+        )}
+        <div className="flex">
+          <button
+            onClick={signOut}
+            className="flex items-center gap-2 px-4 py-3 text-sidebar-foreground hover:bg-sidebar-accent transition-colors flex-1"
+            title="Sign out"
+          >
+            <LogOut className="w-4 h-4" />
+            {!collapsed && <span className="text-sm">Sign out</span>}
+          </button>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex items-center justify-center px-3 text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+          >
+            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
     </aside>
   );
 }
