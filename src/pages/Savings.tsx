@@ -22,7 +22,7 @@ export default function Savings() {
   const createMut = useCreateSavingsTransaction();
   const deleteMut = useDeleteSavingsTransaction();
   const bulkMut = useBulkCreateSavingsTransactions();
-  const { canCreate, canDelete } = usePermissions();
+  const { canCreate, canDelete, canImport, canPrint } = usePermissions();
 
   const [formOpen, setFormOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
