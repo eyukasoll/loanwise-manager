@@ -89,9 +89,11 @@ export default function LoanTypes() {
     <div>
       <TopBar title="Loan Types" subtitle="Configure loan type settings" />
       <div className="p-6 animate-fade-in">
-        <div className="flex justify-end mb-4">
-          <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Loan Type</Button>
-        </div>
+        {canCreate("Loan Types") && (
+          <div className="flex justify-end mb-4">
+            <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Loan Type</Button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
