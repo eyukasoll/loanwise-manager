@@ -73,8 +73,13 @@ export default function AppSidebar() {
       {/* User & Sign out */}
       <div className="border-t border-sidebar-border">
         {!collapsed && user && (
-          <div className="px-4 py-2 text-xs text-sidebar-foreground truncate opacity-70">
-            {user.email}
+          <div className="px-4 py-2 flex items-center gap-2">
+            <span className="text-xs text-sidebar-foreground truncate opacity-70">{user.email}</span>
+            {role && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/20 text-primary-foreground whitespace-nowrap">
+                {roleLabels[role] || role}
+              </span>
+            )}
           </div>
         )}
         <div className="flex">
