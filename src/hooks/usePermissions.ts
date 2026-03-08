@@ -37,7 +37,7 @@ export function usePermissions() {
 
     supabase
       .from("role_permissions")
-      .select("module, can_view, can_create, can_edit, can_delete")
+      .select("module, can_view, can_create, can_edit, can_delete, can_import, can_export, can_print, can_share")
       .eq("role", dbRole)
       .then(({ data }) => {
         setPermissions((data as ModulePermission[]) ?? []);
