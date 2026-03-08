@@ -23,11 +23,19 @@ export default function Employees() {
   const createMut = useCreateEmployee();
   const updateMut = useUpdateEmployee();
   const deleteMut = useDeleteEmployee();
+  const bulkCreateMut = useBulkCreateEmployees();
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+
+  // Calculate next ID number for bulk import
+  const nextIdNum = (() => {
+    const last = nextId;
+    return last ? parseInt(last.replace("EMP", ""), 10) : 1;
+  })();
 
   const filtered = employees.filter((e: any) =>
     e.full_name.toLowerCase().includes(search.toLowerCase()) ||
