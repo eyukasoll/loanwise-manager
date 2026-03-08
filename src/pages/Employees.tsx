@@ -37,7 +37,7 @@ export default function Employees() {
   const updateMut = useUpdateEmployee();
   const deleteMut = useDeleteEmployee();
   const bulkCreateMut = useBulkCreateEmployees();
-  const { canCreate, canEdit, canDelete } = usePermissions();
+  const { canCreate, canEdit, canDelete, canImport } = usePermissions();
   const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState<any>(null);
