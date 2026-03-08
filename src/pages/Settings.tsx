@@ -414,6 +414,39 @@ export default function Settings() {
     </div>
   );
 }
+function getPasswordStrength(password: string): { label: string; color: string; value: number } {
+  if (!password) return { label: "", color: "", value: 0 };
+  let score = 0;
+  if (password.length >= 6) score++;
+  if (password.length >= 10) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  if (score <= 1) return { label: "Weak", color: "bg-destructive", value: 20 };
+  if (score <= 2) return { label: "Fair", color: "bg-orange-500", value: 40 };
+  if (score <= 3) return { label: "Medium", color: "bg-yellow-500", value: 60 };
+  if (score <= 4) return { label: "Strong", color: "bg-emerald-500", value: 80 };
+  return { label: "Very Strong", color: "bg-emerald-600", value: 100 };
+}
+
+function PasswordStrengthIndicator({ password }: { password: string }) {
+  const strength = getPasswordStrength(password);
+  if (!password) return null;
+  return (
+    <div className="mt-2 space-y-1">
+      <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-300 ${strength.color}`}
+          style={{ width: `${strength.value}%` }}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Password strength: <span className="font-medium text-foreground">{strength.label}</span>
+      </p>
+    </div>
+  );
+}
+
 function ChangePasswordTab({ toast }: { toast: ReturnType<typeof useToast>["toast"] }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
