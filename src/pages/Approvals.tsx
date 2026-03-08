@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
-import { CheckCircle, XCircle, RotateCcw } from "lucide-react";
+import { CheckCircle, XCircle, RotateCcw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { toast } from "sonner";
+import LoanApplicationDocument from "@/components/applications/LoanApplicationDocument";
 
 export default function Approvals() {
   const { data: applications = [], isLoading } = useLoanApplications();
