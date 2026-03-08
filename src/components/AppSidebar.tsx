@@ -6,29 +6,30 @@ import {
   Settings, ChevronLeft, ChevronRight, LogOut, Cog, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Badge } from "@/components/ui/badge";
+import { usePermissions } from "@/hooks/usePermissions";
 import logo from "@/assets/logo.png";
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { label: "Employees", icon: Users, path: "/employees" },
-  { label: "Loan Types", icon: Settings, path: "/loan-types" },
-  { label: "Applications", icon: FileText, path: "/applications" },
-  { label: "Approvals", icon: CheckCircle, path: "/approvals" },
-  { label: "Disbursements", icon: Banknote, path: "/disbursements" },
-  { label: "Repayment Schedule", icon: CalendarCheck, path: "/repayments" },
-  { label: "Payroll Deductions", icon: CreditCard, path: "/deductions" },
-  { label: "Manual Payments", icon: HandCoins, path: "/manual-payments" },
-  { label: "Overdue Tracking", icon: AlertTriangle, path: "/overdue" },
-  { label: "Reports", icon: BarChart3, path: "/reports" },
-  { label: "Settings", icon: Cog, path: "/settings" },
-  { label: "Permissions", icon: ShieldCheck, path: "/permissions" },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/", module: "Dashboard" },
+  { label: "Employees", icon: Users, path: "/employees", module: "Employees" },
+  { label: "Loan Types", icon: Settings, path: "/loan-types", module: "Loan Types" },
+  { label: "Applications", icon: FileText, path: "/applications", module: "Applications" },
+  { label: "Approvals", icon: CheckCircle, path: "/approvals", module: "Approvals" },
+  { label: "Disbursements", icon: Banknote, path: "/disbursements", module: "Disbursements" },
+  { label: "Repayment Schedule", icon: CalendarCheck, path: "/repayments", module: "Repayment Schedule" },
+  { label: "Payroll Deductions", icon: CreditCard, path: "/deductions", module: "Payroll Deductions" },
+  { label: "Manual Payments", icon: HandCoins, path: "/manual-payments", module: "Manual Payments" },
+  { label: "Overdue Tracking", icon: AlertTriangle, path: "/overdue", module: "Overdue Tracking" },
+  { label: "Reports", icon: BarChart3, path: "/reports", module: "Reports" },
+  { label: "Settings", icon: Cog, path: "/settings", module: "Settings" },
+  { label: "Permissions", icon: ShieldCheck, path: "/permissions", module: "Permissions" },
 ];
 
 export default function AppSidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { user, role, signOut } = useAuth();
+  const { canView, loading: permLoading } = usePermissions();
 
   const roleLabels: Record<string, string> = {
     admin: "Admin",
@@ -36,6 +37,8 @@ export default function AppSidebar() {
     finance: "Finance",
     employee: "Employee",
   };
+
+  const visibleItems = navItems.filter((item) => canView(item.module));
 
   return (
     <aside
@@ -55,7 +58,7 @@ export default function AppSidebar() {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const active = location.pathname === item.path;
           return (
             <Link
