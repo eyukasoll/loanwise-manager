@@ -232,7 +232,8 @@ export default function GuaranteeDeactivation() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantor</th>
+                     <th className="text-left px-3 py-3 font-medium text-muted-foreground text-xs w-10">#</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantor</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Department</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
