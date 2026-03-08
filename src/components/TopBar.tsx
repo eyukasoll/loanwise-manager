@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Bell, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function TopBar({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
