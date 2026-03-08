@@ -241,7 +241,7 @@ export default function Settings() {
                 </div>
               </div>
               <div className="flex justify-end pt-2">
-                <Button onClick={() => handleSave("loan")} disabled={saving}>
+                <Button onClick={() => handleSave("loan")} disabled={saving || !canEdit("Settings")}>
                   <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Loan Settings"}
                 </Button>
               </div>
