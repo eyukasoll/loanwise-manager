@@ -271,20 +271,30 @@ export default function GuaranteeDeactivation() {
                           )}
                         </td>
                         <td className="px-5 py-3 text-center">
-                          {isEligible && (
+                          <div className="flex items-center justify-center gap-1">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-7 text-xs text-destructive hover:text-destructive"
-                              onClick={() => {
-                                setReleaseDialog(g);
-                                setNewGuarantorId("");
-                                setEmployeeSearch("");
-                              }}
+                              className="h-7 text-xs"
+                              onClick={() => setCertGuarantee(g)}
                             >
-                              <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
+                              <FileText className="w-3.5 h-3.5 mr-1" /> Certificate
                             </Button>
-                          )}
+                            {isEligible && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-xs text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  setReleaseDialog(g);
+                                  setNewGuarantorId("");
+                                  setEmployeeSearch("");
+                                }}
+                              >
+                                <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
