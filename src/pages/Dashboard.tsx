@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
@@ -11,6 +11,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { Link } from "react-router-dom";
 import { fmtShort as fmtS, fmt } from "@/lib/currency";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
+import StartupWizard from "@/components/StartupWizard";
 
 const COLORS = [
   "hsl(217, 72%, 48%)", "hsl(162, 63%, 41%)", "hsl(38, 92%, 50%)",
