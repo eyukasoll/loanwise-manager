@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
@@ -11,6 +11,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { Link } from "react-router-dom";
 import { fmtShort as fmtS, fmt } from "@/lib/currency";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
+import StartupWizard from "@/components/StartupWizard";
 
 const COLORS = [
   "hsl(217, 72%, 48%)", "hsl(162, 63%, 41%)", "hsl(38, 92%, 50%)",
@@ -21,6 +23,24 @@ export default function Dashboard() {
   const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { data: employees = [] } = useEmployees();
+  const { settings, refetch: refetchSettings } = useCompanySettings();
+  const [wizardDismissed, setWizardDismissed] = useState(false);
+
+  const showWizard = !wizardDismissed && settings && (
+    settings.company_name === "Addis Microfinance" || !settings.company_name
+  );
+
+  // We need the settings id for the wizard - fetch it
+  const [settingsId, setSettingsId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (showWizard && !settingsId) {
+      import("@/integrations/supabase/client").then(({ supabase }) => {
+        supabase.from("company_settings").select("id").limit(1).single().then(({ data }) => {
+          if (data) setSettingsId(data.id);
+        });
+      });
+    }
+  }, [showWizard, settingsId]);
 
   const activeLoans = applications.filter((l: any) => l.status === "Active");
   const pendingApproval = applications.filter((l: any) => ["Pending Approval", "Under Review", "Submitted"].includes(l.status));
@@ -50,6 +70,15 @@ export default function Dashboard() {
 
   return (
     <div>
+      {showWizard && settingsId && (
+        <StartupWizard
+          settingsId={settingsId}
+          onComplete={() => {
+            setWizardDismissed(true);
+            refetchSettings();
+          }}
+        />
+      )}
       <TopBar title={t.dashTitle} subtitle={t.dashSubtitle} />
       <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 animate-fade-in">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
