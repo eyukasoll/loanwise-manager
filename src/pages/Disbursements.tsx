@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication, useGenerateRepaymentSchedule } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
