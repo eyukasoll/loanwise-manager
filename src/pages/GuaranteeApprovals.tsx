@@ -124,7 +124,7 @@ export default function GuaranteeApprovals() {
   return (
     <div>
       <TopBar
-        title="Guarantee Approvals"
+        title={t.gaTitle}
         subtitle={
           isAdminOrManager
             ? "Review and approve guarantors assigned to loan applications"
