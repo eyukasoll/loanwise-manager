@@ -23,6 +23,24 @@ export default function Dashboard() {
   const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { data: employees = [] } = useEmployees();
+  const { settings, refetch: refetchSettings } = useCompanySettings();
+  const [wizardDismissed, setWizardDismissed] = useState(false);
+
+  const showWizard = !wizardDismissed && settings && (
+    settings.company_name === "Addis Microfinance" || !settings.company_name
+  );
+
+  // We need the settings id for the wizard - fetch it
+  const [settingsId, setSettingsId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (showWizard && !settingsId) {
+      import("@/integrations/supabase/client").then(({ supabase }) => {
+        supabase.from("company_settings").select("id").limit(1).single().then(({ data }) => {
+          if (data) setSettingsId(data.id);
+        });
+      });
+    }
+  }, [showWizard, settingsId]);
 
   const activeLoans = applications.filter((l: any) => l.status === "Active");
   const pendingApproval = applications.filter((l: any) => ["Pending Approval", "Under Review", "Submitted"].includes(l.status));
