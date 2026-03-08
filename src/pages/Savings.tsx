@@ -219,11 +219,11 @@ export default function Savings() {
               </div>
             </div>
             <div>
-              <Label>Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
+              <Label>{t.amount} ({CURRENCY}) <span className="text-destructive">*</span></Label>
               <Input type="number" min="0" value={form.amount || ""} onChange={e => setForm(f => ({ ...f, amount: Number(e.target.value) }))} className="mt-1" />
             </div>
             <div>
-              <Label>Payment Method</Label>
+              <Label>{t.paymentMethod}</Label>
               <Select value={form.payment_method} onValueChange={v => setForm(f => ({ ...f, payment_method: v }))}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
