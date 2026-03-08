@@ -122,12 +122,12 @@ export default function Savings() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          <div className="text-center py-12 text-muted-foreground">{t.loading}</div>
         ) : transactions.length === 0 ? (
           <div className="bg-card rounded-xl border border-border p-12 text-center">
             <PiggyBank className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-            <h3 className="font-display font-semibold text-lg">No Savings Transactions</h3>
-            <p className="text-muted-foreground text-sm mt-1">Savings transactions will appear here once recorded.</p>
+            <h3 className="font-display font-semibold text-lg">{t.noSavingsTransactions}</h3>
+            <p className="text-muted-foreground text-sm mt-1">{t.savingsWillAppear}</p>
           </div>
         ) : (
           <div className="bg-card rounded-xl border border-border overflow-hidden">
