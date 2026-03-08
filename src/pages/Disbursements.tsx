@@ -16,6 +16,7 @@ export default function Disbursements() {
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
   const genSchedule = useGenerateRepaymentSchedule();
+  const { canCreate } = usePermissions();
   const [disburseOpen, setDisburseOpen] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<any>(null);
   const [disbForm, setDisbForm] = useState({ date: new Date().toISOString().split("T")[0], method: "Bank Transfer", voucher: "", disbursed_by: "" });
