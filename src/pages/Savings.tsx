@@ -168,9 +168,11 @@ export default function Savings() {
                        <td className="px-5 py-3 font-mono text-xs">{tx.receipt_number || "—"}</td>
                        <td className="px-5 py-3">
                          <div className="flex items-center gap-1">
-                           <Button variant="ghost" size="sm" onClick={() => printReceipt(tx)} title="Print receipt">
-                             <Printer className="w-3.5 h-3.5" />
-                           </Button>
+                            {canPrint("Savings") && (
+                              <Button variant="ghost" size="sm" onClick={() => printReceipt(tx)} title="Print receipt">
+                                <Printer className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
                            {canDelete("Savings") && (
                              <Button variant="ghost" size="sm" onClick={() => deleteMut.mutate(tx.id)} title="Delete">
                                <Trash2 className="w-3.5 h-3.5 text-destructive" />

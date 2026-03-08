@@ -123,12 +123,14 @@ export default function Employees() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t.searchEmployees} className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-full sm:w-72" />
           </div>
-          {canCreate("Employees") && (
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> <span className="hidden sm:inline">{t.importCSV}</span></Button>
-              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> <span className="hidden sm:inline">{t.addEmployee}</span></Button>
+          <div className="flex items-center gap-2">
+              {canImport("Employees") && (
+                <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> <span className="hidden sm:inline">{t.importCSV}</span></Button>
+              )}
+              {canCreate("Employees") && (
+                <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> <span className="hidden sm:inline">{t.addEmployee}</span></Button>
+              )}
             </div>
-          )}
         </div>
 
         {isLoading ? (
