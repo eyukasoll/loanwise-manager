@@ -18,6 +18,7 @@ const COLORS = [
 ];
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { data: employees = [] } = useEmployees();
 
