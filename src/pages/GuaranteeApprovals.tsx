@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import GuaranteeApprovalDocument from "@/components/applications/GuaranteeApprovalDocument";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 function GuarantorStatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
@@ -26,6 +27,7 @@ function GuarantorStatusBadge({ status }: { status: string }) {
 }
 
 export default function GuaranteeApprovals() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { role } = useAuth();
   const { data: currentEmployee } = useCurrentEmployee();
@@ -122,7 +124,7 @@ export default function GuaranteeApprovals() {
   return (
     <div>
       <TopBar
-        title="Guarantee Approvals"
+        title={t.gaTitle}
         subtitle={
           isAdminOrManager
             ? "Review and approve guarantors assigned to loan applications"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,6 +36,7 @@ type PermRow = {
 
 export default function Permissions() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [permissions, setPermissions] = useState<PermRow[]>([]);
@@ -106,7 +108,7 @@ export default function Permissions() {
   if (loading) {
     return (
       <div>
-        <TopBar title="Permissions" subtitle="Manage role-based access control" />
+        <TopBar title={t.permTitle} subtitle={t.permSubtitle} />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
@@ -116,7 +118,7 @@ export default function Permissions() {
 
   return (
     <div>
-      <TopBar title="Permissions" subtitle="Manage role-based access control" />
+      <TopBar title={t.permTitle} subtitle={t.permSubtitle} />
       <div className="p-6 animate-fade-in">
         <Tabs value={activeRole} onValueChange={setActiveRole} className="space-y-6">
           <div className="flex items-center justify-between">

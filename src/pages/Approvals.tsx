@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { CheckCircle, XCircle, RotateCcw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import LoanApplicationDocument from "@/components/applications/LoanApplicationDocument";
 
 export default function Approvals() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
   const { canEdit } = usePermissions();
@@ -35,7 +37,7 @@ export default function Approvals() {
 
   return (
     <div>
-      <TopBar title="Loan Approvals" subtitle="Review and approve loan applications" />
+      <TopBar title={t.aprTitle} subtitle={t.aprSubtitle} />
       <div className="p-6 animate-fade-in">
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>

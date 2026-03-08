@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import { useLoanTypes, useCreateLoanType, useUpdateLoanType, useDeleteLoanType } from "@/hooks/useLoans";
 import { uploadLoanDocument } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Plus, Edit, Trash2, FileText, Upload, X, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -29,6 +30,7 @@ export default function LoanTypes() {
   const updateMut = useUpdateLoanType();
   const deleteMut = useDeleteLoanType();
   const { canCreate, canEdit, canDelete } = usePermissions();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -89,7 +91,7 @@ export default function LoanTypes() {
 
   return (
     <div>
-      <TopBar title="Loan Types" subtitle="Configure loan type settings" />
+      <TopBar title={t.ltTitle} subtitle={t.ltSubtitle} />
       <div className="p-6 animate-fade-in">
         {canCreate("Loan Types") && (
           <div className="flex justify-end mb-4">

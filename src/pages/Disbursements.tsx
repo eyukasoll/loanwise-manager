@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication, useGenerateRepaymentSchedule } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -13,6 +14,7 @@ import { fmt } from "@/lib/currency";
 import { toast } from "sonner";
 
 export default function Disbursements() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
   const genSchedule = useGenerateRepaymentSchedule();
@@ -56,7 +58,7 @@ export default function Disbursements() {
 
   return (
     <div>
-      <TopBar title="Disbursements" subtitle="Process and track loan disbursements" />
+      <TopBar title={t.disTitle} subtitle={t.disSubtitle} />
       <div className="p-6 animate-fade-in space-y-6">
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>

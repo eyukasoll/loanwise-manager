@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import { useManualPayments, useCreateManualPayment, useLoanApplications } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { HandCoins, Plus } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fmt, CURRENCY } from "@/lib/currency";
 
 export default function ManualPayments() {
+  const { t } = useLanguage();
   const { data: payments = [], isLoading } = useManualPayments();
   const { data: applications = [] } = useLoanApplications();
   const createMut = useCreateManualPayment();
@@ -29,7 +31,7 @@ export default function ManualPayments() {
 
   return (
     <div>
-      <TopBar title="Manual Payments" subtitle="Record manual loan repayments" />
+      <TopBar title={t.mpTitle} subtitle={t.mpSubtitle} />
       <div className="p-6 animate-fade-in">
         {canCreate("Manual Payments") && (
           <div className="flex justify-end mb-4">

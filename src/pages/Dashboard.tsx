@@ -10,6 +10,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { Link } from "react-router-dom";
 import { fmtShort as fmtS, fmt } from "@/lib/currency";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const COLORS = [
   "hsl(217, 72%, 48%)", "hsl(162, 63%, 41%)", "hsl(38, 92%, 50%)",
@@ -17,6 +18,7 @@ const COLORS = [
 ];
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { data: employees = [] } = useEmployees();
 
@@ -48,19 +50,19 @@ export default function Dashboard() {
 
   return (
     <div>
-      <TopBar title="Dashboard" subtitle="Loan management overview" />
+      <TopBar title={t.dashTitle} subtitle={t.dashSubtitle} />
       <div className="p-6 space-y-6 animate-fade-in">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Total Applications" value={applications.length} icon={FileText} variant="primary" />
-          <StatCard label="Awaiting Approval" value={pendingApproval.length} icon={CheckCircle} variant="warning" />
-          <StatCard label="Total Disbursed" value={fmtS(totalDisbursed)} icon={Banknote} variant="accent" />
-          <StatCard label="Outstanding Balance" value={fmtS(totalOutstanding)} icon={DollarSign} variant="destructive" />
+          <StatCard label={t.navApplications} value={applications.length} icon={FileText} variant="primary" />
+          <StatCard label={t.pendingApproval} value={pendingApproval.length} icon={CheckCircle} variant="warning" />
+          <StatCard label={t.totalDisbursed} value={fmtS(totalDisbursed)} icon={Banknote} variant="accent" />
+          <StatCard label={t.totalOutstanding} value={fmtS(totalOutstanding)} icon={DollarSign} variant="destructive" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Total Recovered" value={fmtS(totalRecovered)} icon={TrendingUp} variant="accent" />
-          <StatCard label="Active Loans" value={activeLoans.length} icon={Users} variant="primary" />
-          <StatCard label="Overdue Loans" value={overdueCount} icon={AlertTriangle} variant="destructive" />
-          <StatCard label="Closed Loans" value={closedCount} icon={CheckCircle} />
+          <StatCard label={t.totalRecovered} value={fmtS(totalRecovered)} icon={TrendingUp} variant="accent" />
+          <StatCard label={t.activeLoans} value={activeLoans.length} icon={Users} variant="primary" />
+          <StatCard label={t.overdueLoans} value={overdueCount} icon={AlertTriangle} variant="destructive" />
+          <StatCard label={t.closedLoans} value={closedCount} icon={CheckCircle} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

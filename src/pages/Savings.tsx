@@ -12,8 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fmt, CURRENCY } from "@/lib/currency";
 import StatCard from "@/components/StatCard";
 import BulkSavingsImport from "@/components/BulkSavingsImport";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Savings() {
+  const { t } = useLanguage();
   const { data: transactions = [], isLoading } = useSavingsTransactions();
   const { data: employees = [] } = useEmployees();
   const createMut = useCreateSavingsTransaction();
@@ -97,7 +99,7 @@ export default function Savings() {
 
   return (
     <div>
-      <TopBar title="Savings" subtitle="Employee savings deposits & withdrawals" />
+      <TopBar title={t.savTitle} subtitle={t.savSubtitle} />
       <div className="p-6 animate-fade-in space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

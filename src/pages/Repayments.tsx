@@ -3,9 +3,11 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useRepaymentSchedule } from "@/hooks/useLoans";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { fmt } from "@/lib/currency";
 
 export default function Repayments() {
+  const { t } = useLanguage();
   const { data: applications = [] } = useLoanApplications();
   const activeLoans = applications.filter((l: any) => ["Active", "Disbursed"].includes(l.status));
   const [selectedLoanId, setSelectedLoanId] = useState("");
@@ -19,7 +21,7 @@ export default function Repayments() {
 
   return (
     <div>
-      <TopBar title="Repayment Schedule" subtitle="View loan repayment schedules" />
+      <TopBar title={t.repTitle} subtitle={t.repSubtitle} />
       <div className="p-6 animate-fade-in space-y-4">
         <div className="flex items-center gap-3">
           <label className="text-sm font-medium">Select Loan:</label>

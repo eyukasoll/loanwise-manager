@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees, useGuaranteedEmployeeIds } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Search, Plus, Eye, Edit, Trash2, Upload, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -36,6 +37,7 @@ export default function Employees() {
   const deleteMut = useDeleteEmployee();
   const bulkCreateMut = useBulkCreateEmployees();
   const { canCreate, canEdit, canDelete } = usePermissions();
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -111,7 +113,7 @@ export default function Employees() {
 
   return (
     <div>
-      <TopBar title="Employees" subtitle="Manage employee records" />
+      <TopBar title={t.empTitle} subtitle={t.empSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
           <div className="relative">

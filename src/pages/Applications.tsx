@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions, useGuaranteedEmployeeIds, useBulkDeleteLoanApplications } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Filter, Trash2 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -16,6 +17,7 @@ import ApplicationsTable from "@/components/applications/ApplicationsTable";
 import ApplicationDetailDialog from "@/components/applications/ApplicationDetailDialog";
 
 export default function Applications() {
+  const { t } = useLanguage();
   const [statusFilter, setStatusFilter] = useState("all");
   const { data: applications = [], isLoading } = useLoanApplications(statusFilter);
   const { data: employees = [] } = useEmployees();
@@ -134,7 +136,7 @@ export default function Applications() {
 
   return (
     <div>
-      <TopBar title="Loan Applications" subtitle="View and manage all loan applications" />
+      <TopBar title={t.appTitle} subtitle={t.appSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">

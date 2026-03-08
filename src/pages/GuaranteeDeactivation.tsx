@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Search, ShieldOff, Filter, UserPlus, Printer, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -44,6 +45,7 @@ function useEmployees() {
 const ACTIVE_STATUSES = ["Submitted", "Under Review", "Pending Approval", "Approved", "Disbursed", "Active"];
 
 export default function GuaranteeDeactivation() {
+  const { t } = useLanguage();
   const { data: guarantees = [], isLoading } = useAllGuarantees();
   const { data: employees = [] } = useEmployees();
   const { settings: company } = useCompanySettings();
@@ -194,7 +196,7 @@ export default function GuaranteeDeactivation() {
 
   return (
     <div>
-      <TopBar title="Guarantee Deactivation" subtitle="Manage and release employee guarantees" />
+      <TopBar title={t.gdTitle} subtitle={t.gdSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">

@@ -8,26 +8,27 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useCompanySettings } from "@/hooks/useCompanySettings";
+import { useLanguage } from "@/i18n/LanguageContext";
 import logo from "@/assets/logo.png";
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/", module: "Dashboard" },
-  { label: "Employees", icon: Users, path: "/employees", module: "Employees" },
-  { label: "Loan Types", icon: Settings, path: "/loan-types", module: "Loan Types" },
-  { label: "Applications", icon: FileText, path: "/applications", module: "Applications" },
-  { label: "Approvals", icon: CheckCircle, path: "/approvals", module: "Approvals" },
-  { label: "Guarantee Approvals", icon: UserCheck, path: "/guarantee-approvals", module: "Approvals" },
-  { label: "Disbursements", icon: Banknote, path: "/disbursements", module: "Disbursements" },
-  { label: "Repayment Schedule", icon: CalendarCheck, path: "/repayments", module: "Repayment Schedule" },
-  { label: "Payroll Deductions", icon: CreditCard, path: "/deductions", module: "Payroll Deductions" },
-  { label: "Manual Payments", icon: HandCoins, path: "/manual-payments", module: "Manual Payments" },
-  { label: "Overdue Tracking", icon: AlertTriangle, path: "/overdue", module: "Overdue Tracking" },
-  { label: "Reports", icon: BarChart3, path: "/reports", module: "Reports" },
-  { label: "Savings", icon: PiggyBank, path: "/savings", module: "Savings" },
-  { label: "Guarantee Deactivation", icon: ShieldOff, path: "/guarantee-deactivation", module: "Applications" },
-  { label: "Settings", icon: Cog, path: "/settings", module: "Settings" },
-  { label: "Permissions", icon: ShieldCheck, path: "/permissions", module: "Permissions" },
-];
+  { labelKey: "navDashboard", icon: LayoutDashboard, path: "/", module: "Dashboard" },
+  { labelKey: "navEmployees", icon: Users, path: "/employees", module: "Employees" },
+  { labelKey: "navLoanTypes", icon: Settings, path: "/loan-types", module: "Loan Types" },
+  { labelKey: "navApplications", icon: FileText, path: "/applications", module: "Applications" },
+  { labelKey: "navApprovals", icon: CheckCircle, path: "/approvals", module: "Approvals" },
+  { labelKey: "navGuaranteeApprovals", icon: UserCheck, path: "/guarantee-approvals", module: "Approvals" },
+  { labelKey: "navDisbursements", icon: Banknote, path: "/disbursements", module: "Disbursements" },
+  { labelKey: "navRepaymentSchedule", icon: CalendarCheck, path: "/repayments", module: "Repayment Schedule" },
+  { labelKey: "navPayrollDeductions", icon: CreditCard, path: "/deductions", module: "Payroll Deductions" },
+  { labelKey: "navManualPayments", icon: HandCoins, path: "/manual-payments", module: "Manual Payments" },
+  { labelKey: "navOverdueTracking", icon: AlertTriangle, path: "/overdue", module: "Overdue Tracking" },
+  { labelKey: "navReports", icon: BarChart3, path: "/reports", module: "Reports" },
+  { labelKey: "navSavings", icon: PiggyBank, path: "/savings", module: "Savings" },
+  { labelKey: "navGuaranteeDeactivation", icon: ShieldOff, path: "/guarantee-deactivation", module: "Applications" },
+  { labelKey: "navSettings", icon: Cog, path: "/settings", module: "Settings" },
+  { labelKey: "navPermissions", icon: ShieldCheck, path: "/permissions", module: "Permissions" },
+] as const;
 
 export default function AppSidebar() {
   const location = useLocation();
@@ -35,12 +36,13 @@ export default function AppSidebar() {
   const { user, role, signOut } = useAuth();
   const { canView, loading: permLoading } = usePermissions();
   const { settings } = useCompanySettings();
+  const { t } = useLanguage();
 
   const roleLabels: Record<string, string> = {
-    admin: "Admin",
-    manager: "Manager",
-    finance: "Finance",
-    employee: "Employee",
+    admin: t.roleAdmin,
+    manager: t.roleManager,
+    finance: t.roleFinance,
+    employee: t.roleEmployee,
   };
 
   const visibleItems = navItems.filter((item) => canView(item.module));
@@ -68,15 +70,16 @@ export default function AppSidebar() {
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
         {visibleItems.map((item) => {
           const active = location.pathname === item.path;
+          const label = t[item.labelKey];
           return (
             <Link
               key={item.path}
               to={item.path}
               className={`sidebar-link ${active ? "sidebar-link-active" : "sidebar-link-inactive"}`}
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? label : undefined}
             >
               <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
-              {!collapsed && <span className="truncate">{item.label}</span>}
+              {!collapsed && <span className="truncate">{label}</span>}
             </Link>
           );
         })}
@@ -98,10 +101,10 @@ export default function AppSidebar() {
           <button
             onClick={signOut}
             className="flex items-center gap-2 px-4 py-3 text-sidebar-foreground hover:bg-sidebar-accent transition-colors flex-1"
-            title="Sign out"
+            title={t.signOut}
           >
             <LogOut className="w-4 h-4" />
-            {!collapsed && <span className="text-sm">Sign out</span>}
+            {!collapsed && <span className="text-sm">{t.signOut}</span>}
           </button>
           <button
             onClick={() => setCollapsed(!collapsed)}

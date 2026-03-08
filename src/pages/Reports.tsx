@@ -3,10 +3,12 @@ import TopBar from "@/components/TopBar";
 import { useLoanApplications, useEmployees } from "@/hooks/useLoans";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useLanguage } from "@/i18n/LanguageContext";
 import StatusBadge from "@/components/StatusBadge";
 import { fmt } from "@/lib/currency";
 
 export default function Reports() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { data: employees = [] } = useEmployees();
 
@@ -34,7 +36,7 @@ export default function Reports() {
 
   return (
     <div>
-      <TopBar title="Reports" subtitle="Operational, financial, and management reports" />
+      <TopBar title={t.rptTitle} subtitle={t.rptSubtitle} />
       <div className="p-6 animate-fade-in">
         <Tabs defaultValue="operational">
           <TabsList className="mb-6">

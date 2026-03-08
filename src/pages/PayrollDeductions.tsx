@@ -3,12 +3,14 @@ import TopBar from "@/components/TopBar";
 import { useLoanApplications, usePayrollDeductions, useGeneratePayrollDeductions, useProcessDeduction } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { CreditCard, RefreshCw, CheckCircle } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fmt } from "@/lib/currency";
 import StatusBadge from "@/components/StatusBadge";
 
 export default function PayrollDeductions() {
+  const { t } = useLanguage();
   const now = new Date();
   const defaultPeriod = `${now.toLocaleString("default", { month: "long" })} ${now.getFullYear()}`;
   const [period, setPeriod] = useState(defaultPeriod);
@@ -23,7 +25,7 @@ export default function PayrollDeductions() {
 
   return (
     <div>
-      <TopBar title="Payroll Deductions" subtitle="Monthly salary deduction schedule" />
+      <TopBar title={t.pdTitle} subtitle={t.pdSubtitle} />
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">
