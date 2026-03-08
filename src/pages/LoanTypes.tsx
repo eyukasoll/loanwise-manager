@@ -154,8 +154,17 @@ export default function LoanTypes() {
             <div className="space-y-3">
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Amount & Terms</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div><Label>Min Amount ({CURRENCY})</Label><Input type="number" value={form.min_amount || ""} onChange={e => setForm(f => ({ ...f, min_amount: Number(e.target.value) }))} className="mt-1" /></div>
-                <div><Label>Max Amount ({CURRENCY}) <span className="text-destructive">*</span></Label><Input type="number" value={form.max_amount || ""} onChange={e => setForm(f => ({ ...f, max_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                {!form.is_savings_based && (
+                  <>
+                    <div><Label>Min Amount ({CURRENCY})</Label><Input type="number" value={form.min_amount || ""} onChange={e => setForm(f => ({ ...f, min_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                    <div><Label>Max Amount ({CURRENCY}) <span className="text-destructive">*</span></Label><Input type="number" value={form.max_amount || ""} onChange={e => setForm(f => ({ ...f, max_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                  </>
+                )}
+                {form.is_savings_based && (
+                  <div className="sm:col-span-2 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm text-muted-foreground">
+                    Max amount is calculated as: <strong>Employee Savings × Savings Multiplier</strong> (set in Settings)
+                  </div>
+                )}
                 <div><Label>Max Period (months)</Label><Input type="number" value={form.max_period_months || ""} onChange={e => setForm(f => ({ ...f, max_period_months: Number(e.target.value) }))} className="mt-1" /></div>
                 <div><Label>Max Active Loans</Label><Input type="number" value={form.max_active_loans || ""} onChange={e => setForm(f => ({ ...f, max_active_loans: Number(e.target.value) }))} className="mt-1" /></div>
               </div>
