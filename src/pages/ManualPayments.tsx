@@ -14,6 +14,7 @@ export default function ManualPayments() {
   const { data: payments = [], isLoading } = useManualPayments();
   const { data: applications = [] } = useLoanApplications();
   const createMut = useCreateManualPayment();
+  const { canCreate } = usePermissions();
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({ loan_application_id: "", amount: 0, payment_method: "Cash", receipt_number: "", received_by: "", remarks: "" });
 
