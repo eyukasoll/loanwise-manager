@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes } from "@/hooks/useLoans";
+import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Eye, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmt, CURRENCY } from "@/lib/currency";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Applications() {
   const [statusFilter, setStatusFilter] = useState("all");
