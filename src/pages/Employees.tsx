@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import StatusBadge from "@/components/StatusBadge";
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees, useGuaranteedEmployeeIds } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
