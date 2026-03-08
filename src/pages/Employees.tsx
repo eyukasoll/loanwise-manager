@@ -212,7 +212,7 @@ export default function Employees() {
       {/* Create/Edit Dialog */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>{editingId ? "Edit Employee" : "Add Employee"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editingId ? t.editEmployee : t.addEmployee}</DialogTitle></DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <Label>Employee ID</Label>
