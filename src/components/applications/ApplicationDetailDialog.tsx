@@ -3,8 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldOff, Printer } from "lucide-react";
-import { toast } from "sonner";
+import { Printer } from "lucide-react";
 import LoanApplicationDocument from "./LoanApplicationDocument";
 
 interface Props {
@@ -24,21 +23,6 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
       .eq("loan_application_id", selected.id)
       .then(({ data }) => setGuarantors(data || []));
   }, [selected]);
-
-  const handleDeactivate = async (guarantor: any) => {
-    const { error } = await supabase
-      .from("loan_guarantors")
-      .delete()
-      .eq("id", guarantor.id);
-    if (error) {
-      toast.error("Failed to deactivate guarantor");
-      return;
-    }
-    toast.success(`Guarantor ${guarantor.employees?.full_name} released`);
-    setGuarantors(prev => prev.filter(g => g.id !== guarantor.id));
-  };
-
-  const isClosedOrPaid = selected && ["Closed", "Cancelled", "Rejected"].includes(selected.status);
 
   return (
     <>
