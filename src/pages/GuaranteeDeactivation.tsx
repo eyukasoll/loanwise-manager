@@ -397,7 +397,11 @@ export default function GuaranteeDeactivation() {
           {releaseDoc && (
             <div ref={printRef}>
               <div style={{ textAlign: "center", borderBottom: "3px solid #1a1a1a", paddingBottom: 16, marginBottom: 24 }}>
-                <h1 style={{ fontSize: 22, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 1 }}>Guarantee Release Document</h1>
+                {company?.logo_url && (
+                  <img src={company.logo_url} alt={company?.company_name || ""} style={{ height: 48, margin: "0 auto 8px", objectFit: "contain" as const }} />
+                )}
+                <h1 style={{ fontSize: 22, margin: "0 0 4px", textTransform: "uppercase" as const, letterSpacing: 1 }}>{company?.company_name || "Addis Microfinance"}</h1>
+                <h2 style={{ fontSize: 16, margin: 0, color: "#555", fontWeight: "normal" }}>Guarantee Release Document</h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12, color: "#888" }}>Date: {releaseDoc.date} | Ref: {releaseDoc.refNo}</p>
               </div>
 
