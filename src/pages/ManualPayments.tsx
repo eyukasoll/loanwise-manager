@@ -32,7 +32,7 @@ export default function ManualPayments() {
   return (
     <div>
       <TopBar title={t.mpTitle} subtitle={t.mpSubtitle} />
-      <div className="p-6 animate-fade-in">
+      <div className="p-3 sm:p-6 animate-fade-in">
         {canCreate("Manual Payments") && (
           <div className="flex justify-end mb-4">
             <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> {t.recordPayment}</Button>

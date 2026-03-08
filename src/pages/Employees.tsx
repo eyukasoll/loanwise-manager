@@ -114,16 +114,16 @@ export default function Employees() {
   return (
     <div>
       <TopBar title={t.empTitle} subtitle={t.empSubtitle} />
-      <div className="p-6 animate-fade-in">
-        <div className="flex items-center justify-between mb-4">
+      <div className="p-3 sm:p-6 animate-fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t.searchEmployees} className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t.searchEmployees} className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-full sm:w-72" />
           </div>
           {canCreate("Employees") && (
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> {t.importCSV}</Button>
-              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> {t.addEmployee}</Button>
+              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> <span className="hidden sm:inline">{t.importCSV}</span></Button>
+              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> <span className="hidden sm:inline">{t.addEmployee}</span></Button>
             </div>
           )}
         </div>

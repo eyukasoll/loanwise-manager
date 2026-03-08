@@ -228,22 +228,22 @@ export default function Settings() {
   return (
     <div>
       <TopBar title={t.setTitle} subtitle={t.setSubtitle} />
-      <div className="p-6 animate-fade-in max-w-4xl">
+      <div className="p-3 sm:p-6 animate-fade-in max-w-4xl">
         <Tabs defaultValue="company" className="space-y-6">
-          <TabsList className="bg-card border border-border">
-            <TabsTrigger value="company" className="gap-2">
-              <Building2 className="w-4 h-4" /> Company Details
+          <TabsList className="bg-card border border-border w-full overflow-x-auto flex-nowrap justify-start">
+            <TabsTrigger value="company" className="gap-2 text-xs sm:text-sm">
+              <Building2 className="w-4 h-4" /> <span className="hidden sm:inline">Company Details</span><span className="sm:hidden">Company</span>
             </TabsTrigger>
-            <TabsTrigger value="loan" className="gap-2">
-              <SettingsIcon className="w-4 h-4" /> Loan Configuration
+            <TabsTrigger value="loan" className="gap-2 text-xs sm:text-sm">
+              <SettingsIcon className="w-4 h-4" /> <span className="hidden sm:inline">Loan Configuration</span><span className="sm:hidden">Loan</span>
             </TabsTrigger>
-             <TabsTrigger value="email" className="gap-2">
-              <Mail className="w-4 h-4" /> Email Settings
+            <TabsTrigger value="email" className="gap-2 text-xs sm:text-sm">
+              <Mail className="w-4 h-4" /> <span className="hidden sm:inline">Email Settings</span><span className="sm:hidden">Email</span>
             </TabsTrigger>
-            <TabsTrigger value="backup" className="gap-2">
-              <DatabaseBackup className="w-4 h-4" /> Backup & Export
+            <TabsTrigger value="backup" className="gap-2 text-xs sm:text-sm">
+              <DatabaseBackup className="w-4 h-4" /> <span className="hidden sm:inline">Backup & Export</span><span className="sm:hidden">Backup</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
+            <TabsTrigger value="security" className="gap-2 text-xs sm:text-sm">
               <Lock className="w-4 h-4" /> Security
             </TabsTrigger>
           </TabsList>

@@ -92,7 +92,7 @@ export default function LoanTypes() {
   return (
     <div>
       <TopBar title={t.ltTitle} subtitle={t.ltSubtitle} />
-      <div className="p-6 animate-fade-in">
+      <div className="p-3 sm:p-6 animate-fade-in">
         {canCreate("Loan Types") && (
           <div className="flex justify-end mb-4">
             <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Loan Type</Button>

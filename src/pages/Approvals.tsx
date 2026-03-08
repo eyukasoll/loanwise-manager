@@ -38,7 +38,7 @@ export default function Approvals() {
   return (
     <div>
       <TopBar title={t.aprTitle} subtitle={t.aprSubtitle} />
-      <div className="p-6 animate-fade-in">
+      <div className="p-3 sm:p-6 animate-fade-in">
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
         ) : pending.length === 0 ? (

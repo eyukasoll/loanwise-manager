@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, FileText, CheckCircle, Calculator, Banknote,
   CalendarCheck, CreditCard, HandCoins, AlertTriangle, BarChart3,
-  Settings, ChevronLeft, ChevronRight, LogOut, Cog, ShieldCheck, PiggyBank, ShieldOff, UserCheck
+  Settings, ChevronLeft, ChevronRight, LogOut, Cog, ShieldCheck, PiggyBank, ShieldOff, UserCheck, X
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -30,7 +30,11 @@ const navItems = [
   { labelKey: "navPermissions", icon: ShieldCheck, path: "/permissions", module: "Permissions" },
 ] as const;
 
-export default function AppSidebar() {
+interface Props {
+  onCloseMobile?: () => void;
+}
+
+export default function AppSidebar({ onCloseMobile }: Props) {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { user, role, signOut } = useAuth();
@@ -50,9 +54,13 @@ export default function AppSidebar() {
   const displayLogo = settings?.logo_url || logo;
   const displayName = settings?.company_name || "Addis Microfinance";
 
+  const handleNavClick = () => {
+    onCloseMobile?.();
+  };
+
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen bg-sidebar flex flex-col z-40 transition-all duration-300 ${
+      className={`h-screen bg-sidebar flex flex-col transition-all duration-300 ${
         collapsed ? "w-[68px]" : "w-[250px]"
       }`}
     >
@@ -60,9 +68,18 @@ export default function AppSidebar() {
       <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
         <img src={displayLogo} alt={displayName} className="w-8 h-8 rounded-lg flex-shrink-0 object-contain" />
         {!collapsed && (
-          <span className="font-display text-sm font-bold text-sidebar-primary-foreground truncate">
+          <span className="font-display text-sm font-bold text-sidebar-primary-foreground truncate flex-1">
             {displayName}
           </span>
+        )}
+        {/* Close button on mobile */}
+        {!collapsed && (
+          <button
+            onClick={onCloseMobile}
+            className="lg:hidden p-1 rounded hover:bg-sidebar-accent transition-colors"
+          >
+            <X className="w-4 h-4 text-sidebar-foreground" />
+          </button>
         )}
       </div>
 
@@ -75,6 +92,7 @@ export default function AppSidebar() {
             <Link
               key={item.path}
               to={item.path}
+              onClick={handleNavClick}
               className={`sidebar-link ${active ? "sidebar-link-active" : "sidebar-link-inactive"}`}
               title={collapsed ? label : undefined}
             >
@@ -108,7 +126,7 @@ export default function AppSidebar() {
           </button>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center justify-center px-3 text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+            className="hidden lg:flex items-center justify-center px-3 text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
