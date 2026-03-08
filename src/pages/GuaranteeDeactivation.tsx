@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ShieldOff, Filter, UserPlus } from "lucide-react";
+import { Search, ShieldOff, Filter, UserPlus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -51,6 +51,8 @@ export default function GuaranteeDeactivation() {
   const [newGuarantorId, setNewGuarantorId] = useState("");
   const [employeeSearch, setEmployeeSearch] = useState("");
   const [releasing, setReleasing] = useState(false);
+  const [releaseDoc, setReleaseDoc] = useState<any>(null);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const getGuaranteeStatus = (loanStatus: string) => {
     if (["Closed", "Cancelled", "Rejected"].includes(loanStatus)) return "Eligible";
@@ -121,6 +123,21 @@ export default function GuaranteeDeactivation() {
         .update({ employment_status: "Active" })
         .eq("id", releaseDialog.employee_id);
 
+      // 4. Show release document
+      const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+      const refNo = `GDR-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999)).padStart(4, "0")}`;
+      setReleaseDoc({
+        guarantor: releaseDialog.employees,
+        borrower: releaseDialog.loan_applications?.employees,
+        application_number: releaseDialog.loan_applications?.application_number,
+        loan_type: releaseDialog.loan_applications?.loan_types?.name,
+        loan_status: releaseDialog.loan_applications?.status,
+        requested_amount: releaseDialog.loan_applications?.requested_amount,
+        replacement: selectedEmployee || null,
+        date: today,
+        refNo,
+      });
+
       toast.success(
         newGuarantorId
           ? `${releaseDialog.employees?.full_name} released and replaced by ${selectedEmployee?.full_name}`
@@ -138,6 +155,36 @@ export default function GuaranteeDeactivation() {
     } finally {
       setReleasing(false);
     }
+  };
+
+  const handlePrintRelease = () => {
+    if (!printRef.current) return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <html><head><title>Guarantee Release Document</title>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a1a1a; }
+        .header { text-align: center; border-bottom: 3px solid #1a1a1a; padding-bottom: 16px; margin-bottom: 24px; }
+        .header h1 { font-size: 22px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .header h2 { font-size: 16px; margin: 0; color: #555; font-weight: normal; }
+        .header p { margin: 4px 0 0; font-size: 12px; color: #888; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px; }
+        .grid .label { color: #666; }
+        .grid .value { font-weight: 600; }
+        .body-text { font-size: 13px; line-height: 1.7; margin: 16px 0; }
+        .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; font-size: 13px; }
+        .sig-line { border-top: 1px solid #333; padding-top: 6px; margin-top: 50px; }
+        .stamp { text-align: center; margin-top: 40px; padding: 12px; border: 2px dashed #aaa; font-size: 12px; color: #888; }
+        .ref { font-size: 11px; color: #888; margin-top: 24px; text-align: right; }
+        @media print { body { padding: 20px; } }
+      </style>
+      </head><body>${printRef.current.innerHTML}</body></html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
   };
 
   return (
@@ -332,6 +379,82 @@ export default function GuaranteeDeactivation() {
                   {releasing ? "Processing..." : newGuarantorId ? "Release & Replace" : "Release Only"}
                 </Button>
               </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* Release Document Dialog */}
+      <Dialog open={!!releaseDoc} onOpenChange={(open) => { if (!open) setReleaseDoc(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              Guarantee Release Document
+              <Button size="sm" onClick={handlePrintRelease}><Printer className="w-4 h-4 mr-1" /> Print</Button>
+            </DialogTitle>
+          </DialogHeader>
+          {releaseDoc && (
+            <div ref={printRef}>
+              <div style={{ textAlign: "center", borderBottom: "3px solid #1a1a1a", paddingBottom: 16, marginBottom: 24 }}>
+                <h1 style={{ fontSize: 22, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 1 }}>Guarantee Release Document</h1>
+                <p style={{ margin: "4px 0 0", fontSize: 12, color: "#888" }}>Date: {releaseDoc.date} | Ref: {releaseDoc.refNo}</p>
+              </div>
+
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8, color: "#333", borderBottom: "1px solid #ddd", paddingBottom: 4 }}>Loan Application Details</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px", fontSize: 13 }}>
+                  <span style={{ color: "#666" }}>Application No:</span><span style={{ fontWeight: 600 }}>{releaseDoc.application_number}</span>
+                  <span style={{ color: "#666" }}>Borrower:</span><span style={{ fontWeight: 600 }}>{releaseDoc.borrower?.full_name}</span>
+                  <span style={{ color: "#666" }}>Borrower ID:</span><span style={{ fontWeight: 600 }}>{releaseDoc.borrower?.employee_id}</span>
+                  <span style={{ color: "#666" }}>Loan Type:</span><span style={{ fontWeight: 600 }}>{releaseDoc.loan_type}</span>
+                  <span style={{ color: "#666" }}>Loan Amount:</span><span style={{ fontWeight: 600 }}>{fmt(releaseDoc.requested_amount)}</span>
+                  <span style={{ color: "#666" }}>Loan Status:</span><span style={{ fontWeight: 600 }}>{releaseDoc.loan_status}</span>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8, color: "#333", borderBottom: "1px solid #ddd", paddingBottom: 4 }}>Released Guarantor</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px", fontSize: 13 }}>
+                  <span style={{ color: "#666" }}>Full Name:</span><span style={{ fontWeight: 600 }}>{releaseDoc.guarantor?.full_name}</span>
+                  <span style={{ color: "#666" }}>Employee ID:</span><span style={{ fontWeight: 600 }}>{releaseDoc.guarantor?.employee_id}</span>
+                  <span style={{ color: "#666" }}>Department:</span><span style={{ fontWeight: 600 }}>{releaseDoc.guarantor?.department}</span>
+                </div>
+              </div>
+
+              {releaseDoc.replacement && (
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8, color: "#333", borderBottom: "1px solid #ddd", paddingBottom: 4 }}>Replacement Guarantor</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px", fontSize: 13 }}>
+                    <span style={{ color: "#666" }}>Full Name:</span><span style={{ fontWeight: 600 }}>{releaseDoc.replacement.full_name}</span>
+                    <span style={{ color: "#666" }}>Employee ID:</span><span style={{ fontWeight: 600 }}>{releaseDoc.replacement.employee_id}</span>
+                    <span style={{ color: "#666" }}>Department:</span><span style={{ fontWeight: 600 }}>{releaseDoc.replacement.department}</span>
+                  </div>
+                </div>
+              )}
+
+              <div style={{ fontSize: 13, lineHeight: 1.7, margin: "16px 0" }}>
+                This is to certify that <strong>{releaseDoc.guarantor?.full_name}</strong> (Employee ID: {releaseDoc.guarantor?.employee_id})
+                has been <strong>officially released</strong> from all guarantee obligations for loan application <strong>{releaseDoc.application_number}</strong>
+                taken by <strong>{releaseDoc.borrower?.full_name}</strong>.
+                {releaseDoc.replacement && (
+                  <> The guarantee responsibility has been transferred to <strong>{releaseDoc.replacement.full_name}</strong> (Employee ID: {releaseDoc.replacement.employee_id}).</>
+                )}
+                <br /><br />
+                The released guarantor is no longer liable for any outstanding amounts related to this loan.
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, marginTop: 60, fontSize: 13 }}>
+                <div>
+                  <div style={{ borderTop: "1px solid #333", paddingTop: 6, marginTop: 50 }}>Authorized Officer</div>
+                  <p style={{ fontSize: 12, color: "#888", marginTop: 4 }}>Name & Signature</p>
+                </div>
+                <div>
+                  <div style={{ borderTop: "1px solid #333", paddingTop: 6, marginTop: 50 }}>Released Guarantor</div>
+                  <p style={{ fontSize: 12, color: "#888", marginTop: 4 }}>{releaseDoc.guarantor?.full_name}</p>
+                </div>
+              </div>
+
+              <div style={{ textAlign: "center", marginTop: 40, padding: 12, border: "2px dashed #aaa", fontSize: 12, color: "#888" }}>Company Stamp / Seal</div>
+              <div style={{ fontSize: 11, color: "#888", marginTop: 24, textAlign: "right" }}>Reference: {releaseDoc.refNo}</div>
             </div>
           )}
         </DialogContent>
