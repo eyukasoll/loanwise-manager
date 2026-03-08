@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions, useGuaranteedEmployeeIds, useBulkDeleteLoanApplications } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Filter, Trash2 } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
