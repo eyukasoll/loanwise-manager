@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image, DatabaseBackup, Download, CheckCircle2, UploadCloud, AlertTriangle, FileSpreadsheet, Lock } from "lucide-react";
+import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image, DatabaseBackup, Download, CheckCircle2, UploadCloud, AlertTriangle, FileSpreadsheet, Lock, BookOpen } from "lucide-react";
+import UserManual from "@/components/UserManual";
 import * as XLSX from "xlsx";
 import {
   AlertDialog,
@@ -246,6 +247,9 @@ export default function Settings() {
             <TabsTrigger value="security" className="gap-2 text-xs sm:text-sm">
               <Lock className="w-4 h-4" /> Security
             </TabsTrigger>
+            <TabsTrigger value="manual" className="gap-2 text-xs sm:text-sm">
+              <BookOpen className="w-4 h-4" /> <span className="hidden sm:inline">User Manual</span><span className="sm:hidden">Manual</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Company Details */}
@@ -408,6 +412,13 @@ export default function Settings() {
           {/* Security - Change Password */}
           <TabsContent value="security">
             <ChangePasswordTab toast={toast} />
+          </TabsContent>
+
+          {/* User Manual */}
+          <TabsContent value="manual">
+            <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+              <UserManual />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
