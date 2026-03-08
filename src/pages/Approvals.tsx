@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
-import { CheckCircle, XCircle, RotateCcw } from "lucide-react";
+import { CheckCircle, XCircle, RotateCcw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { toast } from "sonner";
+import LoanApplicationDocument from "@/components/applications/LoanApplicationDocument";
 
 export default function Approvals() {
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
   const { canEdit } = usePermissions();
+  const [docLoan, setDocLoan] = useState<any>(null);
 
   const pending = applications.filter((l: any) => ["Pending Approval", "Under Review", "Submitted"].includes(l.status));
 
@@ -55,9 +57,12 @@ export default function Approvals() {
                     </div>
                     <p className="text-sm text-muted-foreground">{loan.application_number} · {loan.loan_types?.name} · {loan.employees?.department}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right space-y-1">
                     <p className="text-2xl font-bold font-display">{fmt(loan.requested_amount)}</p>
                     <p className="text-xs text-muted-foreground">{loan.repayment_period_months} months @ {loan.interest_rate}%</p>
+                    <Button size="sm" variant="outline" onClick={() => setDocLoan(loan)}>
+                      <FileText className="w-4 h-4 mr-1" /> Document
+                    </Button>
                   </div>
                 </div>
                 <p className="text-sm mt-3"><span className="text-muted-foreground">Purpose:</span> {loan.purpose || "—"}</p>
@@ -79,6 +84,8 @@ export default function Approvals() {
           </div>
         )}
       </div>
+
+      <LoanApplicationDocument open={!!docLoan} onClose={() => setDocLoan(null)} loan={docLoan} />
     </div>
   );
 }
