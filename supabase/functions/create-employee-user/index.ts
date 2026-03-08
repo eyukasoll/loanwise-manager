@@ -97,10 +97,8 @@ Deno.serve(async (req) => {
         success: true,
         user_id: authUser?.id,
         password,
-        email_sent: emailSent,
-        message: emailSent
-          ? "User created and credentials sent via email"
-          : "User created but email could not be sent. Please share credentials manually.",
+        email_sent: false,
+        message: "User created. Please share credentials manually.",
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
