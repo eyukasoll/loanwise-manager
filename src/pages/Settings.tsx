@@ -413,6 +413,13 @@ export default function Settings() {
           <TabsContent value="security">
             <ChangePasswordTab toast={toast} />
           </TabsContent>
+
+          {/* User Manual */}
+          <TabsContent value="manual">
+            <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
+              <UserManual />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
