@@ -126,6 +126,13 @@ export default function Employees() {
                       <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
                       <td className="px-5 py-3 text-right">{fmt(emp.monthly_salary)}</td>
                       <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
+                      <td className="px-5 py-3">
+                        {guaranteedIds.has(emp.id) ? (
+                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Guaranteed</span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">Free</span>
+                        )}
+                      </td>
                       <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
                         <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
                         {canEdit("Employees") && <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>}
