@@ -38,8 +38,8 @@ export default function OverdueTracking() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    {["Loan ID", "Employee", "Department", "Loan Type", "Outstanding", "Overdue Days", "Next Due", "Status"].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${["Outstanding"].includes(h) ? "text-right" : "text-left"} ${h === "Overdue Days" ? "text-center" : ""}`}>{h}</th>
+                    {[t.loanId, t.employee, t.department, t.loanType, t.outstanding, t.overdueDays, t.nextDue, t.status].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${[t.outstanding].includes(h) ? "text-right" : "text-left"} ${h === t.overdueDays ? "text-center" : ""}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>

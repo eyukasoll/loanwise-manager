@@ -80,7 +80,7 @@ export default function PayrollDeductions() {
             </div>
             {deductions.length > 0 && (
               <div className="p-4 border-t border-border bg-secondary/20 flex justify-between text-sm">
-                <span className="font-medium">Total Deductions</span>
+                <span className="font-medium">{t.totalDeductions}</span>
                 <span className="font-bold">{fmt(total)}</span>
               </div>
             )}

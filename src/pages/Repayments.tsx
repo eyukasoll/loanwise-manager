@@ -53,7 +53,7 @@ export default function Repayments() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/40">
-                  {["#", "Due Date", "Beginning Bal.", "Installment", "Principal", "Interest", "Paid", "Remaining", "Status"].map(h => (
+                  {["#", t.dueDate, t.beginningBal, t.installment, t.principal, t.interest, t.paid, t.remaining, t.status].map(h => (
                     <th key={h} className="px-4 py-3 font-medium text-muted-foreground text-xs text-right first:text-left last:text-left">{h}</th>
                   ))}
                 </tr>

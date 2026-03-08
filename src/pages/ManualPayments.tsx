@@ -79,7 +79,7 @@ export default function ManualPayments() {
 
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Record Manual Payment</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.recordManualPayment}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
               <Label>Loan <span className="text-destructive">*</span></Label>

@@ -71,13 +71,13 @@ export default function Approvals() {
                 {canEdit("Approvals") && (
                   <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
                     <Button size="sm" className="bg-success hover:bg-success/90 text-success-foreground" onClick={() => handleAction(loan.id, "Approved")} disabled={updateMut.isPending}>
-                      <CheckCircle className="w-4 h-4 mr-1" /> Approve
+                      <CheckCircle className="w-4 h-4 mr-1" /> {t.approve}
                     </Button>
                     <Button size="sm" variant="destructive" onClick={() => handleAction(loan.id, "Rejected")} disabled={updateMut.isPending}>
-                      <XCircle className="w-4 h-4 mr-1" /> Reject
+                      <XCircle className="w-4 h-4 mr-1" /> {t.reject}
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => handleAction(loan.id, "Draft")} disabled={updateMut.isPending}>
-                      <RotateCcw className="w-4 h-4 mr-1" /> Return
+                      <RotateCcw className="w-4 h-4 mr-1" /> {t.return_}
                     </Button>
                   </div>
                 )}
