@@ -69,6 +69,67 @@
 
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+
+  .dark {
+    --background: 160 20% 8%;
+    --foreground: 150 10% 90%;
+
+    --card: 160 20% 11%;
+    --card-foreground: 150 10% 90%;
+
+    --popover: 160 20% 11%;
+    --popover-foreground: 150 10% 90%;
+
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 160 15% 16%;
+    --secondary-foreground: 150 10% 80%;
+
+    --muted: 160 15% 16%;
+    --muted-foreground: 150 10% 55%;
+
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+
+    --info: 200 70% 48%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 160 15% 18%;
+    --input: 160 15% 18%;
+    --ring: 160 84% 39%;
+
+    --sidebar-bg: 160 25% 6%;
+    --sidebar-fg: 150 12% 65%;
+    --sidebar-active: 160 84% 39%;
+    --sidebar-active-fg: 0 0% 100%;
+    --sidebar-hover: 160 20% 12%;
+    --sidebar-border: 160 15% 14%;
+
+    --sidebar-background: 160 25% 6%;
+    --sidebar-foreground: 150 12% 65%;
+    --sidebar-primary: 160 84% 39%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 160 20% 12%;
+    --sidebar-accent-foreground: 150 12% 65%;
+    --sidebar-border: 160 15% 14%;
+    --sidebar-ring: 160 84% 39%;
+
+    --chart-1: 160 84% 39%;
+    --chart-2: 200 70% 48%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 60% 55%;
+    --chart-5: 0 72% 51%;
+  }
 }
 
 @layer base {
