@@ -14,6 +14,13 @@ export interface Employee {
   outstandingBalance: number;
 }
 
+export interface LoanTypeDocument {
+  id: string;
+  name: string;
+  file: File | null;
+  required: boolean;
+}
+
 export interface LoanType {
   id: string;
   name: string;
@@ -24,6 +31,11 @@ export interface LoanType {
   interestFree: boolean;
   maxActiveLoans: number;
   deductionMethod: string;
+  description?: string;
+  eligibilityMinMonths?: number;
+  salaryMultiplier?: number;
+  approvalLevel?: string;
+  requiredDocuments?: LoanTypeDocument[];
 }
 
 export interface LoanApplication {
