@@ -44,8 +44,8 @@ export default function ManualPayments() {
         ) : payments.length === 0 ? (
           <div className="bg-card rounded-xl border border-border p-12 text-center">
             <HandCoins className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-            <h3 className="font-display font-semibold text-lg">No Manual Payments</h3>
-            <p className="text-muted-foreground text-sm mt-1">Manual payments will appear here once recorded.</p>
+            <h3 className="font-display font-semibold text-lg">{t.noManualPayments}</h3>
+            <p className="text-muted-foreground text-sm mt-1">{t.manualPaymentsWillAppear}</p>
           </div>
         ) : (
           <div className="bg-card rounded-xl border border-border overflow-hidden">
