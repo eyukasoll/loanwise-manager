@@ -84,6 +84,8 @@ export default function Approvals() {
           </div>
         )}
       </div>
+
+      <LoanApplicationDocument open={!!docLoan} onClose={() => setDocLoan(null)} loan={docLoan} />
     </div>
   );
 }
