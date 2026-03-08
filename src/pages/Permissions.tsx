@@ -100,6 +100,10 @@ export default function Permissions() {
           can_create: perm.can_create,
           can_edit: perm.can_edit,
           can_delete: perm.can_delete,
+          can_import: perm.can_import,
+          can_export: perm.can_export,
+          can_print: perm.can_print,
+          can_share: perm.can_share,
         })
         .eq("id", perm.id);
       if (error) hasError = true;
