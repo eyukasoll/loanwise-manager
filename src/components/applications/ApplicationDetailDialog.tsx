@@ -48,7 +48,14 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
     <>
       <Dialog open={!!selected} onOpenChange={() => onClose()}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Loan Application Details</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              Loan Application Details
+              <Button size="sm" variant="outline" onClick={() => setDocOpen(true)}>
+                <Printer className="w-4 h-4 mr-1" /> Print Document
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
           {selected && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
