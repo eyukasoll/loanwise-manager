@@ -29,12 +29,12 @@ export default function PayrollDeductions() {
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium">Payroll Period:</label>
+            <label className="text-sm font-medium">{t.payrollPeriod}</label>
             <Input value={period} onChange={e => setPeriod(e.target.value)} className="w-48 h-9" />
           </div>
           {canCreate("Payroll Deductions") && (
             <Button size="sm" onClick={() => generateMut.mutate(period)} disabled={generateMut.isPending}>
-              <RefreshCw className="w-4 h-4 mr-1" /> Generate Deductions
+              <RefreshCw className="w-4 h-4 mr-1" /> {t.generateDeductions}
             </Button>
           )}
         </div>
