@@ -1,22 +1,37 @@
 import React, { useState, useMemo } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useLoanApplications } from "@/hooks/useLoans";
+import { useLoanApplications, useUpdateGuarantor } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
-import { FileText, ShieldCheck, Search } from "lucide-react";
+import { FileText, ShieldCheck, Search, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import GuaranteeApprovalDocument from "@/components/applications/GuaranteeApprovalDocument";
+
+function GuarantorStatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    Pending: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+    Approved: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+    Rejected: "bg-red-500/10 text-red-600 border-red-500/30",
+  };
+  return (
+    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${styles[status] || styles.Pending}`}>
+      {status}
+    </span>
+  );
+}
 
 export default function GuaranteeApprovals() {
   const { data: applications = [], isLoading } = useLoanApplications();
-  const { canView } = usePermissions();
+  const { canEdit } = usePermissions();
+  const updateGuarantor = useUpdateGuarantor();
   const [search, setSearch] = useState("");
   const [docLoan, setDocLoan] = useState<any>(null);
 
-  // Fetch all guarantors with their employee info
+  // Fetch all guarantors with their employee info + status
   const { data: allGuarantors = [] } = useQuery({
     queryKey: ["all_loan_guarantors"],
     queryFn: async () => {
@@ -49,7 +64,6 @@ export default function GuaranteeApprovals() {
     const term = search.toLowerCase();
     const name = loan.employees?.full_name || "";
     const appNo = loan.application_number || "";
-    // Also search guarantor names
     const gNames = (guarantorsByLoan.get(loan.id) || [])
       .map((g: any) => g.employees?.full_name || "")
       .join(" ");
@@ -60,9 +74,23 @@ export default function GuaranteeApprovals() {
     );
   });
 
+  const handleGuarantorAction = (guarantorId: string, action: "Approved" | "Rejected") => {
+    updateGuarantor.mutate(
+      {
+        id: guarantorId,
+        status: action,
+        approved_by: "Current User",
+        approved_at: new Date().toISOString(),
+      },
+      {
+        onSuccess: () => toast.success(`Guarantor ${action.toLowerCase()} successfully`),
+      }
+    );
+  };
+
   return (
     <div>
-      <TopBar title="Guarantee Approvals" subtitle="Review guarantors assigned to loan applications" />
+      <TopBar title="Guarantee Approvals" subtitle="Review and approve guarantors assigned to loan applications" />
       <div className="p-6 animate-fade-in">
         {/* Search */}
         <div className="flex items-center gap-3 mb-4">
@@ -89,6 +117,9 @@ export default function GuaranteeApprovals() {
           <div className="space-y-4">
             {filtered.map((loan: any) => {
               const guarantors = guarantorsByLoan.get(loan.id) || [];
+              const allApproved = guarantors.every((g: any) => g.status === "Approved");
+              const hasRejected = guarantors.some((g: any) => g.status === "Rejected");
+
               return (
                 <div key={loan.id} className="bg-card rounded-xl border border-border p-5">
                   <div className="flex items-start justify-between flex-wrap gap-4">
@@ -96,6 +127,16 @@ export default function GuaranteeApprovals() {
                       <div className="flex items-center gap-3">
                         <h3 className="font-display font-semibold">{loan.employees?.full_name}</h3>
                         <StatusBadge status={loan.status} />
+                        {allApproved && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+                            All Guarantors Approved
+                          </span>
+                        )}
+                        {hasRejected && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-red-500/10 text-red-600 border-red-500/30">
+                            Guarantor Rejected
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {loan.application_number} · {loan.loan_types?.name} · {loan.employees?.department}
@@ -109,19 +150,61 @@ export default function GuaranteeApprovals() {
                     </div>
                   </div>
 
-                  {/* Guarantor List */}
+                  {/* Guarantor List with Actions */}
                   <div className="mt-4 pt-3 border-t border-border">
                     <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Assigned Guarantors</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="space-y-2">
                       {guarantors.map((g: any, i: number) => (
-                        <div key={g.id} className="flex items-center gap-3 rounded-lg border border-border bg-secondary/30 px-3 py-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
-                            {i + 1}
+                        <div key={g.id} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                              {i + 1}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium">{g.employees?.full_name}</p>
+                                <GuarantorStatusBadge status={g.status || "Pending"} />
+                              </div>
+                              <p className="text-xs text-muted-foreground">{g.employees?.employee_id} · {g.employees?.department} · {g.employees?.position}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium truncate">{g.employees?.full_name}</p>
-                            <p className="text-xs text-muted-foreground">{g.employees?.employee_id} · {g.employees?.department}</p>
-                          </div>
+                          {canEdit("Approvals") && (g.status === "Pending" || !g.status) && (
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                className="bg-success hover:bg-success/90 text-success-foreground h-8"
+                                onClick={() => handleGuarantorAction(g.id, "Approved")}
+                                disabled={updateGuarantor.isPending}
+                              >
+                                <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="h-8"
+                                onClick={() => handleGuarantorAction(g.id, "Rejected")}
+                                disabled={updateGuarantor.isPending}
+                              >
+                                <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                              </Button>
+                            </div>
+                          )}
+                          {g.status === "Approved" && (
+                            <p className="text-xs text-muted-foreground">
+                              {g.approved_at ? new Date(g.approved_at).toLocaleDateString() : ""}
+                            </p>
+                          )}
+                          {g.status === "Rejected" && canEdit("Approvals") && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8"
+                              onClick={() => handleGuarantorAction(g.id, "Approved")}
+                              disabled={updateGuarantor.isPending}
+                            >
+                              <CheckCircle className="w-3.5 h-3.5 mr-1" /> Re-approve
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>
