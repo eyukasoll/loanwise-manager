@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Globe } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import logo from "@/assets/logo.png";
 
 export default function Login() {
