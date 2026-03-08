@@ -224,6 +224,20 @@ export default function Employees() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Import Dialog */}
+      <BulkEmployeeImport
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        nextIdNum={nextIdNum}
+        onImport={async (employees) => {
+          const withIds = employees.map((emp, i) => ({
+            ...emp,
+            employee_id: `EMP${String(nextIdNum + i).padStart(3, "0")}`,
+          }));
+          await bulkCreateMut.mutateAsync(withIds);
+        }}
+      />
     </div>
   );
 }
