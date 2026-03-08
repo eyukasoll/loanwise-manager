@@ -247,14 +247,14 @@ export default function GuaranteeDeactivation() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((g: any) => {
-                    const loanStatus = g.loan_applications?.status || "—";
-                    const gStatus = getGuaranteeStatus(loanStatus);
-                    const isEligible = gStatus === "Eligible";
-                    return (
-                      <tr key={g.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                        <td className="px-5 py-3 font-medium">{g.employees?.full_name}</td>
-                        <td className="px-5 py-3 font-mono text-xs">{g.employees?.employee_id}</td>
+                   {paginatedFiltered.map((g: any, idx: number) => {
+                     const loanStatus = g.loan_applications?.status || "—";
+                     const gStatus = getGuaranteeStatus(loanStatus);
+                     const isEligible = gStatus === "Eligible";
+                     return (
+                       <tr key={g.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                         <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                         <td className="px-5 py-3 font-medium">{g.employees?.full_name}</td>
                         <td className="px-5 py-3 text-muted-foreground">{g.employees?.department}</td>
                         <td className="px-5 py-3">
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
