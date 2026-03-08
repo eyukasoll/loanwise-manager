@@ -74,7 +74,7 @@ export default function Disbursements() {
                         <p className="font-medium">{loan.employees?.full_name} <span className="text-muted-foreground text-sm ml-2">{loan.application_number}</span></p>
                         <p className="text-sm text-muted-foreground">{loan.loan_types?.name} · {fmt(loan.approved_amount || loan.requested_amount)}</p>
                       </div>
-                      {canCreate("Disbursements") && <Button size="sm" onClick={() => openDisburse(loan)}><Banknote className="w-4 h-4 mr-1" /> Disburse</Button>}
+                      {canCreate("Disbursements") && <Button size="sm" onClick={() => openDisburse(loan)}><Banknote className="w-4 h-4 mr-1" /> {t.disburse}</Button>}
                     </div>
                   ))}
                 </div>
