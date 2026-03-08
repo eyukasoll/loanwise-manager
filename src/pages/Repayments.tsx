@@ -38,10 +38,10 @@ export default function Repayments() {
         {selectedLoan && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {([
-              ["Principal", fmt(selectedLoan.approved_amount || selectedLoan.requested_amount)],
-              ["Total Payable", fmt(selectedLoan.total_payable || 0)],
-              ["Total Paid", fmt(selectedLoan.total_paid)],
-              ["Outstanding", fmt(selectedLoan.outstanding_balance || 0)],
+              [t.principal, fmt(selectedLoan.approved_amount || selectedLoan.requested_amount)],
+              [t.totalPayable, fmt(selectedLoan.total_payable || 0)],
+              [t.totalPaid, fmt(selectedLoan.total_paid)],
+              [t.outstanding, fmt(selectedLoan.outstanding_balance || 0)],
             ] as [string, string][]).map(([label, value]) => (
               <div key={label} className="stat-card"><p className="text-xs text-muted-foreground">{label}</p><p className="text-lg font-bold font-display mt-1">{value}</p></div>
             ))}
