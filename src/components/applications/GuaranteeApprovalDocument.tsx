@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Printer } from "lucide-react";
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function GuaranteeApprovalDocument({ open, onClose, loan }: Props) {
+  const { canPrint } = usePermissions();
   const printRef = useRef<HTMLDivElement>(null);
   const { settings: company } = useCompanySettings();
   const [guarantors, setGuarantors] = useState<any[]>([]);
@@ -75,7 +77,7 @@ export default function GuaranteeApprovalDocument({ open, onClose, loan }: Props
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Guarantee Approval Document
-            <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>
+            {canPrint("Guarantee Approvals") && <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>}
           </DialogTitle>
         </DialogHeader>
 

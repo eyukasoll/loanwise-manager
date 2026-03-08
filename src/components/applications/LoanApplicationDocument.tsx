@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Printer } from "lucide-react";
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function LoanApplicationDocument({ open, onClose, loan }: Props) {
+  const { canPrint } = usePermissions();
   const printRef = useRef<HTMLDivElement>(null);
   const [guarantors, setGuarantors] = useState<any[]>([]);
   const [company, setCompany] = useState<any>(null);
@@ -78,7 +80,7 @@ export default function LoanApplicationDocument({ open, onClose, loan }: Props) 
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Loan Application Document
-            <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>
+            {canPrint("Applications") && <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>}
           </DialogTitle>
         </DialogHeader>
 

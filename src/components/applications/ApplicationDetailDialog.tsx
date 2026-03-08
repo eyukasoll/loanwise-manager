@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export default function ApplicationDetailDialog({ selected, onClose, canEdit = false, canDelete = false }: Props) {
+  const { canPrint } = usePermissions();
   const [guarantors, setGuarantors] = useState<any[]>([]);
   const [docOpen, setDocOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -88,7 +90,7 @@ export default function ApplicationDetailDialog({ selected, onClose, canEdit = f
             <DialogTitle className="flex items-center justify-between gap-2">
               {editMode ? "Edit Application" : "Loan Application Details"}
               <div className="flex items-center gap-1">
-                {!editMode && (
+                {!editMode && canPrint("Applications") && (
                   <Button size="sm" variant="outline" onClick={() => setDocOpen(true)}>
                     <Printer className="w-4 h-4 mr-1" /> Print
                   </Button>

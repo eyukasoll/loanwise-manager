@@ -22,7 +22,7 @@ export default function Savings() {
   const createMut = useCreateSavingsTransaction();
   const deleteMut = useDeleteSavingsTransaction();
   const bulkMut = useBulkCreateSavingsTransactions();
-  const { canCreate, canDelete } = usePermissions();
+  const { canCreate, canDelete, canImport, canPrint } = usePermissions();
 
   const [formOpen, setFormOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -112,16 +112,18 @@ export default function Savings() {
         </div>
 
         {/* Actions */}
-        {canCreate("Savings") && (
-          <div className="flex gap-2 justify-end">
-            <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
-              <Upload className="w-4 h-4 mr-1" /> Import CSV
-            </Button>
-            <Button size="sm" onClick={() => setFormOpen(true)}>
-              <Plus className="w-4 h-4 mr-1" /> New Transaction
-            </Button>
+        <div className="flex gap-2 justify-end">
+            {canImport("Savings") && (
+              <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
+                <Upload className="w-4 h-4 mr-1" /> Import CSV
+              </Button>
+            )}
+            {canCreate("Savings") && (
+              <Button size="sm" onClick={() => setFormOpen(true)}>
+                <Plus className="w-4 h-4 mr-1" /> New Transaction
+              </Button>
+            )}
           </div>
-        )}
 
         {/* Table */}
         {isLoading ? (
@@ -166,9 +168,11 @@ export default function Savings() {
                        <td className="px-5 py-3 font-mono text-xs">{tx.receipt_number || "—"}</td>
                        <td className="px-5 py-3">
                          <div className="flex items-center gap-1">
-                           <Button variant="ghost" size="sm" onClick={() => printReceipt(tx)} title="Print receipt">
-                             <Printer className="w-3.5 h-3.5" />
-                           </Button>
+                            {canPrint("Savings") && (
+                              <Button variant="ghost" size="sm" onClick={() => printReceipt(tx)} title="Print receipt">
+                                <Printer className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
                            {canDelete("Savings") && (
                              <Button variant="ghost" size="sm" onClick={() => deleteMut.mutate(tx.id)} title="Delete">
                                <Trash2 className="w-3.5 h-3.5 text-destructive" />

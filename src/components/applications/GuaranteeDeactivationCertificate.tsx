@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Printer } from "lucide-react";
@@ -13,6 +14,7 @@ interface GuaranteeDeactivationProps {
 }
 
 export default function GuaranteeDeactivationCertificate({ open, onClose, loan, guarantor }: GuaranteeDeactivationProps) {
+  const { canPrint } = usePermissions();
   const printRef = useRef<HTMLDivElement>(null);
   const { settings: company } = useCompanySettings();
 
@@ -60,7 +62,7 @@ export default function GuaranteeDeactivationCertificate({ open, onClose, loan, 
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Guarantee Deactivation Certificate
-            <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>
+            {canPrint("Guarantee Deactivation") && <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>}
           </DialogTitle>
         </DialogHeader>
 
