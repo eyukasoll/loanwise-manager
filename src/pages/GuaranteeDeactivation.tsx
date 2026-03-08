@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
