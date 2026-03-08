@@ -1,0 +1,122 @@
+import React from "react";
+import TopBar from "@/components/TopBar";
+import StatCard from "@/components/StatCard";
+import StatusBadge from "@/components/StatusBadge";
+import { loanApplications, monthlyTrends, loanTypeDistribution, departmentDistribution } from "@/data/mockData";
+import {
+  FileText, CheckCircle, Banknote, DollarSign, AlertTriangle,
+  TrendingUp, Users, ArrowRight
+} from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { Link } from "react-router-dom";
+
+const COLORS = [
+  "hsl(217, 72%, 48%)", "hsl(162, 63%, 41%)", "hsl(38, 92%, 50%)",
+  "hsl(280, 60%, 55%)", "hsl(0, 72%, 51%)"
+];
+
+const fmt = (n: number) => {
+  if (n >= 1000000) return `KES ${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `KES ${(n / 1000).toFixed(0)}K`;
+  return `KES ${n}`;
+};
+
+export default function Dashboard() {
+  const activeLoans = loanApplications.filter(l => l.status === "Active");
+  const pendingApproval = loanApplications.filter(l => ["Pending Approval", "Under Review"].includes(l.status));
+  const totalDisbursed = loanApplications.filter(l => ["Active", "Closed", "Disbursed"].includes(l.status)).reduce((s, l) => s + (l.approvedAmount || 0), 0);
+  const totalRecovered = loanApplications.reduce((s, l) => s + l.totalPaid, 0);
+  const totalOutstanding = activeLoans.reduce((s, l) => s + (l.outstandingBalance || 0), 0);
+  const overdueCount = loanApplications.filter(l => l.status === "Overdue").length;
+
+  return (
+    <div>
+      <TopBar title="Dashboard" subtitle="Loan management overview" />
+      <div className="p-6 space-y-6 animate-fade-in">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label="Total Applications" value={loanApplications.length} icon={FileText} variant="primary" trend="+3 this month" trendUp />
+          <StatCard label="Awaiting Approval" value={pendingApproval.length} icon={CheckCircle} variant="warning" />
+          <StatCard label="Total Disbursed" value={fmt(totalDisbursed)} icon={Banknote} variant="accent" />
+          <StatCard label="Outstanding Balance" value={fmt(totalOutstanding)} icon={DollarSign} variant="destructive" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label="Total Recovered" value={fmt(totalRecovered)} icon={TrendingUp} variant="accent" />
+          <StatCard label="Active Loans" value={activeLoans.length} icon={Users} variant="primary" />
+          <StatCard label="Overdue Loans" value={overdueCount} icon={AlertTriangle} variant="destructive" />
+          <StatCard label="Closed Loans" value={loanApplications.filter(l => l.status === "Closed").length} icon={CheckCircle} />
+        </div>
+
+        {/* Charts row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Monthly trend */}
+          <div className="bg-card rounded-xl border border-border p-5">
+            <h3 className="font-display font-semibold text-sm mb-4">Monthly Disbursement vs Recovery</h3>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={monthlyTrends} barGap={4}>
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}K`} />
+                <Tooltip formatter={(v: number) => fmt(v)} />
+                <Bar dataKey="disbursed" name="Disbursed" fill="hsl(217, 72%, 48%)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="recovered" name="Recovered" fill="hsl(162, 63%, 41%)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Loan type pie */}
+          <div className="bg-card rounded-xl border border-border p-5">
+            <h3 className="font-display font-semibold text-sm mb-4">Loan Type Distribution</h3>
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={loanTypeDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} innerRadius={50} paddingAngle={3}>
+                  {loanTypeDistribution.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Recent applications */}
+        <div className="bg-card rounded-xl border border-border">
+          <div className="flex items-center justify-between p-5 border-b border-border">
+            <h3 className="font-display font-semibold text-sm">Recent Loan Applications</h3>
+            <Link to="/applications" className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">
+              View all <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-secondary/40">
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Application ID</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Type</th>
+                  <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Amount</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loanApplications.slice(0, 5).map(loan => (
+                  <tr key={loan.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                    <td className="px-5 py-3 font-mono text-xs">{loan.id}</td>
+                    <td className="px-5 py-3">{loan.employeeName}</td>
+                    <td className="px-5 py-3 text-muted-foreground">{loan.loanType}</td>
+                    <td className="px-5 py-3 text-right font-medium">{fmt(loan.requestedAmount)}</td>
+                    <td className="px-5 py-3"><StatusBadge status={loan.status} /></td>
+                    <td className="px-5 py-3 text-muted-foreground">{loan.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
