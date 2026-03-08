@@ -24,9 +24,9 @@ export default function Repayments() {
       <TopBar title={t.repTitle} subtitle={t.repSubtitle} />
       <div className="p-6 animate-fade-in space-y-4">
         <div className="flex items-center gap-3">
-          <label className="text-sm font-medium">Select Loan:</label>
+          <label className="text-sm font-medium">{t.selectLoanLabel}</label>
           <Select value={selectedLoanId} onValueChange={setSelectedLoanId}>
-            <SelectTrigger className="w-96 h-9"><SelectValue placeholder="Select a loan" /></SelectTrigger>
+            <SelectTrigger className="w-96 h-9"><SelectValue placeholder={t.selectLoan} /></SelectTrigger>
             <SelectContent>
               {activeLoans.map((l: any) => (
                 <SelectItem key={l.id} value={l.id}>{l.application_number} — {l.employees?.full_name} ({l.loan_types?.name})</SelectItem>
