@@ -3,10 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, FileText, CheckCircle, Calculator, Banknote,
   CalendarCheck, CreditCard, HandCoins, AlertTriangle, BarChart3,
-  Settings, ChevronLeft, ChevronRight, Building2, LogOut
+  Settings, ChevronLeft, ChevronRight, LogOut
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/" },
@@ -42,12 +43,10 @@ export default function AppSidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
-        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
-          <Building2 className="w-4 h-4 text-primary-foreground" />
-        </div>
+        <img src={logo} alt="Addis Microfinance" className="w-8 h-8 rounded-lg flex-shrink-0 object-contain" />
         {!collapsed && (
-          <span className="font-display text-base font-bold text-sidebar-primary-foreground truncate">
-            LoanManager
+          <span className="font-display text-sm font-bold text-sidebar-primary-foreground truncate">
+            Addis Microfinance
           </span>
         )}
       </div>
