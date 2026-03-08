@@ -100,33 +100,15 @@ Deno.serve(async (req) => {
     let emailSent = false;
 
     if (settings?.smtp_host && settings?.smtp_email && settings?.smtp_password) {
-      // Send email via SMTP using Deno's built-in fetch to an SMTP-to-HTTP bridge
-      // Since Deno edge functions can't do raw SMTP, we'll construct a formatted email
-      // and use the Supabase approach: store credentials and notify
       try {
-        // Use a simple SMTP client approach via Deno
-        const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
-        
-        const smtpPort = settings.smtp_port || 587;
-        const client = new SMTPClient({
-          connection: {
-            hostname: settings.smtp_host,
-            port: smtpPort,
-            tls: smtpPort === 465,
-            auth: {
-              username: settings.smtp_email,
-              password: settings.smtp_password,
-            },
-          },
-        });
+        // Use Gmail API approach via SMTP relay with base64 encoding
+        const smtpHost = settings.smtp_host;
+        const smtpPort = 465; // Force SSL port for edge function compatibility
+        const smtpUser = settings.smtp_email;
+        const smtpPass = settings.smtp_password;
+        const senderName = settings.email_sender_name || settings.company_name || "System";
 
-        await client.send({
-          from: `${settings.email_sender_name || settings.company_name || "System"} <${settings.smtp_email}>`,
-          to: email,
-          subject: `Welcome to ${settings.company_name || "Our Platform"} - Your Account Credentials`,
-          content: "auto",
-          html: `
-<!DOCTYPE html>
+        const htmlBody = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb;">
@@ -135,7 +117,6 @@ Deno.serve(async (req) => {
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
       Your employee account has been created. Use the credentials below to log in.
     </p>
-    
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
       <table style="width: 100%; font-size: 14px;">
         <tr>
@@ -152,26 +133,85 @@ Deno.serve(async (req) => {
         </tr>
       </table>
     </div>
-    
     <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; margin-bottom: 24px;">
       <p style="color: #92400e; font-size: 13px; margin: 0;">
         ⚠️ <strong>Important:</strong> Please change your password after your first login for security purposes.
       </p>
     </div>
-    
     <p style="color: #9ca3af; font-size: 12px; margin-top: 24px; text-align: center;">
       This is an automated message from ${settings.company_name || "the system"}. Please do not reply to this email.
     </p>
   </div>
 </body>
-</html>`,
-        });
+</html>`;
 
-        await client.close();
-        emailSent = true;
+        // Build raw MIME message
+        const boundary = "----=_Part_" + crypto.randomUUID().replace(/-/g, "");
+        const rawMessage = [
+          `From: ${senderName} <${smtpUser}>`,
+          `To: ${email}`,
+          `Subject: Welcome to ${settings.company_name || "Our Platform"} - Your Account Credentials`,
+          `MIME-Version: 1.0`,
+          `Content-Type: multipart/alternative; boundary="${boundary}"`,
+          ``,
+          `--${boundary}`,
+          `Content-Type: text/plain; charset=utf-8`,
+          ``,
+          `Welcome ${full_name}! Your login credentials: Email: ${email}, Password: ${password}. Please change your password after first login.`,
+          ``,
+          `--${boundary}`,
+          `Content-Type: text/html; charset=utf-8`,
+          ``,
+          htmlBody,
+          ``,
+          `--${boundary}--`,
+        ].join("\r\n");
+
+        // Connect via TLS to port 465
+        const conn = await Deno.connectTls({ hostname: smtpHost, port: smtpPort });
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+
+        async function readLine(): Promise<string> {
+          const buf = new Uint8Array(4096);
+          const n = await conn.read(buf);
+          return n ? decoder.decode(buf.subarray(0, n)) : "";
+        }
+
+        async function send(cmd: string): Promise<string> {
+          await conn.write(encoder.encode(cmd + "\r\n"));
+          return await readLine();
+        }
+
+        // SMTP conversation
+        await readLine(); // greeting
+        await send(`EHLO localhost`);
+        
+        // AUTH LOGIN
+        await send(`AUTH LOGIN`);
+        await send(btoa(smtpUser));
+        const authResult = await send(btoa(smtpPass));
+        
+        if (!authResult.startsWith("235")) {
+          throw new Error("SMTP auth failed: " + authResult);
+        }
+
+        await send(`MAIL FROM:<${smtpUser}>`);
+        await send(`RCPT TO:<${email}>`);
+        await send(`DATA`);
+        
+        // Send message body (dot-stuffing)
+        await conn.write(encoder.encode(rawMessage + "\r\n.\r\n"));
+        const dataResult = await readLine();
+        
+        if (dataResult.startsWith("250")) {
+          emailSent = true;
+        }
+        
+        await send(`QUIT`);
+        conn.close();
       } catch (smtpError: any) {
         console.error("SMTP send failed:", smtpError);
-        // Email failed but user was still created
       }
     }
 
