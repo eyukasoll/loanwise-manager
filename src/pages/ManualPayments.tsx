@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import { useManualPayments, useCreateManualPayment, useLoanApplications } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { HandCoins, Plus } from "lucide-react";
@@ -21,6 +22,7 @@ export default function ManualPayments() {
   const [form, setForm] = useState({ loan_application_id: "", amount: 0, payment_method: "Cash", receipt_number: "", received_by: "", remarks: "" });
 
   const activeLoans = applications.filter((l: any) => ["Active", "Disbursed"].includes(l.status));
+  const { paginatedItems: paginatedPayments, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(payments);
 
   const handleSave = () => {
     if (!form.loan_application_id || form.amount <= 0) return;
@@ -52,29 +54,32 @@ export default function ManualPayments() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-secondary/40">
-                    {[t.date, t.employee, t.loanId, t.amount, t.method, t.receipt, t.receivedBy].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map((p: any) => (
-                    <tr key={p.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                      <td className="px-5 py-3 text-muted-foreground">{p.payment_date}</td>
-                      <td className="px-5 py-3 font-medium">{p.loan_applications?.employees?.full_name}</td>
-                      <td className="px-5 py-3 font-mono text-xs">{p.loan_applications?.application_number}</td>
-                      <td className="px-5 py-3 text-right font-bold">{fmt(p.amount)}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{p.payment_method}</td>
-                      <td className="px-5 py-3 font-mono text-xs">{p.receipt_number || "—"}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{p.received_by || "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                   <tr className="border-b border-border bg-secondary/40">
+                     <th className="px-3 py-3 font-medium text-muted-foreground text-xs text-left w-10">#</th>
+                     {[t.date, t.employee, t.loanId, t.amount, t.method, t.receipt, t.receivedBy].map(h => (
+                       <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
+                     ))}
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {paginatedPayments.map((p: any, idx: number) => (
+                     <tr key={p.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                       <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{p.payment_date}</td>
+                       <td className="px-5 py-3 font-medium">{p.loan_applications?.employees?.full_name}</td>
+                       <td className="px-5 py-3 font-mono text-xs">{p.loan_applications?.application_number}</td>
+                       <td className="px-5 py-3 text-right font-bold">{fmt(p.amount)}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{p.payment_method}</td>
+                       <td className="px-5 py-3 font-mono text-xs">{p.receipt_number || "—"}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{p.received_by || "—"}</td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+             <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+           </div>
+         )}
       </div>
 
       <Dialog open={formOpen} onOpenChange={setFormOpen}>

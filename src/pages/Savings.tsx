@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import { useEmployees } from "@/hooks/useLoans";
 import { useSavingsTransactions, useCreateSavingsTransaction, useDeleteSavingsTransaction, useBulkCreateSavingsTransactions } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -43,6 +44,8 @@ export default function Savings() {
   const totalDeposits = transactions.filter((t: any) => t.transaction_type === "Deposit").reduce((s: number, t: any) => s + Number(t.amount), 0);
   const totalWithdrawals = transactions.filter((t: any) => t.transaction_type === "Withdrawal").reduce((s: number, t: any) => s + Number(t.amount), 0);
   const netBalance = totalDeposits - totalWithdrawals;
+
+  const { paginatedItems: paginatedTxns, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(transactions);
 
   const handleSave = () => {
     if (!form.employee_id || form.amount <= 0) return;
@@ -134,50 +137,53 @@ export default function Savings() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-secondary/40">
-                    {[t.date, t.employee, t.empId, t.type, t.txn, t.amount, t.method, t.receipt, ""].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((t: any) => (
-                    <tr key={t.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                      <td className="px-5 py-3 text-muted-foreground">{t.transaction_date}</td>
-                      <td className="px-5 py-3 font-medium">{t.employees?.full_name}</td>
-                      <td className="px-5 py-3 font-mono text-xs">{t.employees?.employee_id}</td>
-                      <td className="px-5 py-3">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${t.savings_type === "Mandatory" ? "bg-primary/10 text-primary" : "bg-accent text-accent-foreground"}`}>
-                          {t.savings_type}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={`text-xs font-medium ${t.transaction_type === "Deposit" ? "text-green-600" : "text-destructive"}`}>
-                          {t.transaction_type}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-right font-bold">{fmt(t.amount)}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{t.payment_method}</td>
-                      <td className="px-5 py-3 font-mono text-xs">{t.receipt_number || "—"}</td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => printReceipt(t)} title="Print receipt">
-                            <Printer className="w-3.5 h-3.5" />
-                          </Button>
-                          {canDelete("Savings") && (
-                            <Button variant="ghost" size="sm" onClick={() => deleteMut.mutate(t.id)} title="Delete">
-                              <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                   <tr className="border-b border-border bg-secondary/40">
+                     <th className="px-3 py-3 font-medium text-muted-foreground text-xs text-left w-10">#</th>
+                     {[t.date, t.employee, t.empId, t.type, t.txn, t.amount, t.method, t.receipt, ""].map(h => (
+                       <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
+                     ))}
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {paginatedTxns.map((tx: any, idx: number) => (
+                     <tr key={tx.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                       <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{tx.transaction_date}</td>
+                       <td className="px-5 py-3 font-medium">{tx.employees?.full_name}</td>
+                       <td className="px-5 py-3 font-mono text-xs">{tx.employees?.employee_id}</td>
+                       <td className="px-5 py-3">
+                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${tx.savings_type === "Mandatory" ? "bg-primary/10 text-primary" : "bg-accent text-accent-foreground"}`}>
+                           {tx.savings_type}
+                         </span>
+                       </td>
+                       <td className="px-5 py-3">
+                         <span className={`text-xs font-medium ${tx.transaction_type === "Deposit" ? "text-green-600" : "text-destructive"}`}>
+                           {tx.transaction_type}
+                         </span>
+                       </td>
+                       <td className="px-5 py-3 text-right font-bold">{fmt(tx.amount)}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{tx.payment_method}</td>
+                       <td className="px-5 py-3 font-mono text-xs">{tx.receipt_number || "—"}</td>
+                       <td className="px-5 py-3">
+                         <div className="flex items-center gap-1">
+                           <Button variant="ghost" size="sm" onClick={() => printReceipt(tx)} title="Print receipt">
+                             <Printer className="w-3.5 h-3.5" />
+                           </Button>
+                           {canDelete("Savings") && (
+                             <Button variant="ghost" size="sm" onClick={() => deleteMut.mutate(tx.id)} title="Delete">
+                               <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                             </Button>
+                           )}
+                         </div>
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+             <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+           </div>
+         )}
       </div>
 
       {/* New Transaction Dialog */}

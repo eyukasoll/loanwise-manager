@@ -5,6 +5,7 @@ import { Eye, FileText } from "lucide-react";
 import { fmt } from "@/lib/currency";
 import { Checkbox } from "@/components/ui/checkbox";
 import LoanApplicationDocument from "./LoanApplicationDocument";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 
 interface Props {
   filtered: any[];
@@ -17,6 +18,7 @@ interface Props {
 export default function ApplicationsTable({ filtered, onSelect, selectedIds, onToggleSelect, onToggleAll }: Props) {
   const allSelected = filtered.length > 0 && filtered.every(l => selectedIds.has(l.id));
   const [docLoan, setDocLoan] = useState<any>(null);
+  const { paginatedItems, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(filtered);
 
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -27,17 +29,19 @@ export default function ApplicationsTable({ filtered, onSelect, selectedIds, onT
               <th className="px-3 py-3 w-10">
                 <Checkbox checked={allSelected} onCheckedChange={onToggleAll} />
               </th>
+              <th className="px-3 py-3 font-medium text-muted-foreground text-xs text-left w-10">#</th>
               {["ID", "Date", "Employee", "Loan Type", "Amount", "Period", "Installment", "Status", ""].map(h => (
                 <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${["Amount", "Installment"].includes(h) ? "text-right" : "text-left"} ${h === "" ? "text-center" : ""}`}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filtered.map((loan: any) => (
+            {paginatedItems.map((loan: any, idx: number) => (
               <tr key={loan.id} className={`border-b border-border/50 hover:bg-secondary/20 transition-colors ${selectedIds.has(loan.id) ? "bg-primary/5" : ""}`}>
                 <td className="px-3 py-3">
                   <Checkbox checked={selectedIds.has(loan.id)} onCheckedChange={() => onToggleSelect(loan.id)} />
                 </td>
+                <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
                 <td className="px-5 py-3 font-mono text-xs">{loan.application_number}</td>
                 <td className="px-5 py-3 text-muted-foreground">{loan.application_date}</td>
                 <td className="px-5 py-3 font-medium">{loan.employees?.full_name}</td>
@@ -52,10 +56,11 @@ export default function ApplicationsTable({ filtered, onSelect, selectedIds, onT
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && <tr><td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">No applications found.</td></tr>}
+            {filtered.length === 0 && <tr><td colSpan={11} className="px-5 py-12 text-center text-muted-foreground">No applications found.</td></tr>}
           </tbody>
         </table>
       </div>
+      <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
       <LoanApplicationDocument open={!!docLoan} onClose={() => setDocLoan(null)} loan={docLoan} />
     </div>
   );

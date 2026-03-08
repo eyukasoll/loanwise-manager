@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -194,6 +195,8 @@ export default function GuaranteeDeactivation() {
     printWindow.print();
   };
 
+  const { paginatedItems: paginatedFiltered, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(filtered);
+
   return (
     <div>
       <TopBar title={t.gdTitle} subtitle={t.gdSubtitle} />
@@ -229,7 +232,8 @@ export default function GuaranteeDeactivation() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantor</th>
+                     <th className="text-left px-3 py-3 font-medium text-muted-foreground text-xs w-10">#</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantor</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Department</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
@@ -243,15 +247,16 @@ export default function GuaranteeDeactivation() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((g: any) => {
-                    const loanStatus = g.loan_applications?.status || "—";
-                    const gStatus = getGuaranteeStatus(loanStatus);
-                    const isEligible = gStatus === "Eligible";
-                    return (
-                      <tr key={g.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                        <td className="px-5 py-3 font-medium">{g.employees?.full_name}</td>
-                        <td className="px-5 py-3 font-mono text-xs">{g.employees?.employee_id}</td>
-                        <td className="px-5 py-3 text-muted-foreground">{g.employees?.department}</td>
+                   {paginatedFiltered.map((g: any, idx: number) => {
+                     const loanStatus = g.loan_applications?.status || "—";
+                     const gStatus = getGuaranteeStatus(loanStatus);
+                     const isEligible = gStatus === "Eligible";
+                     return (
+                       <tr key={g.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                         <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                         <td className="px-5 py-3 font-medium">{g.employees?.full_name}</td>
+                         <td className="px-5 py-3 font-mono text-xs">{g.employees?.employee_id}</td>
+                         <td className="px-5 py-3 text-muted-foreground">{g.employees?.department}</td>
                         <td className="px-5 py-3">
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                             g.employees?.employment_status === "Active"
@@ -300,14 +305,15 @@ export default function GuaranteeDeactivation() {
                       </tr>
                     );
                   })}
-                  {filtered.length === 0 && (
-                    <tr><td colSpan={11} className="px-5 py-12 text-center text-muted-foreground">No guarantees found.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                   {filtered.length === 0 && (
+                     <tr><td colSpan={12} className="px-5 py-12 text-center text-muted-foreground">No guarantees found.</td></tr>
+                   )}
+                 </tbody>
+               </table>
+             </div>
+             <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+           </div>
+         )}
       </div>
 
       {/* Release & Replace Dialog */}

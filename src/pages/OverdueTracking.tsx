@@ -1,5 +1,6 @@
 import React from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import StatusBadge from "@/components/StatusBadge";
 import StatCard from "@/components/StatCard";
 import { useLoanApplications } from "@/hooks/useLoans";
@@ -20,6 +21,8 @@ export default function OverdueTracking() {
     return { ...l, overdueDays };
   });
 
+  const { paginatedItems: paginatedOverdue, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(overdueLoans);
+
   return (
     <div>
       <TopBar title={t.odTitle} subtitle={t.odSubtitle} />
@@ -37,31 +40,34 @@ export default function OverdueTracking() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-secondary/40">
-                    {[t.loanId, t.employee, t.department, t.loanType, t.outstanding, t.overdueDays, t.nextDue, t.status].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${[t.outstanding].includes(h) ? "text-right" : "text-left"} ${h === t.overdueDays ? "text-center" : ""}`}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {overdueLoans.length === 0 ? (
-                    <tr><td colSpan={8} className="px-5 py-12 text-center text-muted-foreground">No overdue loans found</td></tr>
-                  ) : overdueLoans.map((l: any) => (
-                    <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                      <td className="px-5 py-3 font-mono text-xs">{l.application_number}</td>
-                      <td className="px-5 py-3 font-medium">{l.employees?.full_name}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{l.employees?.department}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{l.loan_types?.name}</td>
-                      <td className="px-5 py-3 text-right font-medium">{fmt(l.outstanding_balance || 0)}</td>
-                      <td className="px-5 py-3 text-center"><span className={`font-bold ${l.overdueDays > 15 ? "text-destructive" : "text-warning"}`}>{l.overdueDays}</span></td>
-                      <td className="px-5 py-3 text-muted-foreground">{l.next_due_date}</td>
-                      <td className="px-5 py-3"><StatusBadge status={l.overdueDays > 15 ? "Overdue" : "Active"} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                   <tr className="border-b border-border bg-secondary/40">
+                     <th className="px-3 py-3 font-medium text-muted-foreground text-xs text-left w-10">#</th>
+                     {[t.loanId, t.employee, t.department, t.loanType, t.outstanding, t.overdueDays, t.nextDue, t.status].map(h => (
+                       <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${[t.outstanding].includes(h) ? "text-right" : "text-left"} ${h === t.overdueDays ? "text-center" : ""}`}>{h}</th>
+                     ))}
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {overdueLoans.length === 0 ? (
+                     <tr><td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">No overdue loans found</td></tr>
+                   ) : paginatedOverdue.map((l: any, idx: number) => (
+                     <tr key={l.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                       <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                       <td className="px-5 py-3 font-mono text-xs">{l.application_number}</td>
+                       <td className="px-5 py-3 font-medium">{l.employees?.full_name}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{l.employees?.department}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{l.loan_types?.name}</td>
+                       <td className="px-5 py-3 text-right font-medium">{fmt(l.outstanding_balance || 0)}</td>
+                       <td className="px-5 py-3 text-center"><span className={`font-bold ${l.overdueDays > 15 ? "text-destructive" : "text-warning"}`}>{l.overdueDays}</span></td>
+                       <td className="px-5 py-3 text-muted-foreground">{l.next_due_date}</td>
+                       <td className="px-5 py-3"><StatusBadge status={l.overdueDays > 15 ? "Overdue" : "Active"} /></td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+             <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+           </div>
         )}
       </div>
     </div>
