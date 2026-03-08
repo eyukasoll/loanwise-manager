@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees } from "@/hooks/useLoans";
+import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees, useGuaranteedEmployeeIds } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Eye, Edit, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ const emptyForm = {
 
 export default function Employees() {
   const { data: employees = [], isLoading } = useEmployees();
+  const { data: guaranteedIds = new Set<string>() } = useGuaranteedEmployeeIds();
   const { data: nextId = "EMP001" } = useNextEmployeeId();
   const createMut = useCreateEmployee();
   const updateMut = useUpdateEmployee();
@@ -104,7 +105,7 @@ export default function Employees() {
           <div className="bg-card rounded-xl border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>
+                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Name</th>
@@ -112,6 +113,7 @@ export default function Employees() {
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Position</th>
                     <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Salary</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantee</th>
                     <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">Actions</th>
                   </tr>
                 </thead>
@@ -124,6 +126,13 @@ export default function Employees() {
                       <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
                       <td className="px-5 py-3 text-right">{fmt(emp.monthly_salary)}</td>
                       <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
+                      <td className="px-5 py-3">
+                        {guaranteedIds.has(emp.id) ? (
+                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Guaranteed</span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">Free</span>
+                        )}
+                      </td>
                       <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
                         <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
                         {canEdit("Employees") && <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>}
@@ -132,7 +141,7 @@ export default function Employees() {
                     </tr>
                   ))}
                   {filtered.length === 0 && (
-                    <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
+                    <tr><td colSpan={8} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
                   )}
                 </tbody>
               </table>
