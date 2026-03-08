@@ -122,7 +122,7 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">Loading...</td></tr>
+                  <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">{t.loading}</td></tr>
                 ) : applications.length === 0 ? (
                   <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">No applications yet. Start by adding employees and loan types.</td></tr>
                 ) : applications.slice(0, 5).map((loan: any) => (
