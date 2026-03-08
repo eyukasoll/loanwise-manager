@@ -27,7 +27,7 @@ export default function Disbursements() {
   const approved = applications.filter((l: any) => l.status === "Approved");
   const disbursed = applications.filter((l: any) => ["Active", "Disbursed", "Closed"].includes(l.status));
 
-  const openDisburse = (loan: any) => { setSelectedLoan(loan); setDisburseOpen(true); };
+  const { paginatedItems: paginatedDisbursed, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(disbursed);
 
   const handleDisburse = () => {
     if (!selectedLoan) return;
