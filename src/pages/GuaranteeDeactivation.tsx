@@ -304,14 +304,15 @@ export default function GuaranteeDeactivation() {
                       </tr>
                     );
                   })}
-                  {filtered.length === 0 && (
-                    <tr><td colSpan={11} className="px-5 py-12 text-center text-muted-foreground">No guarantees found.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                   {filtered.length === 0 && (
+                     <tr><td colSpan={12} className="px-5 py-12 text-center text-muted-foreground">No guarantees found.</td></tr>
+                   )}
+                 </tbody>
+               </table>
+             </div>
+             <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+           </div>
+         )}
       </div>
 
       {/* Release & Replace Dialog */}
