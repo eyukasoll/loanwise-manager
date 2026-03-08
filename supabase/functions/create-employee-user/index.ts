@@ -46,19 +46,43 @@ Deno.serve(async (req) => {
     };
     const appRole = roleMap[user_type] || "employee";
 
-    // Create auth user
-    const { data: authData, error: authError } = await admin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { full_name },
-    });
+    // Check if user already exists
+    const { data: existingUsers } = await admin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find((u: any) => u.email === email);
 
-    if (authError) {
-      return new Response(
-        JSON.stringify({ error: authError.message }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    let authUser: any;
+    let isExisting = false;
+
+    if (existingUser) {
+      // User already exists — reuse and reset password
+      const { data: updateData, error: updateError } = await admin.auth.admin.updateUserById(existingUser.id, {
+        password,
+        user_metadata: { full_name },
+      });
+      if (updateError) {
+        return new Response(
+          JSON.stringify({ error: updateError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      authUser = updateData.user;
+      isExisting = true;
+    } else {
+      // Create new auth user
+      const { data: authData, error: authError } = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name },
+      });
+
+      if (authError) {
+        return new Response(
+          JSON.stringify({ error: authError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      authUser = authData.user;
     }
 
     // Assign role (the trigger creates 'employee' by default, update if different)
