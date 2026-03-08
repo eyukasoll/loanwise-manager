@@ -26,7 +26,7 @@ export default function PayrollDeductions() {
   return (
     <div>
       <TopBar title={t.pdTitle} subtitle={t.pdSubtitle} />
-      <div className="p-6 animate-fade-in">
+      <div className="p-3 sm:p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium">{t.payrollPeriod}</label>

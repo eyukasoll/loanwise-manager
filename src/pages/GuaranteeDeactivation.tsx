@@ -197,7 +197,7 @@ export default function GuaranteeDeactivation() {
   return (
     <div>
       <TopBar title={t.gdTitle} subtitle={t.gdSubtitle} />
-      <div className="p-6 animate-fade-in">
+      <div className="p-3 sm:p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <div className="relative">

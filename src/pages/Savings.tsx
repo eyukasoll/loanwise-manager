@@ -100,7 +100,7 @@ export default function Savings() {
   return (
     <div>
       <TopBar title={t.savTitle} subtitle={t.savSubtitle} />
-      <div className="p-6 animate-fade-in space-y-6">
+      <div className="p-3 sm:p-6 animate-fade-in space-y-4 sm:space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard label="Total Deposits" value={fmt(totalDeposits)} icon={PiggyBank} variant="primary" />

@@ -119,7 +119,7 @@ export default function Permissions() {
   return (
     <div>
       <TopBar title={t.permTitle} subtitle={t.permSubtitle} />
-      <div className="p-6 animate-fade-in">
+      <div className="p-3 sm:p-6 animate-fade-in">
         <Tabs value={activeRole} onValueChange={setActiveRole} className="space-y-6">
           <div className="flex items-center justify-between">
             <TabsList className="bg-card border border-border">

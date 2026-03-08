@@ -22,7 +22,7 @@ export default function Repayments() {
   return (
     <div>
       <TopBar title={t.repTitle} subtitle={t.repSubtitle} />
-      <div className="p-6 animate-fade-in space-y-4">
+      <div className="p-3 sm:p-6 animate-fade-in space-y-4">
         <div className="flex items-center gap-3">
           <label className="text-sm font-medium">{t.selectLoanLabel}</label>
           <Select value={selectedLoanId} onValueChange={setSelectedLoanId}>

@@ -131,7 +131,7 @@ export default function GuaranteeApprovals() {
             : "Review and approve your guarantee commitments"
         }
       />
-      <div className="p-6 animate-fade-in">
+      <div className="p-3 sm:p-6 animate-fade-in">
         {/* Search */}
         <div className="flex items-center gap-3 mb-4">
           <div className="relative">

@@ -23,7 +23,7 @@ export default function OverdueTracking() {
   return (
     <div>
       <TopBar title={t.odTitle} subtitle={t.odSubtitle} />
-      <div className="p-6 animate-fade-in space-y-6">
+      <div className="p-3 sm:p-6 animate-fade-in space-y-4 sm:space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard label={t.overdueLoans} value={overdueLoans.length} icon={AlertTriangle} variant="destructive" />
           <StatCard label={t.totalOverdueAmount} value={fmt(overdueLoans.reduce((s: number, l: any) => s + (l.monthly_installment || 0), 0))} icon={Clock} variant="warning" />
