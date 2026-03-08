@@ -62,7 +62,7 @@ export default function GuaranteeDeactivationCertificate({ open, onClose, loan, 
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Guarantee Deactivation Certificate
-            <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>
+            {canPrint("Guarantee Deactivation") && <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>}
           </DialogTitle>
         </DialogHeader>
 

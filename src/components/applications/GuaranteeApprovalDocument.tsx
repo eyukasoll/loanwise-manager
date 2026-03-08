@@ -77,7 +77,7 @@ export default function GuaranteeApprovalDocument({ open, onClose, loan }: Props
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Guarantee Approval Document
-            <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>
+            {canPrint("Guarantee Approvals") && <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>}
           </DialogTitle>
         </DialogHeader>
 

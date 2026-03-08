@@ -80,7 +80,7 @@ export default function LoanApplicationDocument({ open, onClose, loan }: Props) 
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Loan Application Document
-            <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>
+            {canPrint("Applications") && <Button size="sm" onClick={handlePrint}><Printer className="w-4 h-4 mr-1" /> Print</Button>}
           </DialogTitle>
         </DialogHeader>
 
