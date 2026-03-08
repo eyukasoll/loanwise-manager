@@ -46,6 +46,7 @@ const App = () => (
               <Route path="/overdue" element={<OverdueTracking />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/permissions" element={<Permissions />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
