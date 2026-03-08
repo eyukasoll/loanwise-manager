@@ -86,9 +86,8 @@ Deno.serve(async (req) => {
     }
 
     // Assign role (the trigger creates 'employee' by default, update if different)
-    if (appRole !== "employee" && authData.user) {
-      // Update the default role
-      await admin.from("user_roles").update({ role: appRole }).eq("user_id", authData.user.id);
+    if (appRole !== "employee" && authUser) {
+      await admin.from("user_roles").update({ role: appRole }).eq("user_id", authUser.id);
     }
 
     // Get company SMTP settings
