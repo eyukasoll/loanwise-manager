@@ -45,6 +45,7 @@ export default function LoanTypes() {
       max_active_loans: lt.max_active_loans, deduction_method: lt.deduction_method,
       eligibility_min_months: lt.eligibility_min_months || 6,
       salary_multiplier: lt.salary_multiplier || 3, approval_level: lt.approval_level || "Department Head",
+      is_savings_based: lt.is_savings_based || false,
     });
     setDocuments((lt.loan_type_documents || []).map((d: any) => ({
       tempId: d.id, document_name: d.document_name, is_required: d.is_required, template_url: d.template_url,
