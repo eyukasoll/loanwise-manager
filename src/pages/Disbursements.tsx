@@ -82,14 +82,14 @@ export default function Disbursements() {
             )}
 
             <div>
-              <h3 className="font-display font-semibold text-sm mb-3">Disbursement History</h3>
+              <h3 className="font-display font-semibold text-sm mb-3">{t.disbursementHistory}</h3>
               <div className="bg-card rounded-xl border border-border overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border bg-secondary/40">
-                        {["ID", "Employee", "Loan Type", "Amount", "Disbursed On", "Method", "Status"].map(h => (
-                          <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Amount" ? "text-right" : "text-left"}`}>{h}</th>
+                        {["ID", t.employee, t.loanType, t.amount, t.disbursedOn, t.method, t.status].map(h => (
+                          <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
