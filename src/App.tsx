@@ -17,6 +17,7 @@ import PayrollDeductions from "./pages/PayrollDeductions";
 import ManualPayments from "./pages/ManualPayments";
 import OverdueTracking from "./pages/OverdueTracking";
 import Reports from "./pages/Reports";
+import SettingsPage from "./pages/Settings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/manual-payments" element={<ManualPayments />} />
               <Route path="/overdue" element={<OverdueTracking />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

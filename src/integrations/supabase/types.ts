@@ -47,6 +47,87 @@ export type Database = {
         }
         Relationships: []
       }
+      company_settings: {
+        Row: {
+          city: string | null
+          company_address: string | null
+          company_email: string | null
+          company_name: string
+          company_phone: string | null
+          country: string | null
+          created_at: string
+          currency: string
+          default_interest_rate: number | null
+          email_sender_name: string | null
+          fiscal_year_start: string | null
+          id: string
+          late_payment_penalty_rate: number | null
+          license_number: string | null
+          logo_url: string | null
+          max_loan_to_salary_ratio: number | null
+          payroll_cutoff_day: number | null
+          smtp_email: string | null
+          smtp_host: string | null
+          smtp_password: string | null
+          smtp_port: number | null
+          tin_number: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          city?: string | null
+          company_address?: string | null
+          company_email?: string | null
+          company_name?: string
+          company_phone?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string
+          default_interest_rate?: number | null
+          email_sender_name?: string | null
+          fiscal_year_start?: string | null
+          id?: string
+          late_payment_penalty_rate?: number | null
+          license_number?: string | null
+          logo_url?: string | null
+          max_loan_to_salary_ratio?: number | null
+          payroll_cutoff_day?: number | null
+          smtp_email?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          tin_number?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          city?: string | null
+          company_address?: string | null
+          company_email?: string | null
+          company_name?: string
+          company_phone?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string
+          default_interest_rate?: number | null
+          email_sender_name?: string | null
+          fiscal_year_start?: string | null
+          id?: string
+          late_payment_penalty_rate?: number | null
+          license_number?: string | null
+          logo_url?: string | null
+          max_loan_to_salary_ratio?: number | null
+          payroll_cutoff_day?: number | null
+          smtp_email?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          tin_number?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           allowances: number
