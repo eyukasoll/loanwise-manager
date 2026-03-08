@@ -17,7 +17,7 @@ const navItems = [
   { labelKey: "navLoanTypes", icon: Settings, path: "/loan-types", module: "Loan Types" },
   { labelKey: "navApplications", icon: FileText, path: "/applications", module: "Applications" },
   { labelKey: "navApprovals", icon: CheckCircle, path: "/approvals", module: "Approvals" },
-  { labelKey: "navGuaranteeApprovals", icon: UserCheck, path: "/guarantee-approvals", module: "Approvals" },
+  { labelKey: "navGuaranteeApprovals", icon: UserCheck, path: "/guarantee-approvals", module: "Guarantee Approvals" },
   { labelKey: "navDisbursements", icon: Banknote, path: "/disbursements", module: "Disbursements" },
   { labelKey: "navRepaymentSchedule", icon: CalendarCheck, path: "/repayments", module: "Repayment Schedule" },
   { labelKey: "navPayrollDeductions", icon: CreditCard, path: "/deductions", module: "Payroll Deductions" },
@@ -25,7 +25,7 @@ const navItems = [
   { labelKey: "navOverdueTracking", icon: AlertTriangle, path: "/overdue", module: "Overdue Tracking" },
   { labelKey: "navReports", icon: BarChart3, path: "/reports", module: "Reports" },
   { labelKey: "navSavings", icon: PiggyBank, path: "/savings", module: "Savings" },
-  { labelKey: "navGuaranteeDeactivation", icon: ShieldOff, path: "/guarantee-deactivation", module: "Applications" },
+  { labelKey: "navGuaranteeDeactivation", icon: ShieldOff, path: "/guarantee-deactivation", module: "Guarantee Deactivation" },
   { labelKey: "navSettings", icon: Cog, path: "/settings", module: "Settings" },
   { labelKey: "navPermissions", icon: ShieldCheck, path: "/permissions", module: "Permissions" },
 ] as const;

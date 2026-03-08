@@ -13,8 +13,9 @@ const ROLES = ["Admin", "Manager", "Finance User", "Employee User"];
 
 const MODULES = [
   "Dashboard", "Employees", "Loan Types", "Applications", "Approvals",
-  "Disbursements", "Repayment Schedule", "Payroll Deductions", "Manual Payments",
-  "Overdue Tracking", "Reports", "Settings", "Permissions",
+  "Guarantee Approvals", "Disbursements", "Repayment Schedule", "Payroll Deductions",
+  "Manual Payments", "Overdue Tracking", "Reports", "Savings",
+  "Guarantee Deactivation", "Settings", "Permissions",
 ];
 
 const ACTIONS = [
