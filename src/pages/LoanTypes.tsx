@@ -104,8 +104,8 @@ export default function LoanTypes() {
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-display font-semibold">{lt.name}</h3>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(lt)}><Edit className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(lt.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                    {canEdit("Loan Types") && <Button variant="ghost" size="icon" onClick={() => openEdit(lt)}><Edit className="w-4 h-4" /></Button>}
+                    {canDelete("Loan Types") && <Button variant="ghost" size="icon" onClick={() => handleDelete(lt.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                   </div>
                 </div>
                 {lt.description && <p className="text-xs text-muted-foreground mb-3">{lt.description}</p>}

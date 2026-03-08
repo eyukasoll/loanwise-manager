@@ -126,8 +126,8 @@ export default function Employees() {
                       <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
                       <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
                         <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                        {canEdit("Employees") && <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>}
+                        {canDelete("Employees") && <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                       </td>
                     </tr>
                   ))}

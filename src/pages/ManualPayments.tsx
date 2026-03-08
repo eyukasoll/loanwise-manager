@@ -31,9 +31,11 @@ export default function ManualPayments() {
     <div>
       <TopBar title="Manual Payments" subtitle="Record manual loan repayments" />
       <div className="p-6 animate-fade-in">
-        <div className="flex justify-end mb-4">
-          <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> Record Payment</Button>
-        </div>
+        {canCreate("Manual Payments") && (
+          <div className="flex justify-end mb-4">
+            <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> Record Payment</Button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>

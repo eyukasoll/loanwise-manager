@@ -68,7 +68,7 @@ export default function Applications() {
               <SelectContent>{statuses.map(s => <SelectItem key={s} value={s}>{s === "all" ? "All Statuses" : s}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> New Application</Button>
+          {canCreate("Applications") && <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> New Application</Button>}
         </div>
 
         {isLoading ? (
