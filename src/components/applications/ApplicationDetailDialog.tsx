@@ -90,7 +90,7 @@ export default function ApplicationDetailDialog({ selected, onClose, canEdit = f
             <DialogTitle className="flex items-center justify-between gap-2">
               {editMode ? "Edit Application" : "Loan Application Details"}
               <div className="flex items-center gap-1">
-                {!editMode && (
+                {!editMode && canPrint("Applications") && (
                   <Button size="sm" variant="outline" onClick={() => setDocOpen(true)}>
                     <Printer className="w-4 h-4 mr-1" /> Print
                   </Button>
