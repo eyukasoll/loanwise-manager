@@ -16,6 +16,7 @@ interface Props {
 export default function ApplicationDetailDialog({ selected, onClose }: Props) {
   const [guarantors, setGuarantors] = useState<any[]>([]);
   const [certGuarantor, setCertGuarantor] = useState<any>(null);
+  const [docOpen, setDocOpen] = useState(false);
 
   useEffect(() => {
     if (!selected) { setGuarantors([]); return; }
