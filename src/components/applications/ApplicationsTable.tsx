@@ -16,6 +16,7 @@ interface Props {
 
 export default function ApplicationsTable({ filtered, onSelect, selectedIds, onToggleSelect, onToggleAll }: Props) {
   const allSelected = filtered.length > 0 && filtered.every(l => selectedIds.has(l.id));
+  const [docLoan, setDocLoan] = useState<any>(null);
 
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden">
