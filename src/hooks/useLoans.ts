@@ -501,6 +501,93 @@ export function useCreateAuditEntry() {
   });
 }
 
+// ======================== SAVINGS ========================
+
+export function useSavingsTransactions() {
+  return useQuery({
+    queryKey: ["savings_transactions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("savings_transactions")
+        .select("*, employees(full_name, employee_id, department, branch)")
+        .order("transaction_date", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useCreateSavingsTransaction() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (tx: {
+      employee_id: string;
+      savings_type: string;
+      transaction_type: string;
+      amount: number;
+      payment_method: string;
+      receipt_number?: string;
+      remarks?: string;
+      recorded_by?: string;
+    }) => {
+      const { data, error } = await supabase
+        .from("savings_transactions")
+        .insert(tx)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["savings_transactions"] });
+      toast.success("Savings transaction recorded");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+}
+
+export function useBulkCreateSavingsTransactions() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (txs: Array<{
+      employee_id: string;
+      savings_type: string;
+      transaction_type: string;
+      amount: number;
+      payment_method: string;
+      receipt_number?: string;
+      remarks?: string;
+    }>) => {
+      const { data, error } = await supabase
+        .from("savings_transactions")
+        .insert(txs)
+        .select();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["savings_transactions"] });
+      toast.success("Bulk savings imported successfully");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+}
+
+export function useDeleteSavingsTransaction() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("savings_transactions").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["savings_transactions"] });
+      toast.success("Transaction deleted");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+}
+
 // ======================== FILE UPLOAD ========================
 
 export async function uploadLoanDocument(file: File, path: string) {
