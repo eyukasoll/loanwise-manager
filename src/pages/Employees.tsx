@@ -141,7 +141,7 @@ export default function Employees() {
                     </tr>
                   ))}
                   {filtered.length === 0 && (
-                    <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
+                    <tr><td colSpan={8} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
                   )}
                 </tbody>
               </table>
