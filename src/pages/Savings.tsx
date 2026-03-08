@@ -186,9 +186,9 @@ export default function Savings() {
           <DialogHeader><DialogTitle>{t.recordSavingsTransaction}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label>Employee <span className="text-destructive">*</span></Label>
+              <Label>{t.employee} <span className="text-destructive">*</span></Label>
               <Select value={form.employee_id} onValueChange={v => setForm(f => ({ ...f, employee_id: v }))}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select employee" /></SelectTrigger>
+                <SelectTrigger className="mt-1"><SelectValue placeholder={t.selectEmployee} /></SelectTrigger>
                 <SelectContent>
                   {employees.filter((e: any) => e.employment_status === "Active").map((e: any) => (
                     <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>
