@@ -118,12 +118,12 @@ export default function Employees() {
         <div className="flex items-center justify-between mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search employees..." className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t.searchEmployees} className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
           </div>
           {canCreate("Employees") && (
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> Import CSV</Button>
-              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
+              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> {t.importCSV}</Button>
+              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> {t.addEmployee}</Button>
             </div>
           )}
         </div>
@@ -136,14 +136,14 @@ export default function Employees() {
               <table className="w-full text-sm">
                  <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Name</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Department</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Position</th>
-                    <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Salary</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantee</th>
-                    <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">Actions</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employeeId}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.name}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.department}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.position}</th>
+                    <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.salary}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.status}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.guarantee}</th>
+                    <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">{t.actions}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -157,9 +157,9 @@ export default function Employees() {
                       <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
                       <td className="px-5 py-3">
                         {guaranteedIds.has(emp.id) ? (
-                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Guaranteed</span>
+                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{t.guaranteed}</span>
                         ) : (
-                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">Free</span>
+                          <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">{t.free}</span>
                         )}
                       </td>
                       <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
@@ -187,17 +187,17 @@ export default function Employees() {
       {/* View Dialog */}
       <Dialog open={!!viewEmp} onOpenChange={() => setViewEmp(null)}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Employee Details</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.employeeDetails}</DialogTitle></DialogHeader>
           {viewEmp && (
             <div className="grid grid-cols-2 gap-3 text-sm">
               {([
-                ["Employee ID", viewEmp.employee_id], ["Name", viewEmp.full_name],
-                ["Department", viewEmp.department], ["Position", viewEmp.position],
-                ["Branch", viewEmp.branch], ["Joined", viewEmp.date_of_employment],
-                ["Salary", fmt(viewEmp.monthly_salary)], ["Allowances", fmt(viewEmp.allowances)],
-                ["Status", viewEmp.employment_status], ["Phone", viewEmp.phone || "—"],
-                ["Email", viewEmp.email || "—"], ["Bank Account", viewEmp.bank_account || "—"],
-                ["User Type", viewEmp.user_type || "—"],
+                [t.employeeId, viewEmp.employee_id], [t.name, viewEmp.full_name],
+                [t.department, viewEmp.department], [t.position, viewEmp.position],
+                [t.branch, viewEmp.branch], [t.joined, viewEmp.date_of_employment],
+                [t.salary, fmt(viewEmp.monthly_salary)], [t.allowances, fmt(viewEmp.allowances)],
+                [t.status, viewEmp.employment_status], [t.phone, viewEmp.phone || "—"],
+                [t.email, viewEmp.email || "—"], [t.bankAccount, viewEmp.bank_account || "—"],
+                [t.userType, viewEmp.user_type || "—"],
               ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-muted-foreground text-xs">{label}</p>
@@ -212,7 +212,7 @@ export default function Employees() {
       {/* Create/Edit Dialog */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>{editingId ? "Edit Employee" : "Add Employee"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editingId ? t.editEmployee : t.addEmployee}</DialogTitle></DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <Label>Employee ID</Label>
@@ -284,9 +284,9 @@ export default function Employees() {
             </div>
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setFormOpen(false)}>{t.cancel}</Button>
             <Button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}>
-              {editingId ? "Update" : "Create"} Employee
+              {editingId ? t.updateEmployee : t.createEmployee}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -122,12 +122,12 @@ export default function Savings() {
 
         {/* Table */}
         {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          <div className="text-center py-12 text-muted-foreground">{t.loading}</div>
         ) : transactions.length === 0 ? (
           <div className="bg-card rounded-xl border border-border p-12 text-center">
             <PiggyBank className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-            <h3 className="font-display font-semibold text-lg">No Savings Transactions</h3>
-            <p className="text-muted-foreground text-sm mt-1">Savings transactions will appear here once recorded.</p>
+            <h3 className="font-display font-semibold text-lg">{t.noSavingsTransactions}</h3>
+            <p className="text-muted-foreground text-sm mt-1">{t.savingsWillAppear}</p>
           </div>
         ) : (
           <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -135,8 +135,8 @@ export default function Savings() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    {["Date", "Employee", "Emp ID", "Type", "Txn", "Amount", "Method", "Receipt", ""].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Amount" ? "text-right" : "text-left"}`}>{h}</th>
+                    {[t.date, t.employee, t.empId, t.type, t.txn, t.amount, t.method, t.receipt, ""].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -183,12 +183,12 @@ export default function Savings() {
       {/* New Transaction Dialog */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Record Savings Transaction</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.recordSavingsTransaction}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label>Employee <span className="text-destructive">*</span></Label>
+              <Label>{t.employee} <span className="text-destructive">*</span></Label>
               <Select value={form.employee_id} onValueChange={v => setForm(f => ({ ...f, employee_id: v }))}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select employee" /></SelectTrigger>
+                <SelectTrigger className="mt-1"><SelectValue placeholder={t.selectEmployee} /></SelectTrigger>
                 <SelectContent>
                   {employees.filter((e: any) => e.employment_status === "Active").map((e: any) => (
                     <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>
@@ -198,7 +198,7 @@ export default function Savings() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Savings Type</Label>
+                <Label>{t.savingsType}</Label>
                 <Select value={form.savings_type} onValueChange={v => setForm(f => ({ ...f, savings_type: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -208,7 +208,7 @@ export default function Savings() {
                 </Select>
               </div>
               <div>
-                <Label>Transaction Type</Label>
+                <Label>{t.transactionType}</Label>
                 <Select value={form.transaction_type} onValueChange={v => setForm(f => ({ ...f, transaction_type: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -219,11 +219,11 @@ export default function Savings() {
               </div>
             </div>
             <div>
-              <Label>Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
+              <Label>{t.amount} ({CURRENCY}) <span className="text-destructive">*</span></Label>
               <Input type="number" min="0" value={form.amount || ""} onChange={e => setForm(f => ({ ...f, amount: Number(e.target.value) }))} className="mt-1" />
             </div>
             <div>
-              <Label>Payment Method</Label>
+              <Label>{t.paymentMethod}</Label>
               <Select value={form.payment_method} onValueChange={v => setForm(f => ({ ...f, payment_method: v }))}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -234,12 +234,12 @@ export default function Savings() {
                 </SelectContent>
               </Select>
             </div>
-            <div><Label>Receipt Number</Label><Input value={form.receipt_number} onChange={e => setForm(f => ({ ...f, receipt_number: e.target.value }))} className="mt-1" /></div>
-            <div><Label>Remarks</Label><Input value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} className="mt-1" /></div>
+            <div><Label>{t.receiptNumber}</Label><Input value={form.receipt_number} onChange={e => setForm(f => ({ ...f, receipt_number: e.target.value }))} className="mt-1" /></div>
+            <div><Label>{t.remarks}</Label><Input value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} className="mt-1" /></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={createMut.isPending}>Save</Button>
+            <Button variant="outline" onClick={() => setFormOpen(false)}>{t.cancel}</Button>
+            <Button onClick={handleSave} disabled={createMut.isPending}>{t.save}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

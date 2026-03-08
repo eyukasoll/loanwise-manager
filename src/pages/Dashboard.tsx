@@ -68,7 +68,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Department chart */}
           <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-display font-semibold text-sm mb-4">Loans by Department</h3>
+            <h3 className="font-display font-semibold text-sm mb-4">{t.loansByDept}</h3>
             {deptDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={deptDistribution} barGap={4}>
@@ -79,13 +79,13 @@ export default function Dashboard() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[260px] text-muted-foreground text-sm">No data yet</div>
+              <div className="flex items-center justify-center h-[260px] text-muted-foreground text-sm">{t.noDataYet}</div>
             )}
           </div>
 
           {/* Type pie */}
           <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-display font-semibold text-sm mb-4">Loan Type Distribution</h3>
+            <h3 className="font-display font-semibold text-sm mb-4">{t.loanTypeDist}</h3>
             {typeDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
@@ -97,7 +97,7 @@ export default function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[260px] text-muted-foreground text-sm">No data yet</div>
+              <div className="flex items-center justify-center h-[260px] text-muted-foreground text-sm">{t.noDataYet}</div>
             )}
           </div>
         </div>
@@ -105,24 +105,24 @@ export default function Dashboard() {
         {/* Recent applications */}
         <div className="bg-card rounded-xl border border-border">
           <div className="flex items-center justify-between p-5 border-b border-border">
-            <h3 className="font-display font-semibold text-sm">Recent Loan Applications</h3>
-            <Link to="/applications" className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">View all <ArrowRight className="w-3 h-3" /></Link>
+            <h3 className="font-display font-semibold text-sm">{t.recentApplications}</h3>
+            <Link to="/applications" className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">{t.viewAll} <ArrowRight className="w-3 h-3" /></Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/40">
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Application ID</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Type</th>
-                  <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Amount</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Date</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.applicationId}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employee}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.type}</th>
+                  <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.amount}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.status}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.date}</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">Loading...</td></tr>
+                  <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">{t.loading}</td></tr>
                 ) : applications.length === 0 ? (
                   <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">No applications yet. Start by adding employees and loan types.</td></tr>
                 ) : applications.slice(0, 5).map((loan: any) => (

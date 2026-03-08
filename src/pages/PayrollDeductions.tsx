@@ -29,12 +29,12 @@ export default function PayrollDeductions() {
       <div className="p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium">Payroll Period:</label>
+            <label className="text-sm font-medium">{t.payrollPeriod}</label>
             <Input value={period} onChange={e => setPeriod(e.target.value)} className="w-48 h-9" />
           </div>
           {canCreate("Payroll Deductions") && (
             <Button size="sm" onClick={() => generateMut.mutate(period)} disabled={generateMut.isPending}>
-              <RefreshCw className="w-4 h-4 mr-1" /> Generate Deductions
+              <RefreshCw className="w-4 h-4 mr-1" /> {t.generateDeductions}
             </Button>
           )}
         </div>
@@ -52,8 +52,8 @@ export default function PayrollDeductions() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    {["Employee", "Loan ID", "Loan Type", "Deduction Amount", "Status", "Action"].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Deduction Amount" ? "text-right" : "text-left"} ${h === "Action" ? "text-center" : ""}`}>{h}</th>
+                    {[t.employee, t.loanId, t.loanType, t.deductionAmount, t.status, t.action].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.deductionAmount ? "text-right" : "text-left"} ${h === t.action ? "text-center" : ""}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -80,7 +80,7 @@ export default function PayrollDeductions() {
             </div>
             {deductions.length > 0 && (
               <div className="p-4 border-t border-border bg-secondary/20 flex justify-between text-sm">
-                <span className="font-medium">Total Deductions</span>
+                <span className="font-medium">{t.totalDeductions}</span>
                 <span className="font-bold">{fmt(total)}</span>
               </div>
             )}

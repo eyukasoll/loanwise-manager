@@ -66,7 +66,7 @@ export default function Disbursements() {
           <>
             {approved.length > 0 && (
               <div>
-                <h3 className="font-display font-semibold text-sm mb-3">Pending Disbursement ({approved.length})</h3>
+                <h3 className="font-display font-semibold text-sm mb-3">{t.pendingDisbursement} ({approved.length})</h3>
                 <div className="space-y-3">
                   {approved.map((loan: any) => (
                     <div key={loan.id} className="bg-card rounded-xl border-2 border-dashed border-warning/40 p-5 flex items-center justify-between flex-wrap gap-4">
@@ -74,7 +74,7 @@ export default function Disbursements() {
                         <p className="font-medium">{loan.employees?.full_name} <span className="text-muted-foreground text-sm ml-2">{loan.application_number}</span></p>
                         <p className="text-sm text-muted-foreground">{loan.loan_types?.name} · {fmt(loan.approved_amount || loan.requested_amount)}</p>
                       </div>
-                      {canCreate("Disbursements") && <Button size="sm" onClick={() => openDisburse(loan)}><Banknote className="w-4 h-4 mr-1" /> Disburse</Button>}
+                      {canCreate("Disbursements") && <Button size="sm" onClick={() => openDisburse(loan)}><Banknote className="w-4 h-4 mr-1" /> {t.disburse}</Button>}
                     </div>
                   ))}
                 </div>
@@ -82,14 +82,14 @@ export default function Disbursements() {
             )}
 
             <div>
-              <h3 className="font-display font-semibold text-sm mb-3">Disbursement History</h3>
+              <h3 className="font-display font-semibold text-sm mb-3">{t.disbursementHistory}</h3>
               <div className="bg-card rounded-xl border border-border overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border bg-secondary/40">
-                        {["ID", "Employee", "Loan Type", "Amount", "Disbursed On", "Method", "Status"].map(h => (
-                          <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Amount" ? "text-right" : "text-left"}`}>{h}</th>
+                        {["ID", t.employee, t.loanType, t.amount, t.disbursedOn, t.method, t.status].map(h => (
+                          <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -117,15 +117,15 @@ export default function Disbursements() {
 
       <Dialog open={disburseOpen} onOpenChange={setDisburseOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Disburse Loan</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.disburseLoan}</DialogTitle></DialogHeader>
           {selectedLoan && (
             <div className="space-y-3">
               <div className="p-3 bg-secondary/30 rounded-lg text-sm">
                 <p><strong>{selectedLoan.employees?.full_name}</strong> — {selectedLoan.application_number}</p>
                 <p className="text-muted-foreground">{selectedLoan.loan_types?.name} · {fmt(selectedLoan.approved_amount || selectedLoan.requested_amount)}</p>
               </div>
-              <div><Label>Disbursement Date</Label><Input type="date" value={disbForm.date} onChange={e => setDisbForm(f => ({ ...f, date: e.target.value }))} className="mt-1" /></div>
-              <div><Label>Payment Method</Label>
+              <div><Label>{t.disbursementDate}</Label><Input type="date" value={disbForm.date} onChange={e => setDisbForm(f => ({ ...f, date: e.target.value }))} className="mt-1" /></div>
+              <div><Label>{t.paymentMethod}</Label>
                 <Select value={disbForm.method} onValueChange={v => setDisbForm(f => ({ ...f, method: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -135,13 +135,13 @@ export default function Disbursements() {
                   </SelectContent>
                 </Select>
               </div>
-              <div><Label>Voucher No.</Label><Input value={disbForm.voucher} onChange={e => setDisbForm(f => ({ ...f, voucher: e.target.value }))} className="mt-1" /></div>
-              <div><Label>Disbursed By</Label><Input value={disbForm.disbursed_by} onChange={e => setDisbForm(f => ({ ...f, disbursed_by: e.target.value }))} className="mt-1" /></div>
+              <div><Label>{t.voucherNo}</Label><Input value={disbForm.voucher} onChange={e => setDisbForm(f => ({ ...f, voucher: e.target.value }))} className="mt-1" /></div>
+              <div><Label>{t.disbursedBy}</Label><Input value={disbForm.disbursed_by} onChange={e => setDisbForm(f => ({ ...f, disbursed_by: e.target.value }))} className="mt-1" /></div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDisburseOpen(false)}>Cancel</Button>
-            <Button onClick={handleDisburse} disabled={updateMut.isPending || genSchedule.isPending}>Confirm Disbursement</Button>
+            <Button variant="outline" onClick={() => setDisburseOpen(false)}>{t.cancel}</Button>
+            <Button onClick={handleDisburse} disabled={updateMut.isPending || genSchedule.isPending}>{t.confirmDisbursement}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

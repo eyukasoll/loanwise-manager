@@ -24,9 +24,9 @@ export default function Repayments() {
       <TopBar title={t.repTitle} subtitle={t.repSubtitle} />
       <div className="p-6 animate-fade-in space-y-4">
         <div className="flex items-center gap-3">
-          <label className="text-sm font-medium">Select Loan:</label>
+          <label className="text-sm font-medium">{t.selectLoanLabel}</label>
           <Select value={selectedLoanId} onValueChange={setSelectedLoanId}>
-            <SelectTrigger className="w-96 h-9"><SelectValue placeholder="Select a loan" /></SelectTrigger>
+            <SelectTrigger className="w-96 h-9"><SelectValue placeholder={t.selectLoan} /></SelectTrigger>
             <SelectContent>
               {activeLoans.map((l: any) => (
                 <SelectItem key={l.id} value={l.id}>{l.application_number} — {l.employees?.full_name} ({l.loan_types?.name})</SelectItem>
@@ -38,10 +38,10 @@ export default function Repayments() {
         {selectedLoan && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {([
-              ["Principal", fmt(selectedLoan.approved_amount || selectedLoan.requested_amount)],
-              ["Total Payable", fmt(selectedLoan.total_payable || 0)],
-              ["Total Paid", fmt(selectedLoan.total_paid)],
-              ["Outstanding", fmt(selectedLoan.outstanding_balance || 0)],
+              [t.principal, fmt(selectedLoan.approved_amount || selectedLoan.requested_amount)],
+              [t.totalPayable, fmt(selectedLoan.total_payable || 0)],
+              [t.totalPaid, fmt(selectedLoan.total_paid)],
+              [t.outstanding, fmt(selectedLoan.outstanding_balance || 0)],
             ] as [string, string][]).map(([label, value]) => (
               <div key={label} className="stat-card"><p className="text-xs text-muted-foreground">{label}</p><p className="text-lg font-bold font-display mt-1">{value}</p></div>
             ))}
@@ -53,7 +53,7 @@ export default function Repayments() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/40">
-                  {["#", "Due Date", "Beginning Bal.", "Installment", "Principal", "Interest", "Paid", "Remaining", "Status"].map(h => (
+                  {["#", t.dueDate, t.beginningBal, t.installment, t.principal, t.interest, t.paid, t.remaining, t.status].map(h => (
                     <th key={h} className="px-4 py-3 font-medium text-muted-foreground text-xs text-right first:text-left last:text-left">{h}</th>
                   ))}
                 </tr>

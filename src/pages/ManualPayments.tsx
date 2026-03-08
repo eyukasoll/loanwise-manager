@@ -35,7 +35,7 @@ export default function ManualPayments() {
       <div className="p-6 animate-fade-in">
         {canCreate("Manual Payments") && (
           <div className="flex justify-end mb-4">
-            <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> Record Payment</Button>
+            <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> {t.recordPayment}</Button>
           </div>
         )}
 
@@ -44,8 +44,8 @@ export default function ManualPayments() {
         ) : payments.length === 0 ? (
           <div className="bg-card rounded-xl border border-border p-12 text-center">
             <HandCoins className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-            <h3 className="font-display font-semibold text-lg">No Manual Payments</h3>
-            <p className="text-muted-foreground text-sm mt-1">Manual payments will appear here once recorded.</p>
+            <h3 className="font-display font-semibold text-lg">{t.noManualPayments}</h3>
+            <p className="text-muted-foreground text-sm mt-1">{t.manualPaymentsWillAppear}</p>
           </div>
         ) : (
           <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -53,8 +53,8 @@ export default function ManualPayments() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    {["Date", "Employee", "Loan ID", "Amount", "Method", "Receipt", "Received By"].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Amount" ? "text-right" : "text-left"}`}>{h}</th>
+                    {[t.date, t.employee, t.loanId, t.amount, t.method, t.receipt, t.receivedBy].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -79,7 +79,7 @@ export default function ManualPayments() {
 
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Record Manual Payment</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.recordManualPayment}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
               <Label>Loan <span className="text-destructive">*</span></Label>

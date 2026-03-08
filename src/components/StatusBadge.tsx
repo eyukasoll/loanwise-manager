@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type BadgeVariant = "default" | "success" | "warning" | "destructive" | "info" | "outline";
 
@@ -12,7 +13,33 @@ const variants: Record<BadgeVariant, string> = {
   outline: "border border-border text-muted-foreground",
 };
 
+const statusTranslationMap: Record<string, keyof typeof import("@/i18n/en").default> = {
+  active: "statusActive",
+  approved: "statusApproved",
+  closed: "statusClosed",
+  paid: "statusPaid",
+  disbursed: "statusDisbursed",
+  "pending approval": "statusPendingApproval",
+  "under review": "statusUnderReview",
+  submitted: "statusSubmitted",
+  pending: "statusPending",
+  overdue: "statusOverdue",
+  rejected: "statusRejected",
+  cancelled: "statusCancelled",
+  "written off": "statusWrittenOff",
+  draft: "statusDraft",
+  recommended: "statusRecommended",
+  scheduled: "statusScheduled",
+  processed: "statusProcessed",
+  probation: "statusProbation",
+  contract: "statusContract",
+  terminated: "statusTerminated",
+  resigned: "statusResigned",
+};
+
 export default function StatusBadge({ status, className }: { status: string; className?: string }) {
+  const { t } = useLanguage();
+  
   let variant: BadgeVariant = "default";
   const s = status.toLowerCase();
   if (["active", "approved", "closed", "paid", "disbursed"].includes(s)) variant = "success";
@@ -20,9 +47,12 @@ export default function StatusBadge({ status, className }: { status: string; cla
   else if (["overdue", "rejected", "cancelled", "written off"].includes(s)) variant = "destructive";
   else if (["draft", "recommended"].includes(s)) variant = "info";
 
+  const key = statusTranslationMap[s];
+  const label = key ? (t as any)[key] : status;
+
   return (
     <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold", variants[variant], className)}>
-      {status}
+      {label}
     </span>
   );
 }
