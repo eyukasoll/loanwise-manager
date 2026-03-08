@@ -60,7 +60,8 @@ export default function GuaranteeDeactivation() {
 
   const getGuaranteeStatus = (loanStatus: string) => {
     if (["Closed", "Cancelled", "Rejected"].includes(loanStatus)) return "Eligible";
-    return "Active";
+    if (ACTIVE_STATUSES.includes(loanStatus)) return "Active";
+    return "Eligible";
   };
 
   const filtered = guarantees.filter((g: any) => {
