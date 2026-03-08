@@ -459,7 +459,13 @@ export default function GuaranteeDeactivation() {
                 </div>
               </div>
 
-              <div style={{ textAlign: "center", marginTop: 40, padding: 12, border: "2px dashed #aaa", fontSize: 12, color: "#888" }}>Company Stamp / Seal</div>
+              <div style={{ textAlign: "center", marginTop: 40, padding: 12, border: "2px dashed #aaa", fontSize: 12, color: "#888" }}>
+                {company?.stamp_url ? (
+                  <img src={company.stamp_url} alt="Company Stamp" style={{ height: 80, margin: "0 auto", objectFit: "contain" as const }} />
+                ) : (
+                  "Company Stamp / Seal"
+                )}
+              </div>
               <div style={{ fontSize: 11, color: "#888", marginTop: 24, textAlign: "right" }}>Reference: {releaseDoc.refNo}</div>
             </div>
           )}
