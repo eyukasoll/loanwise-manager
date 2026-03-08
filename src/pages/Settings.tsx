@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ const fiscalMonths = ["January", "February", "March", "April", "May", "June", "J
 
 export default function Settings() {
   const { toast } = useToast();
+  const { canEdit } = usePermissions();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settingsId, setSettingsId] = useState<string | null>(null);
@@ -185,7 +187,7 @@ export default function Settings() {
                 </div>
               </div>
               <div className="flex justify-end pt-2">
-                <Button onClick={() => handleSave("company")} disabled={saving}>
+                <Button onClick={() => handleSave("company")} disabled={saving || !canEdit("Settings")}>
                   <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Company Details"}
                 </Button>
               </div>
@@ -239,7 +241,7 @@ export default function Settings() {
                 </div>
               </div>
               <div className="flex justify-end pt-2">
-                <Button onClick={() => handleSave("loan")} disabled={saving}>
+                <Button onClick={() => handleSave("loan")} disabled={saving || !canEdit("Settings")}>
                   <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Loan Settings"}
                 </Button>
               </div>
@@ -276,7 +278,7 @@ export default function Settings() {
                 </div>
               </div>
               <div className="flex justify-end pt-2">
-                <Button onClick={() => handleSave("email")} disabled={saving}>
+                <Button onClick={() => handleSave("email")} disabled={saving || !canEdit("Settings")}>
                   <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Email Settings"}
                 </Button>
               </div>

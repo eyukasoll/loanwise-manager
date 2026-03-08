@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useLoanApplications, usePayrollDeductions, useGeneratePayrollDeductions, useProcessDeduction } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { CreditCard, RefreshCw, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ export default function PayrollDeductions() {
   const { data: deductions = [], isLoading } = usePayrollDeductions(period);
   const generateMut = useGeneratePayrollDeductions();
   const processMut = useProcessDeduction();
+  const { canCreate, canEdit } = usePermissions();
 
   const total = deductions.reduce((s: number, d: any) => s + d.deduction_amount, 0);
   const scheduled = deductions.filter((d: any) => d.status === "Scheduled");
@@ -28,9 +30,11 @@ export default function PayrollDeductions() {
             <label className="text-sm font-medium">Payroll Period:</label>
             <Input value={period} onChange={e => setPeriod(e.target.value)} className="w-48 h-9" />
           </div>
-          <Button size="sm" onClick={() => generateMut.mutate(period)} disabled={generateMut.isPending}>
-            <RefreshCw className="w-4 h-4 mr-1" /> Generate Deductions
-          </Button>
+          {canCreate("Payroll Deductions") && (
+            <Button size="sm" onClick={() => generateMut.mutate(period)} disabled={generateMut.isPending}>
+              <RefreshCw className="w-4 h-4 mr-1" /> Generate Deductions
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 mb-4 p-3 bg-info/10 rounded-lg border border-info/20">
@@ -60,7 +64,7 @@ export default function PayrollDeductions() {
                       <td className="px-5 py-3 text-right font-bold">{fmt(d.deduction_amount)}</td>
                       <td className="px-5 py-3"><StatusBadge status={d.status} /></td>
                       <td className="px-5 py-3 text-center">
-                        {d.status === "Scheduled" && (
+                        {d.status === "Scheduled" && canEdit("Payroll Deductions") && (
                           <Button size="sm" variant="outline" onClick={() => processMut.mutate({ id: d.id, loan_application_id: d.loan_application_id, amount: d.deduction_amount })} disabled={processMut.isPending}>
                             <CheckCircle className="w-3.5 h-3.5 mr-1" /> Process
                           </Button>

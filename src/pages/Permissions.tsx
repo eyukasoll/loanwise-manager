@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,6 +39,7 @@ export default function Permissions() {
   const [saving, setSaving] = useState(false);
   const [permissions, setPermissions] = useState<PermRow[]>([]);
   const [activeRole, setActiveRole] = useState(ROLES[0]);
+  const { canEdit: permCanEdit } = usePermissions();
 
   useEffect(() => {
     fetchPermissions();
@@ -126,7 +128,7 @@ export default function Permissions() {
                 </TabsTrigger>
               ))}
             </TabsList>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving || !permCanEdit("Permissions")}>
               <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Permissions"}
             </Button>
           </div>
