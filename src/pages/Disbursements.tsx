@@ -29,7 +29,8 @@ export default function Disbursements() {
 
   const { paginatedItems: paginatedDisbursed, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(disbursed);
 
-  const handleDisburse = () => {
+  const openDisburse = (loan: any) => { setSelectedLoan(loan); setDisburseOpen(true); };
+
     if (!selectedLoan) return;
     updateMut.mutate({
       id: selectedLoan.id,
