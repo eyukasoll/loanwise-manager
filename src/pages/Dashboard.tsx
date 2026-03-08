@@ -97,7 +97,7 @@ export default function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[260px] text-muted-foreground text-sm">No data yet</div>
+              <div className="flex items-center justify-center h-[260px] text-muted-foreground text-sm">{t.noDataYet}</div>
             )}
           </div>
         </div>
