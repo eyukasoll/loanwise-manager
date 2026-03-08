@@ -20,7 +20,7 @@ export default function Login() {
     setLoading(true);
 
     // Username is the email
-    const email = username.includes("@") ? username : `${username}@loanmanager.local`;
+    const email = username.includes("@") ? username : `${username}@loanmanager.app`;
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
