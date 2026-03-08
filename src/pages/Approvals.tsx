@@ -11,6 +11,7 @@ import { toast } from "sonner";
 export default function Approvals() {
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
+  const { canEdit } = usePermissions();
 
   const pending = applications.filter((l: any) => ["Pending Approval", "Under Review", "Submitted"].includes(l.status));
 
