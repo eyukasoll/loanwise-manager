@@ -20,6 +20,7 @@ import OverdueTracking from "./pages/OverdueTracking";
 import Reports from "./pages/Reports";
 import SettingsPage from "./pages/Settings";
 import Permissions from "./pages/Permissions";
+import Savings from "./pages/Savings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/reports" element={guard("Reports", <Reports />)} />
               <Route path="/settings" element={guard("Settings", <SettingsPage />)} />
               <Route path="/permissions" element={guard("Permissions", <Permissions />)} />
+              <Route path="/savings" element={guard("Savings", <Savings />)} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

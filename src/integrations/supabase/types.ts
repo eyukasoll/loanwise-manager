@@ -646,6 +646,56 @@ export type Database = {
         }
         Relationships: []
       }
+      savings_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          employee_id: string
+          id: string
+          payment_method: string
+          receipt_number: string | null
+          recorded_by: string | null
+          remarks: string | null
+          savings_type: string
+          transaction_date: string
+          transaction_type: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          employee_id: string
+          id?: string
+          payment_method?: string
+          receipt_number?: string | null
+          recorded_by?: string | null
+          remarks?: string | null
+          savings_type?: string
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          employee_id?: string
+          id?: string
+          payment_method?: string
+          receipt_number?: string | null
+          recorded_by?: string | null
+          remarks?: string | null
+          savings_type?: string
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "savings_transactions_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
