@@ -9,8 +9,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image, DatabaseBackup, Download, CheckCircle2 } from "lucide-react";
+import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image, DatabaseBackup, Download, CheckCircle2, UploadCloud, AlertTriangle, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Progress } from "@/components/ui/progress";
 
 const fiscalMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -412,8 +423,118 @@ const backupTables = [
 type TableKey = (typeof backupTables)[number]["key"];
 
 function BackupExportTab({ toast }: { toast: ReturnType<typeof useToast>["toast"] }) {
+  const [activeSubTab, setActiveSubTab] = useState<"export" | "import">("export");
   const [exporting, setExporting] = useState<string | null>(null);
   const [exported, setExported] = useState<Set<string>>(new Set());
+
+  // Import state
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importSheets, setImportSheets] = useState<{ sheetName: string; tableKey: TableKey | null; rowCount: number }[]>([]);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [importResults, setImportResults] = useState<{ table: string; inserted: number; errors: number }[]>([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [parsedWorkbook, setParsedWorkbook] = useState<XLSX.WorkBook | null>(null);
+
+  const sheetToTableMap: Record<string, TableKey> = {};
+  backupTables.forEach((t) => {
+    sheetToTableMap[t.label] = t.key;
+    sheetToTableMap[t.key] = t.key;
+    sheetToTableMap[t.label.toLowerCase()] = t.key;
+  });
+
+  const resolveTableKey = (sheetName: string): TableKey | null => {
+    const lower = sheetName.toLowerCase().trim();
+    for (const t of backupTables) {
+      if (lower === t.label.toLowerCase() || lower === t.key.toLowerCase() || lower === t.key.replace(/_/g, " ")) {
+        return t.key;
+      }
+    }
+    return null;
+  };
+
+  const handleFileSelect = (file: File) => {
+    setImportFile(file);
+    setImportResults([]);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const wb = XLSX.read(data, { type: "array" });
+        setParsedWorkbook(wb);
+        const sheets = wb.SheetNames.map((name) => {
+          const ws = wb.Sheets[name];
+          const json = XLSX.utils.sheet_to_json(ws);
+          return { sheetName: name, tableKey: resolveTableKey(name), rowCount: json.length };
+        });
+        setImportSheets(sheets);
+      } catch {
+        toast({ title: "Invalid file", description: "Could not read the Excel file.", variant: "destructive" });
+        setImportFile(null);
+        setImportSheets([]);
+        setParsedWorkbook(null);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const updateSheetMapping = (idx: number, tableKey: TableKey | null) => {
+    setImportSheets((prev) => prev.map((s, i) => (i === idx ? { ...s, tableKey } : s)));
+  };
+
+  const validSheets = importSheets.filter((s) => s.tableKey && s.rowCount > 0);
+
+  const executeImport = async () => {
+    setConfirmOpen(false);
+    if (!parsedWorkbook || validSheets.length === 0) return;
+    setImporting(true);
+    setImportProgress(0);
+    const results: typeof importResults = [];
+
+    for (let i = 0; i < validSheets.length; i++) {
+      const sheet = validSheets[i];
+      const ws = parsedWorkbook.Sheets[sheet.sheetName];
+      const rows: any[] = XLSX.utils.sheet_to_json(ws);
+      const tableKey = sheet.tableKey!;
+      const tableLabel = backupTables.find((t) => t.key === tableKey)?.label || tableKey;
+
+      let inserted = 0;
+      let errors = 0;
+      const batchSize = 50;
+
+      for (let j = 0; j < rows.length; j += batchSize) {
+        const batch = rows.slice(j, j + batchSize).map((row) => {
+          // Clean up: remove empty string values for uuid/numeric fields
+          const cleaned: any = {};
+          for (const [k, v] of Object.entries(row)) {
+            if (v === "" || v === undefined) continue;
+            cleaned[k] = v;
+          }
+          return cleaned;
+        });
+
+        const { error } = await supabase.from(tableKey).upsert(batch as any, { onConflict: "id", ignoreDuplicates: false });
+        if (error) {
+          errors += batch.length;
+        } else {
+          inserted += batch.length;
+        }
+      }
+
+      results.push({ table: tableLabel, inserted, errors });
+      setImportProgress(Math.round(((i + 1) / validSheets.length) * 100));
+    }
+
+    setImportResults(results);
+    setImporting(false);
+    const totalInserted = results.reduce((s, r) => s + r.inserted, 0);
+    const totalErrors = results.reduce((s, r) => s + r.errors, 0);
+    toast({
+      title: "Import complete",
+      description: `${totalInserted} records restored${totalErrors > 0 ? `, ${totalErrors} errors` : ""}.`,
+      variant: totalErrors > 0 ? "destructive" : "default",
+    });
+  };
 
   const exportTable = async (tableKey: TableKey, label: string) => {
     setExporting(tableKey);
@@ -422,28 +543,22 @@ function BackupExportTab({ toast }: { toast: ReturnType<typeof useToast>["toast"
       let from = 0;
       const batchSize = 1000;
       while (true) {
-        const { data, error } = await supabase
-          .from(tableKey)
-          .select("*")
-          .range(from, from + batchSize - 1);
+        const { data, error } = await supabase.from(tableKey).select("*").range(from, from + batchSize - 1);
         if (error) throw error;
         if (!data || data.length === 0) break;
         allData = allData.concat(data);
         if (data.length < batchSize) break;
         from += batchSize;
       }
-
       if (allData.length === 0) {
         toast({ title: "No data", description: `${label} table is empty.` });
         setExporting(null);
         return;
       }
-
       const ws = XLSX.utils.json_to_sheet(allData);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, label);
       XLSX.writeFile(wb, `${tableKey}_backup_${new Date().toISOString().slice(0, 10)}.xlsx`);
-
       setExported((prev) => new Set(prev).add(tableKey));
       toast({ title: "Export complete", description: `${label} exported (${allData.length} records).` });
     } catch (err: any) {
@@ -457,16 +572,12 @@ function BackupExportTab({ toast }: { toast: ReturnType<typeof useToast>["toast"
     try {
       const wb = XLSX.utils.book_new();
       let totalRecords = 0;
-
       for (const table of backupTables) {
         let allData: any[] = [];
         let from = 0;
         const batchSize = 1000;
         while (true) {
-          const { data, error } = await supabase
-            .from(table.key)
-            .select("*")
-            .range(from, from + batchSize - 1);
+          const { data, error } = await supabase.from(table.key).select("*").range(from, from + batchSize - 1);
           if (error) throw error;
           if (!data || data.length === 0) break;
           allData = allData.concat(data);
@@ -479,7 +590,6 @@ function BackupExportTab({ toast }: { toast: ReturnType<typeof useToast>["toast"
           totalRecords += allData.length;
         }
       }
-
       XLSX.writeFile(wb, `full_backup_${new Date().toISOString().slice(0, 10)}.xlsx`);
       setExported(new Set(backupTables.map((t) => t.key)));
       toast({ title: "Full backup complete", description: `All tables exported (${totalRecords} total records).` });
@@ -490,53 +600,221 @@ function BackupExportTab({ toast }: { toast: ReturnType<typeof useToast>["toast"
   };
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">Backup & Export</h3>
-          <p className="text-sm text-muted-foreground">Download your data as Excel files for safekeeping</p>
-        </div>
-        <Button onClick={exportAll} disabled={exporting !== null} className="gap-2">
-          {exporting === "all" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          {exporting === "all" ? "Exporting..." : "Export All Tables"}
+    <div className="space-y-6">
+      {/* Sub-tabs */}
+      <div className="flex gap-2">
+        <Button
+          variant={activeSubTab === "export" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setActiveSubTab("export")}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" /> Export / Backup
+        </Button>
+        <Button
+          variant={activeSubTab === "import" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setActiveSubTab("import")}
+          className="gap-2"
+        >
+          <UploadCloud className="w-4 h-4" /> Import / Restore
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {backupTables.map((table) => (
-          <div
-            key={table.key}
-            className="flex items-center justify-between rounded-lg border border-border px-4 py-3 bg-secondary/20"
-          >
-            <div className="min-w-0">
-              <p className="text-sm font-medium flex items-center gap-2">
-                {table.label}
-                {exported.has(table.key) && <CheckCircle2 className="w-3.5 h-3.5 text-success" />}
-              </p>
-              <p className="text-xs text-muted-foreground">{table.description}</p>
+      {/* Export Tab */}
+      {activeSubTab === "export" && (
+        <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Backup & Export</h3>
+              <p className="text-sm text-muted-foreground">Download your data as Excel files for safekeeping</p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="shrink-0 ml-3 h-8"
-              disabled={exporting !== null}
-              onClick={() => exportTable(table.key, table.label)}
-            >
-              {exporting === table.key ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Download className="w-3.5 h-3.5" />
-              )}
+            <Button onClick={exportAll} disabled={exporting !== null} className="gap-2">
+              {exporting === "all" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {exporting === "all" ? "Exporting..." : "Export All Tables"}
             </Button>
           </div>
-        ))}
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {backupTables.map((table) => (
+              <div key={table.key} className="flex items-center justify-between rounded-lg border border-border px-4 py-3 bg-secondary/20">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    {table.label}
+                    {exported.has(table.key) && <CheckCircle2 className="w-3.5 h-3.5 text-success" />}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{table.description}</p>
+                </div>
+                <Button variant="outline" size="sm" className="shrink-0 ml-3 h-8" disabled={exporting !== null} onClick={() => exportTable(table.key, table.label)}>
+                  {exporting === table.key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                </Button>
+              </div>
+            ))}
+          </div>
+          <div className="rounded-lg bg-muted/50 border border-border px-4 py-3">
+            <p className="text-xs text-muted-foreground">
+              <strong>Tip:</strong> Regular backups help protect your data. We recommend exporting a full backup at least once a week.
+            </p>
+          </div>
+        </div>
+      )}
 
-      <div className="rounded-lg bg-muted/50 border border-border px-4 py-3">
-        <p className="text-xs text-muted-foreground">
-          <strong>Tip:</strong> Regular backups help protect your data. We recommend exporting a full backup at least once a week. Files are downloaded in Excel (.xlsx) format for easy viewing and archiving.
-        </p>
-      </div>
+      {/* Import Tab */}
+      {activeSubTab === "import" && (
+        <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">Import / Restore Data</h3>
+            <p className="text-sm text-muted-foreground">Upload a previously exported Excel backup to restore data into the system</p>
+          </div>
+
+          {/* Warning banner */}
+          <div className="rounded-lg bg-warning/10 border border-warning/30 px-4 py-3 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-warning">Caution: This will overwrite existing records</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Records with matching IDs will be updated. Make sure you have a current backup before restoring data.
+              </p>
+            </div>
+          </div>
+
+          {/* Upload area */}
+          {!importFile ? (
+            <label className="cursor-pointer flex flex-col items-center gap-3 border-2 border-dashed border-border rounded-xl p-10 hover:border-primary/50 hover:bg-primary/5 transition-colors">
+              <div className="rounded-full bg-muted p-4">
+                <FileSpreadsheet className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium">Click to select an Excel backup file</p>
+                <p className="text-xs text-muted-foreground mt-1">.xlsx files exported from this system</p>
+              </div>
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleFileSelect(f);
+                }}
+              />
+            </label>
+          ) : (
+            <div className="space-y-4">
+              {/* File info */}
+              <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3 bg-secondary/20">
+                <div className="flex items-center gap-3">
+                  <FileSpreadsheet className="w-5 h-5 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium">{importFile.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {importSheets.length} sheet(s) · {importSheets.reduce((s, sh) => s + sh.rowCount, 0)} total rows
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => {
+                    setImportFile(null);
+                    setImportSheets([]);
+                    setParsedWorkbook(null);
+                    setImportResults([]);
+                  }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {/* Sheet mapping */}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sheet → Table Mapping</p>
+                {importSheets.map((sheet, idx) => (
+                  <div key={idx} className="flex items-center gap-3 rounded-lg border border-border px-4 py-2.5 bg-secondary/10">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{sheet.sheetName}</p>
+                      <p className="text-xs text-muted-foreground">{sheet.rowCount} rows</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">→</span>
+                    <Select
+                      value={sheet.tableKey || "skip"}
+                      onValueChange={(v) => updateSheetMapping(idx, v === "skip" ? null : (v as TableKey))}
+                    >
+                      <SelectTrigger className="w-48 h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="skip">Skip (don't import)</SelectItem>
+                        {backupTables.map((t) => (
+                          <SelectItem key={t.key} value={t.key}>{t.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+
+              {/* Progress */}
+              {importing && (
+                <div className="space-y-2">
+                  <Progress value={importProgress} className="h-2" />
+                  <p className="text-xs text-muted-foreground text-center">Importing... {importProgress}%</p>
+                </div>
+              )}
+
+              {/* Results */}
+              {importResults.length > 0 && !importing && (
+                <div className="rounded-lg border border-border overflow-hidden">
+                  <div className="px-4 py-2 bg-muted/50 border-b border-border">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Import Results</p>
+                  </div>
+                  {importResults.map((r, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-2 border-b border-border/50 last:border-0">
+                      <p className="text-sm">{r.table}</p>
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="text-success font-medium">{r.inserted} restored</span>
+                        {r.errors > 0 && <span className="text-destructive font-medium">{r.errors} errors</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Action */}
+              <div className="flex justify-end">
+                <Button
+                  onClick={() => setConfirmOpen(true)}
+                  disabled={importing || validSheets.length === 0}
+                  className="gap-2"
+                >
+                  <UploadCloud className="w-4 h-4" />
+                  Restore {validSheets.length} Table{validSheets.length !== 1 ? "s" : ""} ({validSheets.reduce((s, sh) => s + sh.rowCount, 0)} rows)
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Confirm dialog */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Data Restore</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to restore <strong>{validSheets.reduce((s, sh) => s + sh.rowCount, 0)} records</strong> into{" "}
+              <strong>{validSheets.length} table(s)</strong>. Existing records with matching IDs will be overwritten.
+              <br /><br />
+              This action cannot be undone. Make sure you have a current backup.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={executeImport} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+              Yes, Restore Data
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
