@@ -1,5 +1,6 @@
 import React from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import StatusBadge from "@/components/StatusBadge";
 import StatCard from "@/components/StatCard";
 import { useLoanApplications } from "@/hooks/useLoans";

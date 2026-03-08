@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import { useLoanApplications, usePayrollDeductions, useGeneratePayrollDeductions, useProcessDeduction } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { CreditCard, RefreshCw, CheckCircle } from "lucide-react";

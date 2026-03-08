@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import { useManualPayments, useCreateManualPayment, useLoanApplications } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { HandCoins, Plus } from "lucide-react";
