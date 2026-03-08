@@ -30,9 +30,11 @@ export default function PayrollDeductions() {
             <label className="text-sm font-medium">Payroll Period:</label>
             <Input value={period} onChange={e => setPeriod(e.target.value)} className="w-48 h-9" />
           </div>
-          <Button size="sm" onClick={() => generateMut.mutate(period)} disabled={generateMut.isPending}>
-            <RefreshCw className="w-4 h-4 mr-1" /> Generate Deductions
-          </Button>
+          {canCreate("Payroll Deductions") && (
+            <Button size="sm" onClick={() => generateMut.mutate(period)} disabled={generateMut.isPending}>
+              <RefreshCw className="w-4 h-4 mr-1" /> Generate Deductions
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 mb-4 p-3 bg-info/10 rounded-lg border border-info/20">
