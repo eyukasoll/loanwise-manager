@@ -53,40 +53,43 @@ export default function PayrollDeductions() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-secondary/40">
-                    {[t.employee, t.loanId, t.loanType, t.deductionAmount, t.status, t.action].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.deductionAmount ? "text-right" : "text-left"} ${h === t.action ? "text-center" : ""}`}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {deductions.map((d: any) => (
-                    <tr key={d.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                      <td className="px-5 py-3 font-medium">{d.loan_applications?.employees?.full_name}</td>
-                      <td className="px-5 py-3 font-mono text-xs">{d.loan_applications?.application_number}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{d.loan_applications?.loan_types?.name}</td>
-                      <td className="px-5 py-3 text-right font-bold">{fmt(d.deduction_amount)}</td>
-                      <td className="px-5 py-3"><StatusBadge status={d.status} /></td>
-                      <td className="px-5 py-3 text-center">
-                        {d.status === "Scheduled" && canEdit("Payroll Deductions") && (
-                          <Button size="sm" variant="outline" onClick={() => processMut.mutate({ id: d.id, loan_application_id: d.loan_application_id, amount: d.deduction_amount })} disabled={processMut.isPending}>
-                            <CheckCircle className="w-3.5 h-3.5 mr-1" /> Process
-                          </Button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                  {deductions.length === 0 && <tr><td colSpan={6} className="px-5 py-12 text-center text-muted-foreground">No deductions for this period. Click "Generate Deductions" to create them.</td></tr>}
-                </tbody>
-              </table>
-            </div>
-            {deductions.length > 0 && (
-              <div className="p-4 border-t border-border bg-secondary/20 flex justify-between text-sm">
-                <span className="font-medium">{t.totalDeductions}</span>
-                <span className="font-bold">{fmt(total)}</span>
-              </div>
-            )}
-          </div>
+                   <tr className="border-b border-border bg-secondary/40">
+                     <th className="px-3 py-3 font-medium text-muted-foreground text-xs text-left w-10">#</th>
+                     {[t.employee, t.loanId, t.loanType, t.deductionAmount, t.status, t.action].map(h => (
+                       <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.deductionAmount ? "text-right" : "text-left"} ${h === t.action ? "text-center" : ""}`}>{h}</th>
+                     ))}
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {paginatedDeductions.map((d: any, idx: number) => (
+                     <tr key={d.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                       <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                       <td className="px-5 py-3 font-medium">{d.loan_applications?.employees?.full_name}</td>
+                       <td className="px-5 py-3 font-mono text-xs">{d.loan_applications?.application_number}</td>
+                       <td className="px-5 py-3 text-muted-foreground">{d.loan_applications?.loan_types?.name}</td>
+                       <td className="px-5 py-3 text-right font-bold">{fmt(d.deduction_amount)}</td>
+                       <td className="px-5 py-3"><StatusBadge status={d.status} /></td>
+                       <td className="px-5 py-3 text-center">
+                         {d.status === "Scheduled" && canEdit("Payroll Deductions") && (
+                           <Button size="sm" variant="outline" onClick={() => processMut.mutate({ id: d.id, loan_application_id: d.loan_application_id, amount: d.deduction_amount })} disabled={processMut.isPending}>
+                             <CheckCircle className="w-3.5 h-3.5 mr-1" /> Process
+                           </Button>
+                         )}
+                       </td>
+                     </tr>
+                   ))}
+                   {deductions.length === 0 && <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No deductions for this period. Click "Generate Deductions" to create them.</td></tr>}
+                 </tbody>
+               </table>
+             </div>
+             {deductions.length > 0 && (
+               <div className="p-4 border-t border-border bg-secondary/20 flex justify-between text-sm">
+                 <span className="font-medium">{t.totalDeductions}</span>
+                 <span className="font-bold">{fmt(total)}</span>
+               </div>
+             )}
+             <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+           </div>
         )}
       </div>
     </div>
