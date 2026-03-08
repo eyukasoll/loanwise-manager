@@ -21,6 +21,8 @@ export default function OverdueTracking() {
     return { ...l, overdueDays };
   });
 
+  const { paginatedItems: paginatedOverdue, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(overdueLoans);
+
   return (
     <div>
       <TopBar title={t.odTitle} subtitle={t.odSubtitle} />
