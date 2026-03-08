@@ -170,8 +170,8 @@ export default function Permissions() {
                       {MODULES.map((module) => {
                         const perm = getPerm(role, module);
                         if (!perm) return null;
-                        const allChecked = perm.can_view && perm.can_create && perm.can_edit && perm.can_delete;
-                        const someChecked = perm.can_view || perm.can_create || perm.can_edit || perm.can_delete;
+                        const allChecked = perm.can_view && perm.can_create && perm.can_edit && perm.can_delete && perm.can_import && perm.can_export && perm.can_print && perm.can_share;
+                        const someChecked = perm.can_view || perm.can_create || perm.can_edit || perm.can_delete || perm.can_import || perm.can_export || perm.can_print || perm.can_share;
 
                         return (
                           <tr key={module} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
