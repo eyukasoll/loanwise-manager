@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fmt, CURRENCY } from "@/lib/currency";
 import StatCard from "@/components/StatCard";
 import BulkSavingsImport from "@/components/BulkSavingsImport";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Savings() {
   const { data: transactions = [], isLoading } = useSavingsTransactions();
