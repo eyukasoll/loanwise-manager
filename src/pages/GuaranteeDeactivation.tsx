@@ -51,6 +51,8 @@ export default function GuaranteeDeactivation() {
   const [newGuarantorId, setNewGuarantorId] = useState("");
   const [employeeSearch, setEmployeeSearch] = useState("");
   const [releasing, setReleasing] = useState(false);
+  const [releaseDoc, setReleaseDoc] = useState<any>(null);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const getGuaranteeStatus = (loanStatus: string) => {
     if (["Closed", "Cancelled", "Rejected"].includes(loanStatus)) return "Eligible";
