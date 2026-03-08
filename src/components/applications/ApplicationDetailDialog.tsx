@@ -131,6 +131,13 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
         loan={selected}
         guarantor={certGuarantor}
       />
+
+      {/* Loan Application Document */}
+      <LoanApplicationDocument
+        open={docOpen}
+        onClose={() => setDocOpen(false)}
+        loan={selected}
+      />
     </>
   );
 }
