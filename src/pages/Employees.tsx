@@ -105,7 +105,7 @@ export default function Employees() {
           <div className="bg-card rounded-xl border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>
+                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Name</th>
@@ -113,6 +113,7 @@ export default function Employees() {
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Position</th>
                     <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Salary</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantee</th>
                     <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">Actions</th>
                   </tr>
                 </thead>
