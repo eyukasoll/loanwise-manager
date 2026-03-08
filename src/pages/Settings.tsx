@@ -405,6 +405,10 @@ export default function Settings() {
           <TabsContent value="backup">
             <BackupExportTab toast={toast} />
           </TabsContent>
+          {/* Security - Change Password */}
+          <TabsContent value="security">
+            <ChangePasswordTab toast={toast} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
