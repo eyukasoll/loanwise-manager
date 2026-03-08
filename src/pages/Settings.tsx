@@ -385,6 +385,10 @@ export default function Settings() {
               </div>
             </div>
           </TabsContent>
+          {/* Backup & Export */}
+          <TabsContent value="backup">
+            <BackupExportTab toast={toast} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
