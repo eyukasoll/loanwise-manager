@@ -601,6 +601,32 @@ export function useDeleteSavingsTransaction() {
   });
 }
 
+// ======================== GUARANTORS ========================
+
+export function useGuaranteedEmployeeIds() {
+  return useQuery({
+    queryKey: ["guaranteed_employee_ids"],
+    queryFn: async () => {
+      // Get guarantor employee_ids for loans in active statuses
+      const { data: activeLoans, error: lErr } = await supabase
+        .from("loan_applications")
+        .select("id")
+        .in("status", ["Submitted", "Under Review", "Pending Approval", "Approved", "Disbursed", "Active"]);
+      if (lErr) throw lErr;
+      if (!activeLoans || activeLoans.length === 0) return new Set<string>();
+
+      const loanIds = activeLoans.map(l => l.id);
+      const { data: guarantors, error: gErr } = await supabase
+        .from("loan_guarantors")
+        .select("employee_id")
+        .in("loan_application_id", loanIds);
+      if (gErr) throw gErr;
+
+      return new Set((guarantors || []).map(g => g.employee_id));
+    },
+  });
+}
+
 // ======================== FILE UPLOAD ========================
 
 export async function uploadLoanDocument(file: File, path: string) {
