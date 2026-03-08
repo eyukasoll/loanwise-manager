@@ -53,8 +53,8 @@ export default function ManualPayments() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    {["Date", "Employee", "Loan ID", "Amount", "Method", "Receipt", "Received By"].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Amount" ? "text-right" : "text-left"}`}>{h}</th>
+                    {[t.date, t.employee, t.loanId, t.amount, t.method, t.receipt, t.receivedBy].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
