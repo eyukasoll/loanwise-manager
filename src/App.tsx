@@ -20,6 +20,7 @@ import OverdueTracking from "./pages/OverdueTracking";
 import Reports from "./pages/Reports";
 import SettingsPage from "./pages/Settings";
 import Permissions from "./pages/Permissions";
+import Savings from "./pages/Savings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
