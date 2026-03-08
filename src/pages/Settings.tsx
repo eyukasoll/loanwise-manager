@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TopBar from "@/components/TopBar";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
