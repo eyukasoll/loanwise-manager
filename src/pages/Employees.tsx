@@ -150,6 +150,7 @@ export default function Employees() {
                 ["Salary", fmt(viewEmp.monthly_salary)], ["Allowances", fmt(viewEmp.allowances)],
                 ["Status", viewEmp.employment_status], ["Phone", viewEmp.phone || "—"],
                 ["Email", viewEmp.email || "—"], ["Bank Account", viewEmp.bank_account || "—"],
+                ["User Type", viewEmp.user_type || "—"],
               ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-muted-foreground text-xs">{label}</p>
