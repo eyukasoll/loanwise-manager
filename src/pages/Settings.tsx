@@ -243,6 +243,9 @@ export default function Settings() {
             <TabsTrigger value="backup" className="gap-2">
               <DatabaseBackup className="w-4 h-4" /> Backup & Export
             </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2">
+              <Lock className="w-4 h-4" /> Security
+            </TabsTrigger>
           </TabsList>
 
           {/* Company Details */}
