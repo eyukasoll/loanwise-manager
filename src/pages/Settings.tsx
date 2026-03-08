@@ -247,6 +247,9 @@ export default function Settings() {
             <TabsTrigger value="security" className="gap-2 text-xs sm:text-sm">
               <Lock className="w-4 h-4" /> Security
             </TabsTrigger>
+            <TabsTrigger value="manual" className="gap-2 text-xs sm:text-sm">
+              <BookOpen className="w-4 h-4" /> <span className="hidden sm:inline">User Manual</span><span className="sm:hidden">Manual</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Company Details */}
