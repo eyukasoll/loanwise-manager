@@ -1,22 +1,65 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { employees } from "@/data/mockData";
-import { Search, Plus, Eye } from "lucide-react";
+import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from "@/hooks/useLoans";
+import { Search, Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { fmt, CURRENCY } from "@/lib/currency";
 
-import { fmt } from "@/lib/currency";
+const emptyForm = {
+  employee_id: "", full_name: "", department: "", position: "", branch: "Main Office",
+  date_of_employment: "", employment_status: "Active", monthly_salary: 0,
+  allowances: 0, bank_account: "", phone: "", email: "",
+};
 
 export default function Employees() {
+  const { data: employees = [], isLoading } = useEmployees();
+  const createMut = useCreateEmployee();
+  const updateMut = useUpdateEmployee();
+  const deleteMut = useDeleteEmployee();
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<typeof employees[0] | null>(null);
+  const [viewEmp, setViewEmp] = useState<any>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyForm);
 
-  const filtered = employees.filter(e =>
-    e.name.toLowerCase().includes(search.toLowerCase()) ||
-    e.id.toLowerCase().includes(search.toLowerCase()) ||
+  const filtered = employees.filter((e: any) =>
+    e.full_name.toLowerCase().includes(search.toLowerCase()) ||
+    e.employee_id.toLowerCase().includes(search.toLowerCase()) ||
     e.department.toLowerCase().includes(search.toLowerCase())
   );
+
+  const openCreate = () => { setEditingId(null); setForm(emptyForm); setFormOpen(true); };
+  const openEdit = (emp: any) => {
+    setEditingId(emp.id);
+    setForm({
+      employee_id: emp.employee_id, full_name: emp.full_name, department: emp.department,
+      position: emp.position, branch: emp.branch, date_of_employment: emp.date_of_employment,
+      employment_status: emp.employment_status, monthly_salary: emp.monthly_salary,
+      allowances: emp.allowances, bank_account: emp.bank_account || "",
+      phone: emp.phone || "", email: emp.email || "",
+    });
+    setFormOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!form.employee_id || !form.full_name || !form.department || !form.position || !form.date_of_employment) return;
+    if (editingId) {
+      updateMut.mutate({ id: editingId, ...form }, { onSuccess: () => setFormOpen(false) });
+    } else {
+      createMut.mutate(form, { onSuccess: () => setFormOpen(false) });
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to delete this employee?")) {
+      deleteMut.mutate(id);
+    }
+  };
 
   return (
     <div>
@@ -25,70 +68,68 @@ export default function Employees() {
         <div className="flex items-center justify-between mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search employees..."
-              className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72"
-            />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search employees..." className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
           </div>
-          <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
+          <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
         </div>
 
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-secondary/40">
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Name</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Department</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Position</th>
-                  <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Salary</th>
-                  <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">Active Loans</th>
-                  <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Outstanding</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
-                  <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(emp => (
-                  <tr key={emp.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                    <td className="px-5 py-3 font-mono text-xs">{emp.id}</td>
-                    <td className="px-5 py-3 font-medium">{emp.name}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
-                    <td className="px-5 py-3 text-right">{fmt(emp.monthlySalary)}</td>
-                    <td className="px-5 py-3 text-center">{emp.activeLoans}</td>
-                    <td className="px-5 py-3 text-right font-medium">{fmt(emp.outstandingBalance)}</td>
-                    <td className="px-5 py-3"><StatusBadge status={emp.status} /></td>
-                    <td className="px-5 py-3 text-center">
-                      <Button variant="ghost" size="icon" onClick={() => setSelected(emp)}>
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </td>
+        {isLoading ? (
+          <div className="text-center py-12 text-muted-foreground">Loading employees...</div>
+        ) : (
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-secondary/40">
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Name</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Department</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Position</th>
+                    <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Salary</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
+                    <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filtered.map((emp: any) => (
+                    <tr key={emp.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                      <td className="px-5 py-3 font-mono text-xs">{emp.employee_id}</td>
+                      <td className="px-5 py-3 font-medium">{emp.full_name}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
+                      <td className="px-5 py-3 text-right">{fmt(emp.monthly_salary)}</td>
+                      <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
+                      <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                      </td>
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
+      {/* View Dialog */}
+      <Dialog open={!!viewEmp} onOpenChange={() => setViewEmp(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>Employee Details</DialogTitle></DialogHeader>
-          {selected && (
+          {viewEmp && (
             <div className="grid grid-cols-2 gap-3 text-sm">
               {([
-                ["Employee ID", selected.id], ["Name", selected.name],
-                ["Department", selected.department], ["Position", selected.position],
-                ["Branch", selected.branch], ["Joined", selected.dateOfEmployment],
-                ["Salary", fmt(selected.monthlySalary)], ["Status", selected.status],
-                ["Phone", selected.phone], ["Email", selected.email],
-                ["Bank Account", selected.bankAccount], ["Active Loans", selected.activeLoans],
-                ["Outstanding", fmt(selected.outstandingBalance)],
-              ] as [string, string | number][]).map(([label, value]) => (
+                ["Employee ID", viewEmp.employee_id], ["Name", viewEmp.full_name],
+                ["Department", viewEmp.department], ["Position", viewEmp.position],
+                ["Branch", viewEmp.branch], ["Joined", viewEmp.date_of_employment],
+                ["Salary", fmt(viewEmp.monthly_salary)], ["Allowances", fmt(viewEmp.allowances)],
+                ["Status", viewEmp.employment_status], ["Phone", viewEmp.phone || "—"],
+                ["Email", viewEmp.email || "—"], ["Bank Account", viewEmp.bank_account || "—"],
+              ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-muted-foreground text-xs">{label}</p>
                   <p className="font-medium">{value}</p>
@@ -96,6 +137,78 @@ export default function Employees() {
               ))}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create/Edit Dialog */}
+      <Dialog open={formOpen} onOpenChange={setFormOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editingId ? "Edit Employee" : "Add Employee"}</DialogTitle></DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label>Employee ID <span className="text-destructive">*</span></Label>
+              <Input value={form.employee_id} onChange={e => setForm(f => ({ ...f, employee_id: e.target.value }))} placeholder="EMP001" className="mt-1" />
+            </div>
+            <div>
+              <Label>Full Name <span className="text-destructive">*</span></Label>
+              <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="John Doe" className="mt-1" />
+            </div>
+            <div>
+              <Label>Department <span className="text-destructive">*</span></Label>
+              <Input value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))} placeholder="Engineering" className="mt-1" />
+            </div>
+            <div>
+              <Label>Position <span className="text-destructive">*</span></Label>
+              <Input value={form.position} onChange={e => setForm(f => ({ ...f, position: e.target.value }))} placeholder="Software Engineer" className="mt-1" />
+            </div>
+            <div>
+              <Label>Branch</Label>
+              <Input value={form.branch} onChange={e => setForm(f => ({ ...f, branch: e.target.value }))} className="mt-1" />
+            </div>
+            <div>
+              <Label>Date of Employment <span className="text-destructive">*</span></Label>
+              <Input type="date" value={form.date_of_employment} onChange={e => setForm(f => ({ ...f, date_of_employment: e.target.value }))} className="mt-1" />
+            </div>
+            <div>
+              <Label>Monthly Salary ({CURRENCY})</Label>
+              <Input type="number" value={form.monthly_salary || ""} onChange={e => setForm(f => ({ ...f, monthly_salary: Number(e.target.value) }))} className="mt-1" />
+            </div>
+            <div>
+              <Label>Allowances ({CURRENCY})</Label>
+              <Input type="number" value={form.allowances || ""} onChange={e => setForm(f => ({ ...f, allowances: Number(e.target.value) }))} className="mt-1" />
+            </div>
+            <div>
+              <Label>Employment Status</Label>
+              <Select value={form.employment_status} onValueChange={v => setForm(f => ({ ...f, employment_status: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Probation">Probation</SelectItem>
+                  <SelectItem value="Contract">Contract</SelectItem>
+                  <SelectItem value="Terminated">Terminated</SelectItem>
+                  <SelectItem value="Resigned">Resigned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Bank Account</Label>
+              <Input value={form.bank_account} onChange={e => setForm(f => ({ ...f, bank_account: e.target.value }))} className="mt-1" />
+            </div>
+            <div>
+              <Label>Phone</Label>
+              <Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="mt-1" />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="mt-1" />
+            </div>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
+            <Button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}>
+              {editingId ? "Update" : "Create"} Employee
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
