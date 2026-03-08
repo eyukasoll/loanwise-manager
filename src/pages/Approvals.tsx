@@ -57,9 +57,12 @@ export default function Approvals() {
                     </div>
                     <p className="text-sm text-muted-foreground">{loan.application_number} · {loan.loan_types?.name} · {loan.employees?.department}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right space-y-1">
                     <p className="text-2xl font-bold font-display">{fmt(loan.requested_amount)}</p>
                     <p className="text-xs text-muted-foreground">{loan.repayment_period_months} months @ {loan.interest_rate}%</p>
+                    <Button size="sm" variant="outline" onClick={() => setDocLoan(loan)}>
+                      <FileText className="w-4 h-4 mr-1" /> Document
+                    </Button>
                   </div>
                 </div>
                 <p className="text-sm mt-3"><span className="text-muted-foreground">Purpose:</span> {loan.purpose || "—"}</p>
