@@ -21,6 +21,7 @@ const navItems = [
   { label: "Manual Payments", icon: HandCoins, path: "/manual-payments", module: "Manual Payments" },
   { label: "Overdue Tracking", icon: AlertTriangle, path: "/overdue", module: "Overdue Tracking" },
   { label: "Reports", icon: BarChart3, path: "/reports", module: "Reports" },
+  { label: "Savings", icon: PiggyBank, path: "/savings", module: "Savings" },
   { label: "Settings", icon: Cog, path: "/settings", module: "Settings" },
   { label: "Permissions", icon: ShieldCheck, path: "/permissions", module: "Permissions" },
 ];

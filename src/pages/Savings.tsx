@@ -101,9 +101,9 @@ export default function Savings() {
       <div className="p-6 animate-fade-in space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard title="Total Deposits" value={fmt(totalDeposits)} icon={<PiggyBank className="w-5 h-5" />} />
-          <StatCard title="Total Withdrawals" value={fmt(totalWithdrawals)} icon={<PiggyBank className="w-5 h-5" />} />
-          <StatCard title="Net Balance" value={fmt(netBalance)} icon={<PiggyBank className="w-5 h-5" />} />
+          <StatCard label="Total Deposits" value={fmt(totalDeposits)} icon={PiggyBank} variant="primary" />
+          <StatCard label="Total Withdrawals" value={fmt(totalWithdrawals)} icon={PiggyBank} variant="warning" />
+          <StatCard label="Net Balance" value={fmt(netBalance)} icon={PiggyBank} variant="accent" />
         </div>
 
         {/* Actions */}

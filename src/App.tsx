@@ -53,6 +53,7 @@ const App = () => (
               <Route path="/reports" element={guard("Reports", <Reports />)} />
               <Route path="/settings" element={guard("Settings", <SettingsPage />)} />
               <Route path="/permissions" element={guard("Permissions", <Permissions />)} />
+              <Route path="/savings" element={guard("Savings", <Savings />)} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
