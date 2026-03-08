@@ -181,7 +181,7 @@ export default function Settings() {
   if (loading) {
     return (
       <div>
-        <TopBar title="Settings" subtitle="Manage company configuration" />
+        <TopBar title={t.setTitle} subtitle={t.setSubtitle} />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
