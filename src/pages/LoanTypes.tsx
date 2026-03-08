@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
-import { loanTypes as initialLoanTypes } from "@/data/mockData";
-import { Settings, Edit, Plus, Trash2, FileText, Upload, X, ChevronDown, Paperclip } from "lucide-react";
+import { useLoanTypes, useCreateLoanType, useUpdateLoanType, useDeleteLoanType } from "@/hooks/useLoans";
+import { uploadLoanDocument } from "@/hooks/useLoans";
+import { Plus, Edit, Trash2, FileText, Upload, X, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -9,98 +10,77 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { LoanType, LoanTypeDocument } from "@/types/loan";
+import { fmt, CURRENCY } from "@/lib/currency";
 import { toast } from "sonner";
 
-import { fmt, CURRENCY } from "@/lib/currency";
+interface DocItem { tempId: string; document_name: string; is_required: boolean; file?: File; template_url?: string; }
 
-const emptyForm: Omit<LoanType, "id"> = {
-  name: "",
-  minAmount: 0,
-  maxAmount: 0,
-  maxPeriod: 12,
-  interestRate: 0,
-  interestFree: false,
-  maxActiveLoans: 1,
-  deductionMethod: "Payroll",
-  description: "",
-  eligibilityMinMonths: 6,
-  salaryMultiplier: 3,
-  approvalLevel: "Department Head",
-  requiredDocuments: [],
+const emptyForm = {
+  name: "", description: "", min_amount: 0, max_amount: 0, max_period_months: 12,
+  interest_rate: 0, interest_free: false, max_active_loans: 1, deduction_method: "Payroll",
+  eligibility_min_months: 6, salary_multiplier: 3, approval_level: "Department Head",
 };
 
 export default function LoanTypes() {
-  const [loanTypes, setLoanTypes] = useState<LoanType[]>(initialLoanTypes);
+  const { data: loanTypes = [], isLoading } = useLoanTypes();
+  const createMut = useCreateLoanType();
+  const updateMut = useUpdateLoanType();
+  const deleteMut = useDeleteLoanType();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Omit<LoanType, "id">>(emptyForm);
-  const [documents, setDocuments] = useState<LoanTypeDocument[]>([]);
+  const [form, setForm] = useState(emptyForm);
+  const [documents, setDocuments] = useState<DocItem[]>([]);
   const [newDocName, setNewDocName] = useState("");
 
-  const openCreate = () => {
-    setEditingId(null);
-    setForm(emptyForm);
-    setDocuments([]);
-    setOpen(true);
-  };
-
-  const openEdit = (lt: LoanType) => {
+  const openCreate = () => { setEditingId(null); setForm(emptyForm); setDocuments([]); setOpen(true); };
+  const openEdit = (lt: any) => {
     setEditingId(lt.id);
-    setForm({ ...lt });
-    setDocuments(lt.requiredDocuments || []);
+    setForm({
+      name: lt.name, description: lt.description || "", min_amount: lt.min_amount,
+      max_amount: lt.max_amount, max_period_months: lt.max_period_months,
+      interest_rate: lt.interest_rate, interest_free: lt.interest_free,
+      max_active_loans: lt.max_active_loans, deduction_method: lt.deduction_method,
+      eligibility_min_months: lt.eligibility_min_months || 6,
+      salary_multiplier: lt.salary_multiplier || 3, approval_level: lt.approval_level || "Department Head",
+    });
+    setDocuments((lt.loan_type_documents || []).map((d: any) => ({
+      tempId: d.id, document_name: d.document_name, is_required: d.is_required, template_url: d.template_url,
+    })));
     setOpen(true);
   };
 
   const addDocument = () => {
     if (!newDocName.trim()) return;
-    setDocuments(prev => [
-      ...prev,
-      { id: `DOC-${Date.now()}`, name: newDocName.trim(), file: null, required: true },
-    ]);
+    setDocuments(prev => [...prev, { tempId: `temp-${Date.now()}`, document_name: newDocName.trim(), is_required: true }]);
     setNewDocName("");
   };
 
-  const removeDocument = (docId: string) => {
-    setDocuments(prev => prev.filter(d => d.id !== docId));
-  };
+  const handleSave = async () => {
+    if (!form.name.trim()) { toast.error("Name is required"); return; }
+    if (form.max_amount <= 0) { toast.error("Max amount must be > 0"); return; }
 
-  const toggleDocRequired = (docId: string) => {
-    setDocuments(prev => prev.map(d => d.id === docId ? { ...d, required: !d.required } : d));
-  };
-
-  const handleFileChange = (docId: string, file: File | null) => {
-    setDocuments(prev => prev.map(d => d.id === docId ? { ...d, file } : d));
-  };
-
-  const handleSave = () => {
-    if (!form.name.trim()) {
-      toast.error("Loan type name is required");
-      return;
-    }
-    if (form.maxAmount <= 0) {
-      toast.error("Maximum amount must be greater than 0");
-      return;
-    }
-    if (form.minAmount > form.maxAmount) {
-      toast.error("Minimum amount cannot exceed maximum amount");
-      return;
-    }
-
-    const loanType: LoanType = {
-      ...form,
-      id: editingId || `LT${String(loanTypes.length + 1).padStart(3, "0")}`,
-      requiredDocuments: documents,
-    };
+    // Upload any new files
+    const processedDocs = await Promise.all(
+      documents.map(async (d) => {
+        let url = d.template_url;
+        if (d.file) {
+          try {
+            url = await uploadLoanDocument(d.file, `templates/${Date.now()}-${d.file.name}`);
+          } catch { /* ignore upload errors for templates */ }
+        }
+        return { document_name: d.document_name, is_required: d.is_required, template_url: url };
+      })
+    );
 
     if (editingId) {
-      setLoanTypes(prev => prev.map(lt => lt.id === editingId ? loanType : lt));
-      toast.success(`"${loanType.name}" updated successfully`);
+      updateMut.mutate({ id: editingId, ...form, documents: processedDocs }, { onSuccess: () => setOpen(false) });
     } else {
-      setLoanTypes(prev => [...prev, loanType]);
-      toast.success(`"${loanType.name}" created successfully`);
+      createMut.mutate({ ...form, documents: processedDocs }, { onSuccess: () => setOpen(false) });
     }
-    setOpen(false);
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm("Delete this loan type?")) deleteMut.mutate(id);
   };
 
   return (
@@ -108,325 +88,106 @@ export default function LoanTypes() {
       <TopBar title="Loan Types" subtitle="Configure loan type settings" />
       <div className="p-6 animate-fade-in">
         <div className="flex justify-end mb-4">
-          <Button size="sm" onClick={openCreate}>
-            <Plus className="w-4 h-4 mr-1" /> Add Loan Type
-          </Button>
+          <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Loan Type</Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {loanTypes.map(lt => (
-            <div key={lt.id} className="bg-card rounded-xl border border-border p-5 hover:shadow-md transition-shadow group">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold">{lt.name}</h3>
-                <Button variant="ghost" size="icon" onClick={() => openEdit(lt)}>
-                  <Edit className="w-4 h-4" />
-                </Button>
-              </div>
-              {lt.description && (
-                <p className="text-xs text-muted-foreground mb-3">{lt.description}</p>
-              )}
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Amount Range</span>
-                  <span className="font-medium">{fmt(lt.minAmount)} – {fmt(lt.maxAmount)}</span>
+        {isLoading ? (
+          <div className="text-center py-12 text-muted-foreground">Loading...</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {loanTypes.map((lt: any) => (
+              <div key={lt.id} className="bg-card rounded-xl border border-border p-5 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-display font-semibold">{lt.name}</h3>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(lt)}><Edit className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(lt.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Max Period</span>
-                  <span className="font-medium">{lt.maxPeriod} months</span>
+                {lt.description && <p className="text-xs text-muted-foreground mb-3">{lt.description}</p>}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Amount Range</span><span className="font-medium">{fmt(lt.min_amount)} – {fmt(lt.max_amount)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Max Period</span><span className="font-medium">{lt.max_period_months} months</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Interest Rate</span><span className="font-medium">{lt.interest_free ? "Interest Free" : `${lt.interest_rate}%`}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Max Active Loans</span><span className="font-medium">{lt.max_active_loans}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Deduction</span><span className="font-medium">{lt.deduction_method}</span></div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Interest Rate</span>
-                  <span className="font-medium">{lt.interestFree ? "Interest Free" : `${lt.interestRate}%`}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Max Active Loans</span>
-                  <span className="font-medium">{lt.maxActiveLoans}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Deduction</span>
-                  <span className="font-medium">{lt.deductionMethod}</span>
-                </div>
-                {lt.approvalLevel && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Approval</span>
-                    <span className="font-medium">{lt.approvalLevel}</span>
+                {lt.loan_type_documents && lt.loan_type_documents.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1"><Paperclip className="w-3 h-3" /> Required Documents ({lt.loan_type_documents.length})</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {lt.loan_type_documents.map((doc: any) => (
+                        <span key={doc.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-xs font-medium text-secondary-foreground">
+                          <FileText className="w-3 h-3" />{doc.document_name}{doc.is_required && <span className="text-destructive">*</span>}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-
-              {/* Required documents badge */}
-              {lt.requiredDocuments && lt.requiredDocuments.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-border">
-                  <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                    <Paperclip className="w-3 h-3" /> Required Documents ({lt.requiredDocuments.length})
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {lt.requiredDocuments.map(doc => (
-                      <span
-                        key={doc.id}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-xs font-medium text-secondary-foreground"
-                      >
-                        <FileText className="w-3 h-3" />
-                        {doc.name}
-                        {doc.required && <span className="text-destructive">*</span>}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+            {loanTypes.length === 0 && (
+              <div className="col-span-full text-center py-12 text-muted-foreground">No loan types configured. Click "Add Loan Type" to get started.</div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Create / Edit Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingId ? "Edit Loan Type" : "Create Loan Type"}</DialogTitle>
-          </DialogHeader>
-
+          <DialogHeader><DialogTitle>{editingId ? "Edit Loan Type" : "Create Loan Type"}</DialogTitle></DialogHeader>
           <div className="space-y-5">
-            {/* Basic Info */}
             <div className="space-y-3">
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Basic Information</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="sm:col-span-2">
-                  <Label>Loan Type Name <span className="text-destructive">*</span></Label>
-                  <Input
-                    value={form.name}
-                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                    placeholder="e.g. Personal Loan"
-                    className="mt-1"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label>Description</Label>
-                  <Textarea
-                    value={form.description || ""}
-                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                    placeholder="Brief description of this loan type..."
-                    rows={2}
-                    className="mt-1"
-                  />
-                </div>
+                <div className="sm:col-span-2"><Label>Name <span className="text-destructive">*</span></Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="mt-1" /></div>
+                <div className="sm:col-span-2"><Label>Description</Label><Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="mt-1" /></div>
               </div>
             </div>
-
-            {/* Amount & Terms */}
             <div className="space-y-3">
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Amount & Terms</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <Label>Minimum Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
-                  <Input
-                    type="number"
-                    value={form.minAmount || ""}
-                    onChange={e => setForm(f => ({ ...f, minAmount: Number(e.target.value) }))}
-                    placeholder="10000"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label>Maximum Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
-                  <Input
-                    type="number"
-                    value={form.maxAmount || ""}
-                    onChange={e => setForm(f => ({ ...f, maxAmount: Number(e.target.value) }))}
-                    placeholder="500000"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label>Max Repayment Period (months)</Label>
-                  <Input
-                    type="number"
-                    value={form.maxPeriod || ""}
-                    onChange={e => setForm(f => ({ ...f, maxPeriod: Number(e.target.value) }))}
-                    placeholder="12"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label>Max Active Loans</Label>
-                  <Input
-                    type="number"
-                    value={form.maxActiveLoans || ""}
-                    onChange={e => setForm(f => ({ ...f, maxActiveLoans: Number(e.target.value) }))}
-                    placeholder="1"
-                    className="mt-1"
-                  />
-                </div>
+                <div><Label>Min Amount ({CURRENCY})</Label><Input type="number" value={form.min_amount || ""} onChange={e => setForm(f => ({ ...f, min_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                <div><Label>Max Amount ({CURRENCY}) <span className="text-destructive">*</span></Label><Input type="number" value={form.max_amount || ""} onChange={e => setForm(f => ({ ...f, max_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                <div><Label>Max Period (months)</Label><Input type="number" value={form.max_period_months || ""} onChange={e => setForm(f => ({ ...f, max_period_months: Number(e.target.value) }))} className="mt-1" /></div>
+                <div><Label>Max Active Loans</Label><Input type="number" value={form.max_active_loans || ""} onChange={e => setForm(f => ({ ...f, max_active_loans: Number(e.target.value) }))} className="mt-1" /></div>
               </div>
             </div>
-
-            {/* Interest */}
             <div className="space-y-3">
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Interest & Deduction</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
-                  <Label className="cursor-pointer">Interest Free</Label>
-                  <Switch
-                    checked={form.interestFree}
-                    onCheckedChange={checked => setForm(f => ({ ...f, interestFree: checked, interestRate: checked ? 0 : f.interestRate }))}
-                  />
-                </div>
-                <div>
-                  <Label>Interest Rate (%)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={form.interestRate || ""}
-                    onChange={e => setForm(f => ({ ...f, interestRate: Number(e.target.value) }))}
-                    placeholder="8"
-                    disabled={form.interestFree}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label>Deduction Method</Label>
-                  <Select value={form.deductionMethod} onValueChange={v => setForm(f => ({ ...f, deductionMethod: v }))}>
-                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Payroll">Payroll Deduction</SelectItem>
-                      <SelectItem value="Manual">Manual Payment</SelectItem>
-                      <SelectItem value="Both">Both</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Approval Level</Label>
-                  <Select value={form.approvalLevel || "Department Head"} onValueChange={v => setForm(f => ({ ...f, approvalLevel: v }))}>
-                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Department Head">Department Head</SelectItem>
-                      <SelectItem value="HR + Finance">HR + Finance Manager</SelectItem>
-                      <SelectItem value="General Manager">General Manager</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3"><Label>Interest Free</Label><Switch checked={form.interest_free} onCheckedChange={c => setForm(f => ({ ...f, interest_free: c, interest_rate: c ? 0 : f.interest_rate }))} /></div>
+                <div><Label>Interest Rate (%)</Label><Input type="number" step="0.1" value={form.interest_rate || ""} onChange={e => setForm(f => ({ ...f, interest_rate: Number(e.target.value) }))} disabled={form.interest_free} className="mt-1" /></div>
+                <div><Label>Deduction Method</Label><Select value={form.deduction_method} onValueChange={v => setForm(f => ({ ...f, deduction_method: v }))}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Payroll">Payroll</SelectItem><SelectItem value="Manual">Manual</SelectItem><SelectItem value="Both">Both</SelectItem></SelectContent></Select></div>
+                <div><Label>Approval Level</Label><Select value={form.approval_level} onValueChange={v => setForm(f => ({ ...f, approval_level: v }))}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Department Head">Department Head</SelectItem><SelectItem value="HR + Finance">HR + Finance</SelectItem><SelectItem value="General Manager">General Manager</SelectItem></SelectContent></Select></div>
               </div>
             </div>
-
-            {/* Eligibility */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Eligibility Rules</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <Label>Min. Service Period (months)</Label>
-                  <Input
-                    type="number"
-                    value={form.eligibilityMinMonths || ""}
-                    onChange={e => setForm(f => ({ ...f, eligibilityMinMonths: Number(e.target.value) }))}
-                    placeholder="6"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label>Max Salary Multiplier</Label>
-                  <Input
-                    type="number"
-                    step="0.5"
-                    value={form.salaryMultiplier || ""}
-                    onChange={e => setForm(f => ({ ...f, salaryMultiplier: Number(e.target.value) }))}
-                    placeholder="3"
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Required Documents */}
             <div className="space-y-3">
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Required Documents</h4>
-              <p className="text-xs text-muted-foreground">
-                Define documents applicants must provide when applying for this loan type.
-              </p>
-
-              {/* Add new document */}
               <div className="flex items-center gap-2">
-                <Input
-                  value={newDocName}
-                  onChange={e => setNewDocName(e.target.value)}
-                  placeholder="Document name (e.g. Pay Slip, ID Copy)"
-                  className="flex-1"
-                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addDocument(); } }}
-                />
-                <Button size="sm" variant="outline" onClick={addDocument} disabled={!newDocName.trim()}>
-                  <Plus className="w-4 h-4 mr-1" /> Add
-                </Button>
+                <Input value={newDocName} onChange={e => setNewDocName(e.target.value)} placeholder="Document name..." className="flex-1" onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addDocument(); } }} />
+                <Button size="sm" variant="outline" onClick={addDocument} disabled={!newDocName.trim()}><Plus className="w-4 h-4 mr-1" /> Add</Button>
               </div>
-
-              {/* Document list */}
-              {documents.length > 0 && (
-                <div className="space-y-2">
-                  {documents.map(doc => (
-                    <div
-                      key={doc.id}
-                      className="flex items-center gap-3 rounded-lg border border-border bg-secondary/30 px-4 py-3"
-                    >
-                      <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{doc.name}</p>
-                        {doc.file && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {doc.file.name} ({(doc.file.size / 1024).toFixed(1)} KB)
-                          </p>
-                        )}
-                      </div>
-
-                      {/* File upload */}
-                      <label className="cursor-pointer">
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                          onChange={e => handleFileChange(doc.id, e.target.files?.[0] || null)}
-                        />
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-card border border-border hover:bg-secondary transition-colors">
-                          <Upload className="w-3 h-3" />
-                          {doc.file ? "Replace" : "Upload Template"}
-                        </span>
-                      </label>
-
-                      {/* Required toggle */}
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-muted-foreground">Required</span>
-                        <Switch
-                          checked={doc.required}
-                          onCheckedChange={() => toggleDocRequired(doc.id)}
-                        />
-                      </div>
-
-                      {/* Remove */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                        onClick={() => removeDocument(doc.id)}
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  ))}
+              {documents.map(doc => (
+                <div key={doc.tempId} className="flex items-center gap-3 rounded-lg border border-border bg-secondary/30 px-4 py-3">
+                  <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="flex-1 text-sm font-medium truncate">{doc.document_name}</span>
+                  <label className="cursor-pointer">
+                    <input type="file" className="hidden" accept=".pdf,.doc,.docx,.jpg,.png" onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (file) setDocuments(prev => prev.map(d => d.tempId === doc.tempId ? { ...d, file } : d));
+                    }} />
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-card border border-border hover:bg-secondary transition-colors"><Upload className="w-3 h-3" />{doc.file ? doc.file.name : "Template"}</span>
+                  </label>
+                  <div className="flex items-center gap-1.5"><span className="text-xs text-muted-foreground">Req.</span><Switch checked={doc.is_required} onCheckedChange={() => setDocuments(prev => prev.map(d => d.tempId === doc.tempId ? { ...d, is_required: !d.is_required } : d))} /></div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDocuments(prev => prev.filter(d => d.tempId !== doc.tempId))}><X className="w-3.5 h-3.5" /></Button>
                 </div>
-              )}
-
-              {documents.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-6 rounded-lg border border-dashed border-border bg-secondary/20">
-                  <Paperclip className="w-8 h-8 text-muted-foreground/40 mb-2" />
-                  <p className="text-sm text-muted-foreground">No documents added yet</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Add documents applicants must submit</p>
-                </div>
-              )}
+              ))}
             </div>
           </div>
-
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave}>
-              {editingId ? "Update Loan Type" : "Create Loan Type"}
-            </Button>
+            <Button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}>{editingId ? "Update" : "Create"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
