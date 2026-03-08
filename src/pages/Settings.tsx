@@ -951,3 +951,186 @@ function BackupExportTab({ toast }: { toast: ReturnType<typeof useToast>["toast"
     </div>
   );
 }
+
+function DataManagementTab({ toast, canEdit }: { toast: ReturnType<typeof useToast>["toast"]; canEdit: (module: string) => boolean }) {
+  const [resetType, setResetType] = useState<"transactions" | "all" | null>(null);
+  const [confirmText, setConfirmText] = useState("");
+  const [resetting, setResetting] = useState(false);
+
+  const transactionTables = [
+    "payroll_deductions",
+    "manual_payments",
+    "repayment_schedule",
+    "loan_application_documents",
+    "loan_guarantors",
+    "loan_applications",
+    "savings_transactions",
+    "notifications",
+    "audit_log",
+  ] as const;
+
+  const allTables = [
+    ...transactionTables,
+    "employees",
+    "loan_type_documents",
+    "loan_types",
+    "role_permissions",
+  ] as const;
+
+  const expectedConfirm = resetType === "all" ? "RESET ALL" : "RESET TRANSACTIONS";
+
+  const handleReset = async () => {
+    if (confirmText !== expectedConfirm) return;
+    setResetting(true);
+
+    const tables = resetType === "all" ? allTables : transactionTables;
+    let errors: string[] = [];
+
+    for (const table of tables) {
+      const { error } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      if (error) errors.push(`${table}: ${error.message}`);
+    }
+
+    if (resetType === "all") {
+      // Reset company settings to defaults
+      const { error } = await supabase
+        .from("company_settings")
+        .update({
+          company_name: "Addis Microfinance",
+          company_email: null,
+          company_phone: null,
+          company_address: null,
+          city: null,
+          country: "Ethiopia",
+          logo_url: null,
+          stamp_url: null,
+          tin_number: null,
+          license_number: null,
+          website: null,
+          currency: "ETB",
+          fiscal_year_start: "July",
+          default_interest_rate: 0,
+          max_loan_to_salary_ratio: 3,
+          payroll_cutoff_day: 25,
+          late_payment_penalty_rate: 2,
+          savings_multiplier: 3,
+          smtp_host: null,
+          smtp_port: null,
+          smtp_email: null,
+          smtp_password: null,
+          email_sender_name: null,
+        } as any)
+        .neq("id", "00000000-0000-0000-0000-000000000000");
+      if (error) errors.push(`company_settings: ${error.message}`);
+    }
+
+    setResetting(false);
+    setResetType(null);
+    setConfirmText("");
+
+    if (errors.length > 0) {
+      toast({ title: "Reset completed with errors", description: errors.join("; "), variant: "destructive" });
+    } else {
+      toast({ title: "Reset complete", description: resetType === "all" ? "All data has been cleared and settings reset to defaults." : "All transaction data has been cleared." });
+    }
+  };
+
+  return (
+    <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-foreground">Data Management</h3>
+        <p className="text-sm text-muted-foreground">Reset company data. These actions are irreversible.</p>
+      </div>
+
+      {/* Reset Transactions */}
+      <div className="rounded-lg border border-warning/30 bg-warning/5 p-5 space-y-3">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">Reset Transactions Only</h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              Deletes all loan applications, repayment schedules, payroll deductions, manual payments, savings transactions, guarantor records, notifications, and audit logs. 
+              <strong className="text-foreground"> Employee records, loan types, and company settings will be preserved.</strong>
+            </p>
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            className="border-warning text-warning hover:bg-warning/10"
+            disabled={!canEdit("Settings")}
+            onClick={() => { setResetType("transactions"); setConfirmText(""); }}
+          >
+            <Trash2 className="w-4 h-4 mr-2" /> Reset Transactions
+          </Button>
+        </div>
+      </div>
+
+      {/* Reset All */}
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-5 space-y-3">
+        <div className="flex items-start gap-3">
+          <ShieldAlert className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">Reset All Data</h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              Deletes <strong className="text-destructive">everything</strong>: employees, all loan data, savings, payments, loan types, permissions, and resets company settings to factory defaults. 
+              <strong className="text-foreground"> Only user accounts will be preserved.</strong>
+            </p>
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <Button
+            variant="destructive"
+            disabled={!canEdit("Settings")}
+            onClick={() => { setResetType("all"); setConfirmText(""); }}
+          >
+            <Trash2 className="w-4 h-4 mr-2" /> Reset All Data
+          </Button>
+        </div>
+      </div>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={resetType !== null} onOpenChange={(open) => { if (!open) { setResetType(null); setConfirmText(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <ShieldAlert className="w-5 h-5" />
+              {resetType === "all" ? "Reset All Company Data" : "Reset Transaction Data"}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  {resetType === "all"
+                    ? "This will permanently delete ALL data including employees, loans, savings, payments, loan types, permissions, and reset company settings to defaults."
+                    : "This will permanently delete all transaction data including loan applications, repayments, payments, savings, and notifications."}
+                </p>
+                <p className="font-medium text-destructive">This action cannot be undone. Please create a backup first.</p>
+                <div>
+                  <Label className="text-xs">Type <span className="font-mono font-bold">{expectedConfirm}</span> to confirm:</Label>
+                  <Input
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                    placeholder={expectedConfirm}
+                    className="mt-1 font-mono"
+                    autoFocus
+                  />
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={resetting}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={confirmText !== expectedConfirm || resetting}
+              onClick={handleReset}
+            >
+              {resetting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              {resetting ? "Resetting..." : "Confirm Reset"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
