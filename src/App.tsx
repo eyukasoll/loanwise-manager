@@ -22,6 +22,7 @@ import SettingsPage from "./pages/Settings";
 import Permissions from "./pages/Permissions";
 import Savings from "./pages/Savings";
 import Login from "./pages/Login";
+import GuaranteeDeactivation from "./pages/GuaranteeDeactivation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
