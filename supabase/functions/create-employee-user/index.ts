@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        user_id: authData.user?.id,
+        user_id: authUser?.id,
         password,
         email_sent: emailSent,
         message: emailSent
