@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId } from "@/hooks/useLoans";
-import { Search, Plus, Eye, Edit, Trash2 } from "lucide-react";
+import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees } from "@/hooks/useLoans";
+import { Search, Plus, Eye, Edit, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmt, CURRENCY } from "@/lib/currency";
+import BulkEmployeeImport from "@/components/BulkEmployeeImport";
 
 const emptyForm = {
   employee_id: "", full_name: "", department: "", position: "", branch: "Main Office",
