@@ -23,7 +23,7 @@ export default function Applications() {
   const { data: loanTypesData = [] } = useLoanTypes();
   const { data: savingsData = [] } = useSavingsTransactions();
   const createMut = useCreateLoanApplication();
-  const { canCreate } = usePermissions();
+  const { canCreate, canEdit, canDelete } = usePermissions();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
