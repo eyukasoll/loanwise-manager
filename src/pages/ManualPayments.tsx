@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import { useManualPayments, useCreateManualPayment, useLoanApplications } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { HandCoins, Plus } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
