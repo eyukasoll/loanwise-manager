@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, FileText, CheckCircle, Calculator, Banknote,
   CalendarCheck, CreditCard, HandCoins, AlertTriangle, BarChart3,
-  Settings, ChevronLeft, ChevronRight, LogOut, Cog, ShieldCheck, PiggyBank, ShieldOff
+  Settings, ChevronLeft, ChevronRight, LogOut, Cog, ShieldCheck, PiggyBank, ShieldOff, UserCheck
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -16,6 +16,7 @@ const navItems = [
   { label: "Loan Types", icon: Settings, path: "/loan-types", module: "Loan Types" },
   { label: "Applications", icon: FileText, path: "/applications", module: "Applications" },
   { label: "Approvals", icon: CheckCircle, path: "/approvals", module: "Approvals" },
+  { label: "Guarantee Approvals", icon: UserCheck, path: "/guarantee-approvals", module: "Approvals" },
   { label: "Disbursements", icon: Banknote, path: "/disbursements", module: "Disbursements" },
   { label: "Repayment Schedule", icon: CalendarCheck, path: "/repayments", module: "Repayment Schedule" },
   { label: "Payroll Deductions", icon: CreditCard, path: "/deductions", module: "Payroll Deductions" },

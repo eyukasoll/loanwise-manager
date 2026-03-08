@@ -23,6 +23,7 @@ import Permissions from "./pages/Permissions";
 import Savings from "./pages/Savings";
 import Login from "./pages/Login";
 import GuaranteeDeactivation from "./pages/GuaranteeDeactivation";
+import GuaranteeApprovals from "./pages/GuaranteeApprovals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/loan-types" element={guard("Loan Types", <LoanTypes />)} />
               <Route path="/applications" element={guard("Applications", <Applications />)} />
               <Route path="/approvals" element={guard("Approvals", <Approvals />)} />
+              <Route path="/guarantee-approvals" element={guard("Approvals", <GuaranteeApprovals />)} />
               <Route path="/disbursements" element={guard("Disbursements", <Disbursements />)} />
               <Route path="/repayments" element={guard("Repayment Schedule", <Repayments />)} />
               <Route path="/deductions" element={guard("Payroll Deductions", <PayrollDeductions />)} />
