@@ -25,7 +25,7 @@ const navItems = [
   { labelKey: "navOverdueTracking", icon: AlertTriangle, path: "/overdue", module: "Overdue Tracking" },
   { labelKey: "navReports", icon: BarChart3, path: "/reports", module: "Reports" },
   { labelKey: "navSavings", icon: PiggyBank, path: "/savings", module: "Savings" },
-  { labelKey: "navGuaranteeDeactivation", icon: ShieldOff, path: "/guarantee-deactivation", module: "Applications" },
+  { labelKey: "navGuaranteeDeactivation", icon: ShieldOff, path: "/guarantee-deactivation", module: "Guarantee Deactivation" },
   { labelKey: "navSettings", icon: Cog, path: "/settings", module: "Settings" },
   { labelKey: "navPermissions", icon: ShieldCheck, path: "/permissions", module: "Permissions" },
 ] as const;
