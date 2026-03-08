@@ -178,9 +178,23 @@ export default function Applications() {
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Select loan type" /></SelectTrigger>
                 <SelectContent>{loanTypesData.map((lt: any) => <SelectItem key={lt.id} value={lt.id}>{lt.name}</SelectItem>)}</SelectContent>
               </Select>
+              {isSavingsBased && form.employee_id && (
+                <div className="mt-2 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+                  <p className="font-medium text-primary">Savings-Based Loan</p>
+                  <p className="text-muted-foreground mt-0.5">
+                    Savings Balance: <strong>{fmt(savingsBalance)}</strong> × {savingsMultiplier} = Max <strong>{fmt(savingsMaxAmount || 0)}</strong>
+                  </p>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Amount ({CURRENCY}) <span className="text-destructive">*</span></Label><Input type="number" value={form.requested_amount || ""} onChange={e => setForm(f => ({ ...f, requested_amount: Number(e.target.value) }))} className="mt-1" /></div>
+              <div>
+                <Label>Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
+                <Input type="number" value={form.requested_amount || ""} onChange={e => setForm(f => ({ ...f, requested_amount: Number(e.target.value) }))} className="mt-1" max={savingsMaxAmount ?? undefined} />
+                {isSavingsBased && savingsMaxAmount !== null && form.requested_amount > savingsMaxAmount && (
+                  <p className="text-xs text-destructive mt-1">Amount exceeds max allowed ({fmt(savingsMaxAmount)})</p>
+                )}
+              </div>
               <div><Label>Period (months)</Label><Input type="number" value={form.repayment_period_months} onChange={e => setForm(f => ({ ...f, repayment_period_months: Number(e.target.value) }))} className="mt-1" /></div>
             </div>
             <div><Label>Purpose</Label><Textarea value={form.purpose} onChange={e => setForm(f => ({ ...f, purpose: e.target.value }))} rows={2} className="mt-1" /></div>
