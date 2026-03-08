@@ -20,6 +20,7 @@ const emptyForm = {
   name: "", description: "", min_amount: 0, max_amount: 0, max_period_months: 12,
   interest_rate: 0, interest_free: false, max_active_loans: 1, deduction_method: "Payroll",
   eligibility_min_months: 6, salary_multiplier: 3, approval_level: "Department Head",
+  is_savings_based: false,
 };
 
 export default function LoanTypes() {
