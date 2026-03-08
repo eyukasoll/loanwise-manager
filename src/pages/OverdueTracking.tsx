@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import StatCard from "@/components/StatCard";
 import { useLoanApplications } from "@/hooks/useLoans";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { AlertTriangle, Clock, Ban } from "lucide-react";
 import { fmt } from "@/lib/currency";
 
