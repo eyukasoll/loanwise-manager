@@ -8,6 +8,10 @@ export interface ModulePermission {
   can_create: boolean;
   can_edit: boolean;
   can_delete: boolean;
+  can_import: boolean;
+  can_export: boolean;
+  can_print: boolean;
+  can_share: boolean;
 }
 
 const roleMap: Record<string, string> = {
