@@ -112,12 +112,12 @@ export default function Dashboard() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-secondary/40">
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Application ID</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Type</th>
-                  <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Amount</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
-                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Date</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.applicationId}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employee}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.type}</th>
+                  <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.amount}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.status}</th>
+                  <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.date}</th>
                 </tr>
               </thead>
               <tbody>
