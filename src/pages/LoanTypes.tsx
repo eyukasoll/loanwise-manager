@@ -61,7 +61,7 @@ export default function LoanTypes() {
 
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error("Name is required"); return; }
-    if (form.max_amount <= 0) { toast.error("Max amount must be > 0"); return; }
+    if (!form.is_savings_based && form.max_amount <= 0) { toast.error("Max amount must be > 0"); return; }
 
     // Upload any new files
     const processedDocs = await Promise.all(
