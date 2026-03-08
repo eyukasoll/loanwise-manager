@@ -19,6 +19,7 @@ export default function TopBar({ title, subtitle }: { title: string; subtitle?: 
             className="h-9 pl-9 pr-4 rounded-lg bg-secondary border-0 text-sm focus:outline-none focus:ring-2 focus:ring-ring w-56"
           />
         </div>
+        <ThemeToggle />
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-4 h-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
