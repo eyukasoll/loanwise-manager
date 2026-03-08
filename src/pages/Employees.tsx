@@ -136,14 +136,14 @@ export default function Employees() {
               <table className="w-full text-sm">
                  <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Name</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Department</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Position</th>
-                    <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">Salary</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
-                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantee</th>
-                    <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">Actions</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employeeId}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.name}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.department}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.position}</th>
+                    <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.salary}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.status}</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.guarantee}</th>
+                    <th className="text-center px-5 py-3 font-medium text-muted-foreground text-xs">{t.actions}</th>
                   </tr>
                 </thead>
                 <tbody>
