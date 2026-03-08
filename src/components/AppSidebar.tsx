@@ -6,6 +6,7 @@ import {
   Settings, ChevronLeft, ChevronRight, Building2, LogOut
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/" },
@@ -24,7 +25,14 @@ const navItems = [
 export default function AppSidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, role, signOut } = useAuth();
+
+  const roleLabels: Record<string, string> = {
+    admin: "Admin",
+    manager: "Manager",
+    finance: "Finance",
+    employee: "Employee",
+  };
 
   return (
     <aside
@@ -65,8 +73,13 @@ export default function AppSidebar() {
       {/* User & Sign out */}
       <div className="border-t border-sidebar-border">
         {!collapsed && user && (
-          <div className="px-4 py-2 text-xs text-sidebar-foreground truncate opacity-70">
-            {user.email}
+          <div className="px-4 py-2 flex items-center gap-2">
+            <span className="text-xs text-sidebar-foreground truncate opacity-70">{user.email}</span>
+            {role && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/20 text-primary-foreground whitespace-nowrap">
+                {roleLabels[role] || role}
+              </span>
+            )}
           </div>
         )}
         <div className="flex">
