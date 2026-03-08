@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useRepaymentSchedule } from "@/hooks/useLoans";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { fmt } from "@/lib/currency";
 
 export default function Repayments() {
