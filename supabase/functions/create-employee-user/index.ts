@@ -107,11 +107,12 @@ Deno.serve(async (req) => {
         // Use a simple SMTP client approach via Deno
         const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
         
+        const smtpPort = settings.smtp_port || 587;
         const client = new SMTPClient({
           connection: {
             hostname: settings.smtp_host,
-            port: settings.smtp_port || 587,
-            tls: true,
+            port: smtpPort,
+            tls: smtpPort === 465,
             auth: {
               username: settings.smtp_email,
               password: settings.smtp_password,
