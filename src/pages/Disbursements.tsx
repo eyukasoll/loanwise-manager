@@ -117,7 +117,7 @@ export default function Disbursements() {
 
       <Dialog open={disburseOpen} onOpenChange={setDisburseOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Disburse Loan</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.disburseLoan}</DialogTitle></DialogHeader>
           {selectedLoan && (
             <div className="space-y-3">
               <div className="p-3 bg-secondary/30 rounded-lg text-sm">
