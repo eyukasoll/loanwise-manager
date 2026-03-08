@@ -28,8 +28,8 @@ export default function Login() {
 
     if (error) {
       toast({
-        title: "Login failed",
-        description: "Invalid username or password",
+        title: t.loginFailed,
+        description: t.invalidCredentials,
         variant: "destructive",
       });
     } else {
