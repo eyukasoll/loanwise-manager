@@ -62,6 +62,7 @@ export default function Applications() {
 
   const handleCreate = () => {
     if (!form.employee_id || !form.loan_type_id || form.requested_amount <= 0) return;
+    if (isSavingsBased && savingsMaxAmount !== null && form.requested_amount > savingsMaxAmount) return;
     const lt = loanTypesData.find((t: any) => t.id === form.loan_type_id);
     const rate = lt?.interest_rate || 0;
     const principal = form.requested_amount;
