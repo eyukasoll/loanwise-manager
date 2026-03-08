@@ -18,6 +18,24 @@ export function useEmployees() {
   });
 }
 
+export function useNextEmployeeId() {
+  return useQuery({
+    queryKey: ["next-employee-id"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("employee_id")
+        .like("employee_id", "EMP%")
+        .order("employee_id", { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      const last = data?.[0]?.employee_id;
+      const num = last ? parseInt(last.replace("EMP", ""), 10) + 1 : 1;
+      return `EMP${String(num).padStart(3, "0")}`;
+    },
+  });
+}
+
 export function useCreateEmployee() {
   const qc = useQueryClient();
   return useMutation({
@@ -31,7 +49,7 @@ export function useCreateEmployee() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["employees"] }); toast.success("Employee created"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["employees", "next-employee-id"] }); toast.success("Employee created"); },
     onError: (e: Error) => toast.error(e.message),
   });
 }
