@@ -3,10 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, FileText, CheckCircle, Calculator, Banknote,
   CalendarCheck, CreditCard, HandCoins, AlertTriangle, BarChart3,
-  Settings, ChevronLeft, ChevronRight, Building2, LogOut
+  Settings, ChevronLeft, ChevronRight, LogOut
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/" },
