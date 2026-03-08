@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes } from "@/hooks/useLoans";
+import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Eye, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,21 +11,47 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmt, CURRENCY } from "@/lib/currency";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Applications() {
   const [statusFilter, setStatusFilter] = useState("all");
   const { data: applications = [], isLoading } = useLoanApplications(statusFilter);
   const { data: employees = [] } = useEmployees();
   const { data: loanTypesData = [] } = useLoanTypes();
+  const { data: savingsData = [] } = useSavingsTransactions();
   const createMut = useCreateLoanApplication();
   const { canCreate } = usePermissions();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [savingsMultiplier, setSavingsMultiplier] = useState(3);
   const [form, setForm] = useState({
     employee_id: "", loan_type_id: "", requested_amount: 0,
     repayment_period_months: 12, purpose: "", proposed_start_date: "", remarks: "",
   });
+
+  // Fetch savings multiplier from settings
+  useEffect(() => {
+    supabase.from("company_settings").select("savings_multiplier").limit(1).single().then(({ data }) => {
+      if (data && (data as any).savings_multiplier) setSavingsMultiplier(Number((data as any).savings_multiplier));
+    });
+  }, []);
+
+  // Compute employee savings balances
+  const employeeSavingsBalance = useMemo(() => {
+    const map = new Map<string, number>();
+    savingsData.forEach((t: any) => {
+      const curr = map.get(t.employee_id) || 0;
+      map.set(t.employee_id, t.transaction_type === "Deposit" ? curr + Number(t.amount) : curr - Number(t.amount));
+    });
+    return map;
+  }, [savingsData]);
+
+  // Get max amount for savings-based loan
+  const selectedLoanType = loanTypesData.find((t: any) => t.id === form.loan_type_id);
+  const isSavingsBased = selectedLoanType?.is_savings_based;
+  const savingsBalance = employeeSavingsBalance.get(form.employee_id) || 0;
+  const savingsMaxAmount = isSavingsBased ? savingsBalance * savingsMultiplier : null;
 
   const filtered = applications.filter((l: any) => {
     const name = l.employees?.full_name || "";
@@ -36,6 +62,7 @@ export default function Applications() {
 
   const handleCreate = () => {
     if (!form.employee_id || !form.loan_type_id || form.requested_amount <= 0) return;
+    if (isSavingsBased && savingsMaxAmount !== null && form.requested_amount > savingsMaxAmount) return;
     const lt = loanTypesData.find((t: any) => t.id === form.loan_type_id);
     const rate = lt?.interest_rate || 0;
     const principal = form.requested_amount;
@@ -151,9 +178,23 @@ export default function Applications() {
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Select loan type" /></SelectTrigger>
                 <SelectContent>{loanTypesData.map((lt: any) => <SelectItem key={lt.id} value={lt.id}>{lt.name}</SelectItem>)}</SelectContent>
               </Select>
+              {isSavingsBased && form.employee_id && (
+                <div className="mt-2 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+                  <p className="font-medium text-primary">Savings-Based Loan</p>
+                  <p className="text-muted-foreground mt-0.5">
+                    Savings Balance: <strong>{fmt(savingsBalance)}</strong> × {savingsMultiplier} = Max <strong>{fmt(savingsMaxAmount || 0)}</strong>
+                  </p>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Amount ({CURRENCY}) <span className="text-destructive">*</span></Label><Input type="number" value={form.requested_amount || ""} onChange={e => setForm(f => ({ ...f, requested_amount: Number(e.target.value) }))} className="mt-1" /></div>
+              <div>
+                <Label>Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
+                <Input type="number" value={form.requested_amount || ""} onChange={e => setForm(f => ({ ...f, requested_amount: Number(e.target.value) }))} className="mt-1" max={savingsMaxAmount ?? undefined} />
+                {isSavingsBased && savingsMaxAmount !== null && form.requested_amount > savingsMaxAmount && (
+                  <p className="text-xs text-destructive mt-1">Amount exceeds max allowed ({fmt(savingsMaxAmount)})</p>
+                )}
+              </div>
               <div><Label>Period (months)</Label><Input type="number" value={form.repayment_period_months} onChange={e => setForm(f => ({ ...f, repayment_period_months: Number(e.target.value) }))} className="mt-1" /></div>
             </div>
             <div><Label>Purpose</Label><Textarea value={form.purpose} onChange={e => setForm(f => ({ ...f, purpose: e.target.value }))} rows={2} className="mt-1" /></div>

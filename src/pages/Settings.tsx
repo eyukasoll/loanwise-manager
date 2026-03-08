@@ -39,6 +39,7 @@ export default function Settings() {
     max_loan_to_salary_ratio: 3,
     payroll_cutoff_day: 25,
     late_payment_penalty_rate: 2,
+    savings_multiplier: 3,
   });
 
   const [email, setEmail] = useState({
@@ -80,6 +81,7 @@ export default function Settings() {
         max_loan_to_salary_ratio: data.max_loan_to_salary_ratio || 3,
         payroll_cutoff_day: data.payroll_cutoff_day || 25,
         late_payment_penalty_rate: data.late_payment_penalty_rate || 2,
+        savings_multiplier: (data as any).savings_multiplier || 3,
       });
       setEmail({
         smtp_host: data.smtp_host || "",
@@ -238,6 +240,11 @@ export default function Settings() {
                 <div>
                   <Label>Late Payment Penalty Rate (%)</Label>
                   <Input type="number" step="0.1" value={loanConfig.late_payment_penalty_rate || ""} onChange={e => setLoanConfig(s => ({ ...s, late_payment_penalty_rate: Number(e.target.value) }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Savings Multiplier</Label>
+                  <Input type="number" step="0.5" min={1} value={loanConfig.savings_multiplier || ""} onChange={e => setLoanConfig(s => ({ ...s, savings_multiplier: Number(e.target.value) }))} className="mt-1" />
+                  <p className="text-xs text-muted-foreground mt-1">For savings-based loans: max amount = savings × this number</p>
                 </div>
               </div>
               <div className="flex justify-end pt-2">

@@ -66,6 +66,7 @@ export type Database = {
           logo_url: string | null
           max_loan_to_salary_ratio: number | null
           payroll_cutoff_day: number | null
+          savings_multiplier: number | null
           smtp_email: string | null
           smtp_host: string | null
           smtp_password: string | null
@@ -92,6 +93,7 @@ export type Database = {
           logo_url?: string | null
           max_loan_to_salary_ratio?: number | null
           payroll_cutoff_day?: number | null
+          savings_multiplier?: number | null
           smtp_email?: string | null
           smtp_host?: string | null
           smtp_password?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           logo_url?: string | null
           max_loan_to_salary_ratio?: number | null
           payroll_cutoff_day?: number | null
+          savings_multiplier?: number | null
           smtp_email?: string | null
           smtp_host?: string | null
           smtp_password?: string | null
@@ -383,6 +386,7 @@ export type Database = {
           interest_free: boolean
           interest_rate: number
           is_active: boolean
+          is_savings_based: boolean
           max_active_loans: number
           max_amount: number
           max_period_months: number
@@ -401,6 +405,7 @@ export type Database = {
           interest_free?: boolean
           interest_rate?: number
           is_active?: boolean
+          is_savings_based?: boolean
           max_active_loans?: number
           max_amount?: number
           max_period_months?: number
@@ -419,6 +424,7 @@ export type Database = {
           interest_free?: boolean
           interest_rate?: number
           is_active?: boolean
+          is_savings_based?: boolean
           max_active_loans?: number
           max_amount?: number
           max_period_months?: number

@@ -20,6 +20,7 @@ const emptyForm = {
   name: "", description: "", min_amount: 0, max_amount: 0, max_period_months: 12,
   interest_rate: 0, interest_free: false, max_active_loans: 1, deduction_method: "Payroll",
   eligibility_min_months: 6, salary_multiplier: 3, approval_level: "Department Head",
+  is_savings_based: false,
 };
 
 export default function LoanTypes() {
@@ -44,6 +45,7 @@ export default function LoanTypes() {
       max_active_loans: lt.max_active_loans, deduction_method: lt.deduction_method,
       eligibility_min_months: lt.eligibility_min_months || 6,
       salary_multiplier: lt.salary_multiplier || 3, approval_level: lt.approval_level || "Department Head",
+      is_savings_based: lt.is_savings_based || false,
     });
     setDocuments((lt.loan_type_documents || []).map((d: any) => ({
       tempId: d.id, document_name: d.document_name, is_required: d.is_required, template_url: d.template_url,
@@ -113,6 +115,7 @@ export default function LoanTypes() {
                   <div className="flex justify-between"><span className="text-muted-foreground">Amount Range</span><span className="font-medium">{fmt(lt.min_amount)} – {fmt(lt.max_amount)}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Max Period</span><span className="font-medium">{lt.max_period_months} months</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Interest Rate</span><span className="font-medium">{lt.interest_free ? "Interest Free" : `${lt.interest_rate}%`}</span></div>
+                  {lt.is_savings_based && <div className="flex justify-between"><span className="text-muted-foreground">Basis</span><span className="font-medium text-primary">Savings-Based</span></div>}
                   <div className="flex justify-between"><span className="text-muted-foreground">Max Active Loans</span><span className="font-medium">{lt.max_active_loans}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Deduction</span><span className="font-medium">{lt.deduction_method}</span></div>
                 </div>
@@ -162,6 +165,13 @@ export default function LoanTypes() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3"><Label>Interest Free</Label><Switch checked={form.interest_free} onCheckedChange={c => setForm(f => ({ ...f, interest_free: c, interest_rate: c ? 0 : f.interest_rate }))} /></div>
                 <div><Label>Interest Rate (%)</Label><Input type="number" step="0.1" value={form.interest_rate || ""} onChange={e => setForm(f => ({ ...f, interest_rate: Number(e.target.value) }))} disabled={form.interest_free} className="mt-1" /></div>
+                <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+                  <div>
+                    <Label>Savings-Based Loan</Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">Max amount = employee savings × multiplier</p>
+                  </div>
+                  <Switch checked={form.is_savings_based} onCheckedChange={c => setForm(f => ({ ...f, is_savings_based: c }))} />
+                </div>
                 <div><Label>Deduction Method</Label><Select value={form.deduction_method} onValueChange={v => setForm(f => ({ ...f, deduction_method: v }))}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Payroll">Payroll</SelectItem><SelectItem value="Manual">Manual</SelectItem><SelectItem value="Both">Both</SelectItem></SelectContent></Select></div>
                 <div><Label>Approval Level</Label><Select value={form.approval_level} onValueChange={v => setForm(f => ({ ...f, approval_level: v }))}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Department Head">Department Head</SelectItem><SelectItem value="HR + Finance">HR + Finance</SelectItem><SelectItem value="General Manager">General Manager</SelectItem></SelectContent></Select></div>
               </div>
