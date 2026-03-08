@@ -18,6 +18,10 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { lang, setLang, t } = useLanguage();
+  const { settings } = useCompanySettings();
+
+  const displayLogo = settings?.logo_url || logo;
+  const displayName = settings?.company_name || "Addis Microfinance";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
