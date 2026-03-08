@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Globe } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 import logo from "@/assets/logo.png";
 
 export default function Login() {
