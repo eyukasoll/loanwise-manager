@@ -281,20 +281,18 @@ export default function GuaranteeDeactivation() {
                             >
                               <FileText className="w-3.5 h-3.5 mr-1" /> Certificate
                             </Button>
-                            {isEligible && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 text-xs text-destructive hover:text-destructive"
-                                onClick={() => {
-                                  setReleaseDialog(g);
-                                  setNewGuarantorId("");
-                                  setEmployeeSearch("");
-                                }}
-                              >
-                                <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
-                              </Button>
-                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs text-destructive hover:text-destructive"
+                              onClick={() => {
+                                setReleaseDialog(g);
+                                setNewGuarantorId("");
+                                setEmployeeSearch("");
+                              }}
+                            >
+                              <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
+                            </Button>
                           </div>
                         </td>
                       </tr>
