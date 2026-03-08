@@ -34,7 +34,7 @@ export default function Employees() {
     e.department.toLowerCase().includes(search.toLowerCase())
   );
 
-  const openCreate = () => { setEditingId(null); setForm(emptyForm); setFormOpen(true); };
+  const openCreate = () => { setEditingId(null); setForm({ ...emptyForm, employee_id: nextId }); setFormOpen(true); };
   const openEdit = (emp: any) => {
     setEditingId(emp.id);
     setForm({
