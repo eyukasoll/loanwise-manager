@@ -22,6 +22,7 @@ interface Props {
 }
 
 export default function ApplicationDetailDialog({ selected, onClose, canEdit = false, canDelete = false }: Props) {
+  const { canPrint } = usePermissions();
   const [guarantors, setGuarantors] = useState<any[]>([]);
   const [docOpen, setDocOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);

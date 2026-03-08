@@ -13,6 +13,7 @@ interface Props {
 }
 
 export default function LoanApplicationDocument({ open, onClose, loan }: Props) {
+  const { canPrint } = usePermissions();
   const printRef = useRef<HTMLDivElement>(null);
   const [guarantors, setGuarantors] = useState<any[]>([]);
   const [company, setCompany] = useState<any>(null);

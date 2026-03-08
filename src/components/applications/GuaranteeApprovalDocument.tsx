@@ -14,6 +14,7 @@ interface Props {
 }
 
 export default function GuaranteeApprovalDocument({ open, onClose, loan }: Props) {
+  const { canPrint } = usePermissions();
   const printRef = useRef<HTMLDivElement>(null);
   const { settings: company } = useCompanySettings();
   const [guarantors, setGuarantors] = useState<any[]>([]);

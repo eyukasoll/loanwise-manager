@@ -14,6 +14,7 @@ interface GuaranteeDeactivationProps {
 }
 
 export default function GuaranteeDeactivationCertificate({ open, onClose, loan, guarantor }: GuaranteeDeactivationProps) {
+  const { canPrint } = usePermissions();
   const printRef = useRef<HTMLDivElement>(null);
   const { settings: company } = useCompanySettings();
 
