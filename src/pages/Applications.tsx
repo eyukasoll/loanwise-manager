@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions } from "@/hooks/useLoans";
+import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions, useGuaranteedEmployeeIds } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Eye, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
