@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image } from "lucide-react";
+import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image, DatabaseBackup, Download, CheckCircle2 } from "lucide-react";
+import * as XLSX from "xlsx";
 
 const fiscalMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
