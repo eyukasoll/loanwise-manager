@@ -195,6 +195,8 @@ export default function GuaranteeDeactivation() {
     printWindow.print();
   };
 
+  const { paginatedItems: paginatedFiltered, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(filtered);
+
   return (
     <div>
       <TopBar title={t.gdTitle} subtitle={t.gdSubtitle} />
