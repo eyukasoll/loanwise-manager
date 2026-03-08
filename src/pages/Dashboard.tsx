@@ -85,7 +85,7 @@ export default function Dashboard() {
 
           {/* Type pie */}
           <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-display font-semibold text-sm mb-4">Loan Type Distribution</h3>
+            <h3 className="font-display font-semibold text-sm mb-4">{t.loanTypeDist}</h3>
             {typeDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
