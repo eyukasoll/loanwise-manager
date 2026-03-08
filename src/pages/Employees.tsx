@@ -18,6 +18,7 @@ const emptyForm = {
 
 export default function Employees() {
   const { data: employees = [], isLoading } = useEmployees();
+  const { data: nextId = "EMP001" } = useNextEmployeeId();
   const createMut = useCreateEmployee();
   const updateMut = useUpdateEmployee();
   const deleteMut = useDeleteEmployee();
