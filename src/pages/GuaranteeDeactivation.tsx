@@ -3,13 +3,14 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ShieldOff, Filter, UserPlus, Printer } from "lucide-react";
+import { Search, ShieldOff, Filter, UserPlus, Printer, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { fmt } from "@/lib/currency";
 import { toast } from "sonner";
 import { useCompanySettings } from "@/hooks/useCompanySettings";
+import GuaranteeDeactivationCertificate from "@/components/applications/GuaranteeDeactivationCertificate";
 
 function useAllGuarantees() {
   return useQuery({
@@ -54,6 +55,7 @@ export default function GuaranteeDeactivation() {
   const [employeeSearch, setEmployeeSearch] = useState("");
   const [releasing, setReleasing] = useState(false);
   const [releaseDoc, setReleaseDoc] = useState<any>(null);
+  const [certGuarantee, setCertGuarantee] = useState<any>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
   const getGuaranteeStatus = (loanStatus: string) => {
@@ -269,20 +271,30 @@ export default function GuaranteeDeactivation() {
                           )}
                         </td>
                         <td className="px-5 py-3 text-center">
-                          {isEligible && (
+                          <div className="flex items-center justify-center gap-1">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-7 text-xs text-destructive hover:text-destructive"
-                              onClick={() => {
-                                setReleaseDialog(g);
-                                setNewGuarantorId("");
-                                setEmployeeSearch("");
-                              }}
+                              className="h-7 text-xs"
+                              onClick={() => setCertGuarantee(g)}
                             >
-                              <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
+                              <FileText className="w-3.5 h-3.5 mr-1" /> Certificate
                             </Button>
-                          )}
+                            {isEligible && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-xs text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  setReleaseDialog(g);
+                                  setNewGuarantorId("");
+                                  setEmployeeSearch("");
+                                }}
+                              >
+                                <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -471,6 +483,16 @@ export default function GuaranteeDeactivation() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Deactivation Certificate Dialog */}
+      {certGuarantee && (
+        <GuaranteeDeactivationCertificate
+          open={!!certGuarantee}
+          onClose={() => setCertGuarantee(null)}
+          loan={certGuarantee.loan_applications}
+          guarantor={certGuarantee}
+        />
+      )}
     </div>
   );
 }
