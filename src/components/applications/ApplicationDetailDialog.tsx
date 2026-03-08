@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { Printer, Pencil, Trash2 } from "lucide-react";
+import ApplicationTimeline from "./ApplicationTimeline";
 import { toast } from "sonner";
 import LoanApplicationDocument from "./LoanApplicationDocument";
 import { useUpdateLoanApplication, useDeleteLoanApplication } from "@/hooks/useLoans";
@@ -107,6 +108,9 @@ export default function ApplicationDetailDialog({ selected, onClose, canEdit = f
           </DialogHeader>
           {selected && !editMode && (
             <div className="space-y-4">
+              {/* Status Timeline */}
+              <ApplicationTimeline loan={selected} />
+
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {([
                   ["Application ID", selected.application_number], ["Date", selected.application_date],
