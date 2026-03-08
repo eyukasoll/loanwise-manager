@@ -39,6 +39,7 @@ export default function Settings() {
     max_loan_to_salary_ratio: 3,
     payroll_cutoff_day: 25,
     late_payment_penalty_rate: 2,
+    savings_multiplier: 3,
   });
 
   const [email, setEmail] = useState({
