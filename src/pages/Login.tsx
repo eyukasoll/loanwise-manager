@@ -40,33 +40,44 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setLang(lang === "en" ? "am" : "en")}
+          className="flex items-center gap-1.5"
+        >
+          <Globe className="w-3.5 h-3.5" />
+          {lang === "en" ? "አማ" : "EN"}
+        </Button>
+      </div>
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <img src={logo} alt="Addis Microfinance" className="w-20 h-20 mb-4 object-contain" />
           <h1 className="text-2xl font-bold text-foreground font-display">Addis Microfinance</h1>
-          <p className="text-muted-foreground mt-1">Sign in to your account</p>
+          <p className="text-muted-foreground mt-1">{t.loginTitle}</p>
         </div>
 
         <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{t.username}</Label>
               <Input
                 id="username"
                 type="text"
-                placeholder="Enter your username"
+                placeholder={t.username}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t.password}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={t.password}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -81,7 +92,7 @@ export default function Login() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? t.signingIn : t.signIn}
             </Button>
           </form>
         </div>

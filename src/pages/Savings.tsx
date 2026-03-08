@@ -99,7 +99,7 @@ export default function Savings() {
 
   return (
     <div>
-      <TopBar title="Savings" subtitle="Employee savings deposits & withdrawals" />
+      <TopBar title={t.savTitle} subtitle={t.savSubtitle} />
       <div className="p-6 animate-fade-in space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
