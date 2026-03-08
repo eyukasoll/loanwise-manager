@@ -340,6 +340,42 @@ export type Database = {
           },
         ]
       }
+      loan_guarantors: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          loan_application_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          loan_application_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          loan_application_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_guarantors_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_guarantors_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_type_documents: {
         Row: {
           created_at: string

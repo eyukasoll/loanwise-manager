@@ -201,13 +201,26 @@ export function useCreateLoanApplication() {
       repayment_period_months: number; interest_rate?: number; purpose?: string;
       proposed_start_date?: string; remarks?: string; status?: string;
       total_payable?: number; monthly_installment?: number; outstanding_balance?: number;
+      guarantor_ids?: string[];
     }) => {
+      const { guarantor_ids, ...appData } = app;
       const { data, error } = await supabase
         .from("loan_applications")
-        .insert({ ...app, application_number: "" }) // trigger will generate
+        .insert({ ...appData, application_number: "" }) // trigger will generate
         .select("*, employees(full_name, department, employee_id), loan_types(name)")
         .single();
       if (error) throw error;
+
+      // Insert guarantors
+      if (guarantor_ids && guarantor_ids.length > 0) {
+        const guarantors = guarantor_ids.map(eid => ({
+          loan_application_id: data.id,
+          employee_id: eid,
+        }));
+        const { error: gErr } = await supabase.from("loan_guarantors").insert(guarantors);
+        if (gErr) throw gErr;
+      }
+
       return data;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["loan_applications"] }); toast.success("Application submitted"); },
