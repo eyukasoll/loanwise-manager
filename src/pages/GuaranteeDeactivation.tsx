@@ -45,6 +45,7 @@ const ACTIVE_STATUSES = ["Submitted", "Under Review", "Pending Approval", "Appro
 export default function GuaranteeDeactivation() {
   const { data: guarantees = [], isLoading } = useAllGuarantees();
   const { data: employees = [] } = useEmployees();
+  const { settings: company } = useCompanySettings();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
