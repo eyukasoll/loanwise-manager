@@ -14,7 +14,7 @@ import { fmt, CURRENCY } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import ApplicationsTable from "@/components/applications/ApplicationsTable";
 import ApplicationDetailDialog from "@/components/applications/ApplicationDetailDialog";
-import NewApplicationDialog from "@/components/applications/NewApplicationDialog";
+
 
 export default function Applications() {
   const [statusFilter, setStatusFilter] = useState("all");
