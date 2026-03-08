@@ -10,6 +10,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { Link } from "react-router-dom";
 import { fmtShort as fmtS, fmt } from "@/lib/currency";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const COLORS = [
   "hsl(217, 72%, 48%)", "hsl(162, 63%, 41%)", "hsl(38, 92%, 50%)",
