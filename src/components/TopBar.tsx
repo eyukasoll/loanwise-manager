@@ -1,7 +1,7 @@
 import React from "react";
-import { Bell, Search, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, User } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import NotificationBell from "@/components/NotificationBell";
 
 export default function TopBar({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
@@ -20,10 +20,7 @@ export default function TopBar({ title, subtitle }: { title: string; subtitle?: 
           />
         </div>
         <ThemeToggle />
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
-        </Button>
+        <NotificationBell />
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
           <User className="w-4 h-4 text-primary" />
         </div>
