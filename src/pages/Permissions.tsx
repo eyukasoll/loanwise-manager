@@ -118,7 +118,7 @@ export default function Permissions() {
 
   return (
     <div>
-      <TopBar title="Permissions" subtitle="Manage role-based access control" />
+      <TopBar title={t.permTitle} subtitle={t.permSubtitle} />
       <div className="p-6 animate-fade-in">
         <Tabs value={activeRole} onValueChange={setActiveRole} className="space-y-6">
           <div className="flex items-center justify-between">
