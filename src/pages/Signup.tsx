@@ -47,7 +47,7 @@ export default function Signup() {
     } else {
       // Update role if user was created (the trigger sets 'employee' by default)
       if (data.user && selectedRole !== "employee") {
-        await supabase.from("user_roles").update({ role: selectedRole }).eq("user_id", data.user.id);
+        await supabase.from("user_roles").update({ role: selectedRole as any }).eq("user_id", data.user.id);
       }
       setSuccess(true);
     }
