@@ -88,29 +88,32 @@ export default function Disbursements() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-border bg-secondary/40">
-                        {["ID", t.employee, t.loanType, t.amount, t.disbursedOn, t.method, t.status].map(h => (
-                          <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {disbursed.map((loan: any) => (
-                        <tr key={loan.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                          <td className="px-5 py-3 font-mono text-xs">{loan.application_number}</td>
-                          <td className="px-5 py-3 font-medium">{loan.employees?.full_name}</td>
-                          <td className="px-5 py-3 text-muted-foreground">{loan.loan_types?.name}</td>
-                          <td className="px-5 py-3 text-right font-medium">{fmt(loan.approved_amount || loan.requested_amount)}</td>
-                          <td className="px-5 py-3 text-muted-foreground">{loan.disbursement_date || "—"}</td>
-                          <td className="px-5 py-3 text-muted-foreground">{loan.disbursement_method || "—"}</td>
-                          <td className="px-5 py-3"><StatusBadge status={loan.status} /></td>
-                        </tr>
-                      ))}
-                      {disbursed.length === 0 && <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No disbursements yet.</td></tr>}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                       <tr className="border-b border-border bg-secondary/40">
+                         <th className="px-3 py-3 font-medium text-muted-foreground text-xs text-left w-10">#</th>
+                         {["ID", t.employee, t.loanType, t.amount, t.disbursedOn, t.method, t.status].map(h => (
+                           <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
+                         ))}
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {paginatedDisbursed.map((loan: any, idx: number) => (
+                         <tr key={loan.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                           <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
+                           <td className="px-5 py-3 font-mono text-xs">{loan.application_number}</td>
+                           <td className="px-5 py-3 font-medium">{loan.employees?.full_name}</td>
+                           <td className="px-5 py-3 text-muted-foreground">{loan.loan_types?.name}</td>
+                           <td className="px-5 py-3 text-right font-medium">{fmt(loan.approved_amount || loan.requested_amount)}</td>
+                           <td className="px-5 py-3 text-muted-foreground">{loan.disbursement_date || "—"}</td>
+                           <td className="px-5 py-3 text-muted-foreground">{loan.disbursement_method || "—"}</td>
+                           <td className="px-5 py-3"><StatusBadge status={loan.status} /></td>
+                         </tr>
+                       ))}
+                       {disbursed.length === 0 && <tr><td colSpan={8} className="px-5 py-12 text-center text-muted-foreground">No disbursements yet.</td></tr>}
+                     </tbody>
+                   </table>
+                 </div>
+                 <TablePagination currentPage={currentPage} totalItems={totalItems} pageSize={pageSize} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
+               </div>
             </div>
           </>
         )}
