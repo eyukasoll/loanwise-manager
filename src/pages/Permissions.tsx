@@ -36,6 +36,7 @@ type PermRow = {
 
 export default function Permissions() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [permissions, setPermissions] = useState<PermRow[]>([]);
