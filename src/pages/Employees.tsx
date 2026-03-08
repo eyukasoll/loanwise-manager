@@ -3,7 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees, useGuaranteedEmployeeIds } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Search, Plus, Eye, Edit, Trash2, Upload } from "lucide-react";
+import { Search, Plus, Eye, Edit, Trash2, Upload, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmt, CURRENCY } from "@/lib/currency";
 import BulkEmployeeImport from "@/components/BulkEmployeeImport";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const userTypes = [
   { value: "Admin", label: "Admin" },
@@ -40,6 +42,31 @@ export default function Employees() {
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [resendingId, setResendingId] = useState<string | null>(null);
+
+  const handleResendCredentials = async (emp: any) => {
+    if (!emp.email) {
+      toast.error("This employee has no email address");
+      return;
+    }
+    setResendingId(emp.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-employee-user", {
+        body: { email: emp.email, full_name: emp.full_name, user_type: emp.user_type || "Employee User" },
+      });
+      if (error) {
+        toast.error("Failed to resend credentials");
+      } else if (data?.email_sent) {
+        toast.success(`New credentials sent to ${emp.email}`);
+      } else if (data?.success) {
+        toast.info(`Password reset to: ${data.password} (email not sent — check SMTP settings)`);
+      }
+    } catch {
+      toast.error("Failed to resend credentials");
+    } finally {
+      setResendingId(null);
+    }
+  };
 
   // Calculate next ID number for bulk import
   const nextIdNum = (() => {
@@ -136,6 +163,11 @@ export default function Employees() {
                       <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
                         <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
                         {canEdit("Employees") && <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>}
+                        {canEdit("Employees") && emp.email && (
+                          <Button variant="ghost" size="icon" title="Resend Credentials" onClick={() => handleResendCredentials(emp)} disabled={resendingId === emp.id}>
+                            <RefreshCw className={`w-4 h-4 text-primary ${resendingId === emp.id ? "animate-spin" : ""}`} />
+                          </Button>
+                        )}
                         {canDelete("Employees") && <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                       </td>
                     </tr>
