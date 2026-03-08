@@ -64,6 +64,7 @@ export type Database = {
           phone: string | null
           position: string
           updated_at: string
+          user_type: string
         }
         Insert: {
           allowances?: number
@@ -81,6 +82,7 @@ export type Database = {
           phone?: string | null
           position: string
           updated_at?: string
+          user_type?: string
         }
         Update: {
           allowances?: number
@@ -98,6 +100,7 @@ export type Database = {
           phone?: string | null
           position?: string
           updated_at?: string
+          user_type?: string
         }
         Relationships: []
       }

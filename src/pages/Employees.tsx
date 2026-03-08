@@ -11,10 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fmt, CURRENCY } from "@/lib/currency";
 import BulkEmployeeImport from "@/components/BulkEmployeeImport";
 
+const userTypes = [
+  { value: "Admin", label: "Admin" },
+  { value: "Manager", label: "Manager" },
+  { value: "Finance User", label: "Finance User" },
+  { value: "Employee User", label: "Employee User" },
+];
+
 const emptyForm = {
   employee_id: "", full_name: "", department: "", position: "", branch: "Main Office",
   date_of_employment: "", employment_status: "Active", monthly_salary: 0,
-  allowances: 0, bank_account: "", phone: "", email: "",
+  allowances: 0, bank_account: "", phone: "", email: "", user_type: "Employee User",
 };
 
 export default function Employees() {
@@ -52,6 +59,7 @@ export default function Employees() {
       employment_status: emp.employment_status, monthly_salary: emp.monthly_salary,
       allowances: emp.allowances, bank_account: emp.bank_account || "",
       phone: emp.phone || "", email: emp.email || "",
+      user_type: emp.user_type || "Employee User",
     });
     setFormOpen(true);
   };
@@ -142,6 +150,7 @@ export default function Employees() {
                 ["Salary", fmt(viewEmp.monthly_salary)], ["Allowances", fmt(viewEmp.allowances)],
                 ["Status", viewEmp.employment_status], ["Phone", viewEmp.phone || "—"],
                 ["Email", viewEmp.email || "—"], ["Bank Account", viewEmp.bank_account || "—"],
+                ["User Type", viewEmp.user_type || "—"],
               ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-muted-foreground text-xs">{label}</p>
@@ -214,6 +223,17 @@ export default function Employees() {
             <div>
               <Label>Email</Label>
               <Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="mt-1" />
+            </div>
+            <div>
+              <Label>User Type <span className="text-destructive">*</span></Label>
+              <Select value={form.user_type} onValueChange={v => setForm(f => ({ ...f, user_type: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {userTypes.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter className="mt-4">
