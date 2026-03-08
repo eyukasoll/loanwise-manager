@@ -105,8 +105,8 @@ export default function Dashboard() {
         {/* Recent applications */}
         <div className="bg-card rounded-xl border border-border">
           <div className="flex items-center justify-between p-5 border-b border-border">
-            <h3 className="font-display font-semibold text-sm">Recent Loan Applications</h3>
-            <Link to="/applications" className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">View all <ArrowRight className="w-3 h-3" /></Link>
+            <h3 className="font-display font-semibold text-sm">{t.recentApplications}</h3>
+            <Link to="/applications" className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">{t.viewAll} <ArrowRight className="w-3 h-3" /></Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
