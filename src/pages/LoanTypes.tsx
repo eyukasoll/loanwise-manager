@@ -112,7 +112,7 @@ export default function LoanTypes() {
                 </div>
                 {lt.description && <p className="text-xs text-muted-foreground mb-3">{lt.description}</p>}
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-muted-foreground">Amount Range</span><span className="font-medium">{fmt(lt.min_amount)} – {fmt(lt.max_amount)}</span></div>
+                  {!lt.is_savings_based && <div className="flex justify-between"><span className="text-muted-foreground">Amount Range</span><span className="font-medium">{fmt(lt.min_amount)} – {fmt(lt.max_amount)}</span></div>}
                   <div className="flex justify-between"><span className="text-muted-foreground">Max Period</span><span className="font-medium">{lt.max_period_months} months</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Interest Rate</span><span className="font-medium">{lt.interest_free ? "Interest Free" : `${lt.interest_rate}%`}</span></div>
                   {lt.is_savings_based && <div className="flex justify-between"><span className="text-muted-foreground">Basis</span><span className="font-medium text-primary">Savings-Based</span></div>}
