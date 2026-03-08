@@ -3,9 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, ShieldOff } from "lucide-react";
+import { FileText, ShieldOff, Printer } from "lucide-react";
 import { toast } from "sonner";
 import GuaranteeDeactivationCertificate from "./GuaranteeDeactivationCertificate";
+import LoanApplicationDocument from "./LoanApplicationDocument";
 
 interface Props {
   selected: any;
