@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -32,6 +33,7 @@ export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { user, role, signOut } = useAuth();
   const { canView, loading: permLoading } = usePermissions();
+  const { settings } = useCompanySettings();
 
   const roleLabels: Record<string, string> = {
     admin: "Admin",
@@ -42,6 +44,9 @@ export default function AppSidebar() {
 
   const visibleItems = navItems.filter((item) => canView(item.module));
 
+  const displayLogo = settings?.logo_url || logo;
+  const displayName = settings?.company_name || "Addis Microfinance";
+
   return (
     <aside
       className={`fixed top-0 left-0 h-screen bg-sidebar flex flex-col z-40 transition-all duration-300 ${
@@ -50,10 +55,10 @@ export default function AppSidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
-        <img src={logo} alt="Addis Microfinance" className="w-8 h-8 rounded-lg flex-shrink-0 object-contain" />
+        <img src={displayLogo} alt={displayName} className="w-8 h-8 rounded-lg flex-shrink-0 object-contain" />
         {!collapsed && (
           <span className="font-display text-sm font-bold text-sidebar-primary-foreground truncate">
-            Addis Microfinance
+            {displayName}
           </span>
         )}
       </div>
