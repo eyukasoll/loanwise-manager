@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useLoanApplications, usePayrollDeductions, useGeneratePayrollDeductions, useProcessDeduction } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { CreditCard, RefreshCw, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
