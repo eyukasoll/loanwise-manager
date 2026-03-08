@@ -223,6 +223,17 @@ export default function Employees() {
               <Label>Email</Label>
               <Input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="mt-1" />
             </div>
+            <div>
+              <Label>User Type <span className="text-destructive">*</span></Label>
+              <Select value={form.user_type} onValueChange={v => setForm(f => ({ ...f, user_type: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {userTypes.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
