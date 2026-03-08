@@ -22,6 +22,10 @@ const ACTIONS = [
   { key: "can_create", label: "Create", icon: Plus, color: "text-success" },
   { key: "can_edit", label: "Edit", icon: Edit, color: "text-warning" },
   { key: "can_delete", label: "Delete", icon: Trash2, color: "text-destructive" },
+  { key: "can_import", label: "Import", icon: Upload, color: "text-primary" },
+  { key: "can_export", label: "Export", icon: Download, color: "text-primary" },
+  { key: "can_print", label: "Print", icon: Printer, color: "text-muted-foreground" },
+  { key: "can_share", label: "Share", icon: Share2, color: "text-info" },
 ] as const;
 
 type PermRow = {
