@@ -11,10 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fmt, CURRENCY } from "@/lib/currency";
 import BulkEmployeeImport from "@/components/BulkEmployeeImport";
 
+const userTypes = [
+  { value: "Admin", label: "Admin" },
+  { value: "Manager", label: "Manager" },
+  { value: "Finance User", label: "Finance User" },
+  { value: "Employee User", label: "Employee User" },
+];
+
 const emptyForm = {
   employee_id: "", full_name: "", department: "", position: "", branch: "Main Office",
   date_of_employment: "", employment_status: "Active", monthly_salary: 0,
-  allowances: 0, bank_account: "", phone: "", email: "",
+  allowances: 0, bank_account: "", phone: "", email: "", user_type: "Employee User",
 };
 
 export default function Employees() {
