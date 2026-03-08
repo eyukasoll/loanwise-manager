@@ -43,10 +43,31 @@ export function useCreateEmployee() {
       employee_id: string; full_name: string; department: string; position: string;
       branch?: string; date_of_employment: string; employment_status?: string;
       monthly_salary?: number; allowances?: number; bank_account?: string;
-      phone?: string; email?: string;
+      phone?: string; email?: string; user_type?: string;
     }) => {
       const { data, error } = await supabase.from("employees").insert(emp).select().single();
       if (error) throw error;
+
+      // Auto-create auth user and send credentials email if email provided
+      if (emp.email) {
+        try {
+          const { data: fnData, error: fnError } = await supabase.functions.invoke("create-employee-user", {
+            body: { email: emp.email, full_name: emp.full_name, user_type: emp.user_type || "Employee User" },
+          });
+          if (fnError) {
+            console.error("Failed to create user account:", fnError);
+            toast.warning("Employee created but user account could not be set up. Check email/SMTP settings.");
+          } else if (fnData?.email_sent) {
+            toast.success(`Credentials sent to ${emp.email}`);
+          } else if (fnData?.success) {
+            toast.info(`User created. Password: ${fnData.password} (email not sent — check SMTP settings)`);
+          }
+        } catch (e: any) {
+          console.error("Edge function error:", e);
+          toast.warning("Employee saved but auto user creation failed.");
+        }
+      }
+
       return data;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["employees"] }); qc.invalidateQueries({ queryKey: ["next-employee-id"] }); toast.success("Employee created"); },
