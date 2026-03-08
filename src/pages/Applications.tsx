@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
 import TopBar from "@/components/TopBar";
-import StatusBadge from "@/components/StatusBadge";
-import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions, useGuaranteedEmployeeIds } from "@/hooks/useLoans";
+import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes, useSavingsTransactions, useGuaranteedEmployeeIds, useBulkDeleteLoanApplications } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Search, Plus, Eye, Filter } from "lucide-react";
+import { Search, Plus, Filter, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +15,6 @@ import { supabase } from "@/integrations/supabase/client";
 import ApplicationsTable from "@/components/applications/ApplicationsTable";
 import ApplicationDetailDialog from "@/components/applications/ApplicationDetailDialog";
 
-
 export default function Applications() {
   const [statusFilter, setStatusFilter] = useState("all");
   const { data: applications = [], isLoading } = useLoanApplications(statusFilter);
@@ -23,11 +22,14 @@ export default function Applications() {
   const { data: loanTypesData = [] } = useLoanTypes();
   const { data: savingsData = [] } = useSavingsTransactions();
   const createMut = useCreateLoanApplication();
+  const bulkDeleteMut = useBulkDeleteLoanApplications();
   const { canCreate, canEdit, canDelete } = usePermissions();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [savingsMultiplier, setSavingsMultiplier] = useState(3);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [form, setForm] = useState({
     employee_id: "", loan_type_id: "", requested_amount: 0,
     repayment_period_months: 12, purpose: "", proposed_start_date: "", remarks: "",
@@ -60,8 +62,6 @@ export default function Applications() {
     }
   }, [isSavingsBased, form.employee_id, savingsBalance, savingsMultiplier]);
 
-  // Filter guarantor options: exclude the applicant and the other selected guarantor
-  // Filter guarantor options: exclude applicant, other guarantor, and already-guaranteed employees
   const { data: guaranteedIds = new Set<string>() } = useGuaranteedEmployeeIds();
   const freeEmployees = employees.filter((e: any) => !guaranteedIds.has(e.id));
   const guarantorOptions1 = freeEmployees.filter((e: any) => e.id !== form.employee_id && e.id !== form.guarantor2_id);
@@ -73,6 +73,31 @@ export default function Applications() {
   });
 
   const statuses = ["all", "Draft", "Submitted", "Under Review", "Pending Approval", "Approved", "Rejected", "Disbursed", "Active", "Overdue", "Closed", "Cancelled"];
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleToggleAll = () => {
+    if (filtered.every(l => selectedIds.has(l.id))) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map(l => l.id)));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    bulkDeleteMut.mutate(Array.from(selectedIds), {
+      onSuccess: () => {
+        setSelectedIds(new Set());
+        setBulkDeleteOpen(false);
+      },
+    });
+  };
 
   const handleCreate = () => {
     if (!form.employee_id || !form.loan_type_id || form.requested_amount <= 0) return;
@@ -122,17 +147,48 @@ export default function Applications() {
               <SelectContent>{statuses.map(s => <SelectItem key={s} value={s}>{s === "all" ? "All Statuses" : s}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          {canCreate("Applications") && <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> New Application</Button>}
+          <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && canDelete("Applications") && (
+              <Button size="sm" variant="destructive" onClick={() => setBulkDeleteOpen(true)}>
+                <Trash2 className="w-4 h-4 mr-1" /> Delete ({selectedIds.size})
+              </Button>
+            )}
+            {canCreate("Applications") && <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> New Application</Button>}
+          </div>
         </div>
 
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
         ) : (
-          <ApplicationsTable filtered={filtered} onSelect={setSelected} />
+          <ApplicationsTable
+            filtered={filtered}
+            onSelect={setSelected}
+            selectedIds={selectedIds}
+            onToggleSelect={handleToggleSelect}
+            onToggleAll={handleToggleAll}
+          />
         )}
       </div>
 
       <ApplicationDetailDialog selected={selected} onClose={() => setSelected(null)} canEdit={canEdit("Applications")} canDelete={canDelete("Applications")} />
+
+      {/* Bulk Delete Confirmation */}
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedIds.size} application(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the selected applications along with their guarantors, documents, repayment schedules, and payment records. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={bulkDeleteMut.isPending}>
+              {bulkDeleteMut.isPending ? "Deleting..." : "Delete All"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* New Application */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
@@ -172,29 +228,21 @@ export default function Applications() {
               <div><Label>Period (months)</Label><Input type="number" value={form.repayment_period_months} onChange={e => setForm(f => ({ ...f, repayment_period_months: Number(e.target.value) }))} className="mt-1" /></div>
             </div>
 
-            {/* Guarantors - Mandatory */}
+            {/* Guarantors */}
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-3">
               <p className="font-medium text-sm text-amber-700 dark:text-amber-400">Guarantors (2 required) <span className="text-destructive">*</span></p>
               <div>
                 <Label className="text-xs">Guarantor 1 <span className="text-destructive">*</span></Label>
                 <Select value={form.guarantor1_id} onValueChange={v => setForm(f => ({ ...f, guarantor1_id: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Select first guarantor" /></SelectTrigger>
-                  <SelectContent>
-                    {guarantorOptions1.map((e: any) => (
-                      <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectContent>{guarantorOptions1.map((e: any) => <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
                 <Label className="text-xs">Guarantor 2 <span className="text-destructive">*</span></Label>
                 <Select value={form.guarantor2_id} onValueChange={v => setForm(f => ({ ...f, guarantor2_id: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Select second guarantor" /></SelectTrigger>
-                  <SelectContent>
-                    {guarantorOptions2.map((e: any) => (
-                      <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectContent>{guarantorOptions2.map((e: any) => <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               {(!form.guarantor1_id || !form.guarantor2_id) && form.employee_id && (

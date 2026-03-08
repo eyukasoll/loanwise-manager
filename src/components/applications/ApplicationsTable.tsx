@@ -3,19 +3,28 @@ import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { fmt } from "@/lib/currency";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Props {
   filtered: any[];
   onSelect: (loan: any) => void;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string) => void;
+  onToggleAll: () => void;
 }
 
-export default function ApplicationsTable({ filtered, onSelect }: Props) {
+export default function ApplicationsTable({ filtered, onSelect, selectedIds, onToggleSelect, onToggleAll }: Props) {
+  const allSelected = filtered.length > 0 && filtered.every(l => selectedIds.has(l.id));
+
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-secondary/40">
+              <th className="px-3 py-3 w-10">
+                <Checkbox checked={allSelected} onCheckedChange={onToggleAll} />
+              </th>
               {["ID", "Date", "Employee", "Loan Type", "Amount", "Period", "Installment", "Status", ""].map(h => (
                 <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${["Amount", "Installment"].includes(h) ? "text-right" : "text-left"} ${h === "" ? "text-center" : ""}`}>{h}</th>
               ))}
@@ -23,7 +32,10 @@ export default function ApplicationsTable({ filtered, onSelect }: Props) {
           </thead>
           <tbody>
             {filtered.map((loan: any) => (
-              <tr key={loan.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+              <tr key={loan.id} className={`border-b border-border/50 hover:bg-secondary/20 transition-colors ${selectedIds.has(loan.id) ? "bg-primary/5" : ""}`}>
+                <td className="px-3 py-3">
+                  <Checkbox checked={selectedIds.has(loan.id)} onCheckedChange={() => onToggleSelect(loan.id)} />
+                </td>
                 <td className="px-5 py-3 font-mono text-xs">{loan.application_number}</td>
                 <td className="px-5 py-3 text-muted-foreground">{loan.application_date}</td>
                 <td className="px-5 py-3 font-medium">{loan.employees?.full_name}</td>
@@ -35,7 +47,7 @@ export default function ApplicationsTable({ filtered, onSelect }: Props) {
                 <td className="px-5 py-3 text-center"><Button variant="ghost" size="icon" onClick={() => onSelect(loan)}><Eye className="w-4 h-4" /></Button></td>
               </tr>
             ))}
-            {filtered.length === 0 && <tr><td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">No applications found.</td></tr>}
+            {filtered.length === 0 && <tr><td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">No applications found.</td></tr>}
           </tbody>
         </table>
       </div>
