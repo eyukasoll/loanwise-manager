@@ -22,6 +22,7 @@ import SettingsPage from "./pages/Settings";
 import Permissions from "./pages/Permissions";
 import Savings from "./pages/Savings";
 import Login from "./pages/Login";
+import GuaranteeDeactivation from "./pages/GuaranteeDeactivation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/settings" element={guard("Settings", <SettingsPage />)} />
               <Route path="/permissions" element={guard("Permissions", <Permissions />)} />
               <Route path="/savings" element={guard("Savings", <Savings />)} />
+              <Route path="/guarantee-deactivation" element={guard("Applications", <GuaranteeDeactivation />)} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
