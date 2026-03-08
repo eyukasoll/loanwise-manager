@@ -66,7 +66,7 @@ export default function Disbursements() {
           <>
             {approved.length > 0 && (
               <div>
-                <h3 className="font-display font-semibold text-sm mb-3">Pending Disbursement ({approved.length})</h3>
+                <h3 className="font-display font-semibold text-sm mb-3">{t.pendingDisbursement} ({approved.length})</h3>
                 <div className="space-y-3">
                   {approved.map((loan: any) => (
                     <div key={loan.id} className="bg-card rounded-xl border-2 border-dashed border-warning/40 p-5 flex items-center justify-between flex-wrap gap-4">
