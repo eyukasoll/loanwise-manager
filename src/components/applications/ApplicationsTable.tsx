@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, FileText } from "lucide-react";
 import { fmt } from "@/lib/currency";
 import { Checkbox } from "@/components/ui/checkbox";
+import LoanApplicationDocument from "./LoanApplicationDocument";
 
 interface Props {
   filtered: any[];
@@ -15,6 +16,7 @@ interface Props {
 
 export default function ApplicationsTable({ filtered, onSelect, selectedIds, onToggleSelect, onToggleAll }: Props) {
   const allSelected = filtered.length > 0 && filtered.every(l => selectedIds.has(l.id));
+  const [docLoan, setDocLoan] = useState<any>(null);
 
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -44,13 +46,17 @@ export default function ApplicationsTable({ filtered, onSelect, selectedIds, onT
                 <td className="px-5 py-3">{loan.repayment_period_months}m</td>
                 <td className="px-5 py-3 text-right">{loan.monthly_installment ? fmt(loan.monthly_installment) : "—"}</td>
                 <td className="px-5 py-3"><StatusBadge status={loan.status} /></td>
-                <td className="px-5 py-3 text-center"><Button variant="ghost" size="icon" onClick={() => onSelect(loan)}><Eye className="w-4 h-4" /></Button></td>
+                <td className="px-5 py-3 text-center">
+                  <Button variant="ghost" size="icon" onClick={() => setDocLoan(loan)} title="Document"><FileText className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => onSelect(loan)} title="View"><Eye className="w-4 h-4" /></Button>
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && <tr><td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">No applications found.</td></tr>}
           </tbody>
         </table>
       </div>
+      <LoanApplicationDocument open={!!docLoan} onClose={() => setDocLoan(null)} loan={docLoan} />
     </div>
   );
 }
