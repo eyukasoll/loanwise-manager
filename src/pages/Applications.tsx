@@ -12,6 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmt, CURRENCY } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
+import ApplicationsTable from "@/components/applications/ApplicationsTable";
+import ApplicationDetailDialog from "@/components/applications/ApplicationDetailDialog";
+import NewApplicationDialog from "@/components/applications/NewApplicationDialog";
 
 export default function Applications() {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -28,16 +31,15 @@ export default function Applications() {
   const [form, setForm] = useState({
     employee_id: "", loan_type_id: "", requested_amount: 0,
     repayment_period_months: 12, purpose: "", proposed_start_date: "", remarks: "",
+    guarantor1_id: "", guarantor2_id: "",
   });
 
-  // Fetch savings multiplier from settings
   useEffect(() => {
     supabase.from("company_settings").select("savings_multiplier").limit(1).single().then(({ data }) => {
       if (data && (data as any).savings_multiplier) setSavingsMultiplier(Number((data as any).savings_multiplier));
     });
   }, []);
 
-  // Compute employee savings balances
   const employeeSavingsBalance = useMemo(() => {
     const map = new Map<string, number>();
     savingsData.forEach((t: any) => {
@@ -47,18 +49,20 @@ export default function Applications() {
     return map;
   }, [savingsData]);
 
-  // Get max amount for savings-based loan
   const selectedLoanType = loanTypesData.find((t: any) => t.id === form.loan_type_id);
   const isSavingsBased = selectedLoanType?.is_savings_based;
   const savingsBalance = employeeSavingsBalance.get(form.employee_id) || 0;
   const savingsMaxAmount = isSavingsBased ? savingsBalance * savingsMultiplier : null;
 
-  // Auto-set requested amount for savings-based loans
   useEffect(() => {
     if (isSavingsBased && form.employee_id) {
       setForm(f => ({ ...f, requested_amount: savingsBalance * savingsMultiplier }));
     }
   }, [isSavingsBased, form.employee_id, savingsBalance, savingsMultiplier]);
+
+  // Filter guarantor options: exclude the applicant and the other selected guarantor
+  const guarantorOptions1 = employees.filter((e: any) => e.id !== form.employee_id && e.id !== form.guarantor2_id);
+  const guarantorOptions2 = employees.filter((e: any) => e.id !== form.employee_id && e.id !== form.guarantor1_id);
 
   const filtered = applications.filter((l: any) => {
     const name = l.employees?.full_name || "";
@@ -69,6 +73,7 @@ export default function Applications() {
 
   const handleCreate = () => {
     if (!form.employee_id || !form.loan_type_id || form.requested_amount <= 0) return;
+    if (!form.guarantor1_id || !form.guarantor2_id) return;
     if (isSavingsBased && savingsMaxAmount !== null && form.requested_amount > savingsMaxAmount) return;
     const lt = loanTypesData.find((t: any) => t.id === form.loan_type_id);
     const rate = lt?.interest_rate || 0;
@@ -78,13 +83,25 @@ export default function Applications() {
     const monthlyInstallment = Math.ceil(totalPayable / form.repayment_period_months);
 
     createMut.mutate({
-      ...form,
+      employee_id: form.employee_id,
+      loan_type_id: form.loan_type_id,
+      requested_amount: form.requested_amount,
+      repayment_period_months: form.repayment_period_months,
+      purpose: form.purpose,
+      proposed_start_date: form.proposed_start_date,
+      remarks: form.remarks,
       interest_rate: rate,
       status: "Submitted",
       total_payable: totalPayable,
       monthly_installment: monthlyInstallment,
       outstanding_balance: totalPayable,
-    }, { onSuccess: () => { setFormOpen(false); setForm({ employee_id: "", loan_type_id: "", requested_amount: 0, repayment_period_months: 12, purpose: "", proposed_start_date: "", remarks: "" }); } });
+      guarantor_ids: [form.guarantor1_id, form.guarantor2_id],
+    }, {
+      onSuccess: () => {
+        setFormOpen(false);
+        setForm({ employee_id: "", loan_type_id: "", requested_amount: 0, repayment_period_months: 12, purpose: "", proposed_start_date: "", remarks: "", guarantor1_id: "", guarantor2_id: "" });
+      }
+    });
   };
 
   return (
@@ -108,73 +125,20 @@ export default function Applications() {
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
         ) : (
-          <div className="bg-card rounded-xl border border-border overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-secondary/40">
-                    {["ID", "Date", "Employee", "Loan Type", "Amount", "Period", "Installment", "Status", ""].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${["Amount", "Installment"].includes(h) ? "text-right" : "text-left"} ${h === "" ? "text-center" : ""}`}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((loan: any) => (
-                    <tr key={loan.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                      <td className="px-5 py-3 font-mono text-xs">{loan.application_number}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{loan.application_date}</td>
-                      <td className="px-5 py-3 font-medium">{loan.employees?.full_name}</td>
-                      <td className="px-5 py-3 text-muted-foreground">{loan.loan_types?.name}</td>
-                      <td className="px-5 py-3 text-right font-medium">{fmt(loan.requested_amount)}</td>
-                      <td className="px-5 py-3">{loan.repayment_period_months}m</td>
-                      <td className="px-5 py-3 text-right">{loan.monthly_installment ? fmt(loan.monthly_installment) : "—"}</td>
-                      <td className="px-5 py-3"><StatusBadge status={loan.status} /></td>
-                      <td className="px-5 py-3 text-center"><Button variant="ghost" size="icon" onClick={() => setSelected(loan)}><Eye className="w-4 h-4" /></Button></td>
-                    </tr>
-                  ))}
-                  {filtered.length === 0 && <tr><td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">No applications found.</td></tr>}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <ApplicationsTable filtered={filtered} onSelect={setSelected} />
         )}
       </div>
 
-      {/* View Detail */}
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Loan Application Details</DialogTitle></DialogHeader>
-          {selected && (
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              {([
-                ["Application ID", selected.application_number], ["Date", selected.application_date],
-                ["Employee", selected.employees?.full_name], ["Department", selected.employees?.department],
-                ["Loan Type", selected.loan_types?.name], ["Status", selected.status],
-                ["Requested", fmt(selected.requested_amount)],
-                ["Approved", selected.approved_amount ? fmt(selected.approved_amount) : "—"],
-                ["Interest Rate", `${selected.interest_rate}%`], ["Period", `${selected.repayment_period_months} months`],
-                ["Installment", selected.monthly_installment ? fmt(selected.monthly_installment) : "—"],
-                ["Purpose", selected.purpose || "—"],
-                ["Total Payable", selected.total_payable ? fmt(selected.total_payable) : "—"],
-                ["Total Paid", fmt(selected.total_paid)],
-                ["Outstanding", selected.outstanding_balance != null ? fmt(selected.outstanding_balance) : "—"],
-                ["Disbursed On", selected.disbursement_date || "—"],
-              ] as [string, string][]).map(([label, value]) => (
-                <div key={label}><p className="text-muted-foreground text-xs">{label}</p><p className="font-medium">{value}</p></div>
-              ))}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ApplicationDetailDialog selected={selected} onClose={() => setSelected(null)} />
 
       {/* New Application */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>New Loan Application</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
               <Label>Employee <span className="text-destructive">*</span></Label>
-              <Select value={form.employee_id} onValueChange={v => setForm(f => ({ ...f, employee_id: v }))}>
+              <Select value={form.employee_id} onValueChange={v => setForm(f => ({ ...f, employee_id: v, guarantor1_id: f.guarantor1_id === v ? "" : f.guarantor1_id, guarantor2_id: f.guarantor2_id === v ? "" : f.guarantor2_id }))}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Select employee" /></SelectTrigger>
                 <SelectContent>{employees.map((e: any) => <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>)}</SelectContent>
               </Select>
@@ -204,13 +168,44 @@ export default function Applications() {
               </div>
               <div><Label>Period (months)</Label><Input type="number" value={form.repayment_period_months} onChange={e => setForm(f => ({ ...f, repayment_period_months: Number(e.target.value) }))} className="mt-1" /></div>
             </div>
+
+            {/* Guarantors - Mandatory */}
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-3">
+              <p className="font-medium text-sm text-amber-700 dark:text-amber-400">Guarantors (2 required) <span className="text-destructive">*</span></p>
+              <div>
+                <Label className="text-xs">Guarantor 1 <span className="text-destructive">*</span></Label>
+                <Select value={form.guarantor1_id} onValueChange={v => setForm(f => ({ ...f, guarantor1_id: v }))}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select first guarantor" /></SelectTrigger>
+                  <SelectContent>
+                    {guarantorOptions1.map((e: any) => (
+                      <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Guarantor 2 <span className="text-destructive">*</span></Label>
+                <Select value={form.guarantor2_id} onValueChange={v => setForm(f => ({ ...f, guarantor2_id: v }))}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select second guarantor" /></SelectTrigger>
+                  <SelectContent>
+                    {guarantorOptions2.map((e: any) => (
+                      <SelectItem key={e.id} value={e.id}>{e.employee_id} — {e.full_name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {(!form.guarantor1_id || !form.guarantor2_id) && form.employee_id && (
+                <p className="text-xs text-destructive">Both guarantors are required to submit the application</p>
+              )}
+            </div>
+
             <div><Label>Purpose</Label><Textarea value={form.purpose} onChange={e => setForm(f => ({ ...f, purpose: e.target.value }))} rows={2} className="mt-1" /></div>
             <div><Label>Proposed Start Date</Label><Input type="date" value={form.proposed_start_date} onChange={e => setForm(f => ({ ...f, proposed_start_date: e.target.value }))} className="mt-1" /></div>
             <div><Label>Remarks</Label><Input value={form.remarks} onChange={e => setForm(f => ({ ...f, remarks: e.target.value }))} className="mt-1" /></div>
           </div>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button>
-            <Button onClick={handleCreate} disabled={createMut.isPending}>Submit Application</Button>
+            <Button onClick={handleCreate} disabled={createMut.isPending || !form.guarantor1_id || !form.guarantor2_id}>Submit Application</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
