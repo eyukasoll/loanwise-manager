@@ -2,12 +2,13 @@ import React, { useState, useMemo } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateGuarantor } from "@/hooks/useLoans";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useCurrentEmployee } from "@/hooks/useCurrentEmployee";
+import { useAuth } from "@/contexts/AuthContext";
 import { FileText, ShieldCheck, Search, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import GuaranteeApprovalDocument from "@/components/applications/GuaranteeApprovalDocument";
 
@@ -26,10 +27,14 @@ function GuarantorStatusBadge({ status }: { status: string }) {
 
 export default function GuaranteeApprovals() {
   const { data: applications = [], isLoading } = useLoanApplications();
-  const { canEdit } = usePermissions();
+  const { role } = useAuth();
+  const { data: currentEmployee } = useCurrentEmployee();
   const updateGuarantor = useUpdateGuarantor();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [docLoan, setDocLoan] = useState<any>(null);
+
+  const isAdminOrManager = role === "admin" || role === "manager";
 
   // Fetch all guarantors with their employee info + status
   const { data: allGuarantors = [] } = useQuery({
@@ -55,10 +60,21 @@ export default function GuaranteeApprovals() {
     return map;
   }, [allGuarantors]);
 
-  // Show loans that have guarantors assigned
-  const loansWithGuarantors = applications.filter(
-    (loan: any) => guarantorsByLoan.has(loan.id)
-  );
+  // For regular employees: only show loans where THEY are a guarantor
+  // For admin/manager: show all loans with guarantors
+  const loansWithGuarantors = useMemo(() => {
+    if (isAdminOrManager) {
+      return applications.filter((loan: any) => guarantorsByLoan.has(loan.id));
+    }
+    if (!currentEmployee) return [];
+    // Filter to loans where this employee is assigned as guarantor
+    const myLoanIds = new Set(
+      allGuarantors
+        .filter((g: any) => g.employee_id === currentEmployee.id)
+        .map((g: any) => g.loan_application_id)
+    );
+    return applications.filter((loan: any) => myLoanIds.has(loan.id));
+  }, [applications, guarantorsByLoan, allGuarantors, currentEmployee, isAdminOrManager]);
 
   const filtered = loansWithGuarantors.filter((loan: any) => {
     const term = search.toLowerCase();
@@ -79,18 +95,40 @@ export default function GuaranteeApprovals() {
       {
         id: guarantorId,
         status: action,
-        approved_by: "Current User",
+        approved_by: currentEmployee?.full_name || "Current User",
         approved_at: new Date().toISOString(),
       },
       {
-        onSuccess: () => toast.success(`Guarantor ${action.toLowerCase()} successfully`),
+        onSuccess: () => {
+          toast.success(`Guarantor ${action.toLowerCase()} successfully`);
+          // Refresh loan applications to pick up auto-approved status
+          queryClient.invalidateQueries({ queryKey: ["loan_applications"] });
+        },
       }
     );
   };
 
+  // Check if the current user is the guarantor for a specific record
+  const isOwnGuarantee = (guarantor: any) => {
+    return currentEmployee?.id === guarantor.employee_id;
+  };
+
+  // Can this user act on a guarantor record?
+  const canActOnGuarantor = (guarantor: any) => {
+    if (isAdminOrManager) return true;
+    return isOwnGuarantee(guarantor);
+  };
+
   return (
     <div>
-      <TopBar title="Guarantee Approvals" subtitle="Review and approve guarantors assigned to loan applications" />
+      <TopBar
+        title="Guarantee Approvals"
+        subtitle={
+          isAdminOrManager
+            ? "Review and approve guarantors assigned to loan applications"
+            : "Review and approve your guarantee commitments"
+        }
+      />
       <div className="p-6 animate-fade-in">
         {/* Search */}
         <div className="flex items-center gap-3 mb-4">
@@ -110,8 +148,14 @@ export default function GuaranteeApprovals() {
         ) : filtered.length === 0 ? (
           <div className="bg-card rounded-xl border border-border p-12 text-center">
             <ShieldCheck className="w-12 h-12 mx-auto text-success mb-3" />
-            <h3 className="font-display font-semibold text-lg">No Guarantee Records</h3>
-            <p className="text-muted-foreground text-sm mt-1">No loan applications with assigned guarantors found.</p>
+            <h3 className="font-display font-semibold text-lg">
+              {isAdminOrManager ? "No Guarantee Records" : "No Guarantees Assigned to You"}
+            </h3>
+            <p className="text-muted-foreground text-sm mt-1">
+              {isAdminOrManager
+                ? "No loan applications with assigned guarantors found."
+                : "You have no pending guarantee commitments to review."}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -152,63 +196,91 @@ export default function GuaranteeApprovals() {
 
                   {/* Guarantor List with Actions */}
                   <div className="mt-4 pt-3 border-t border-border">
-                    <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Assigned Guarantors</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                      {isAdminOrManager ? "Assigned Guarantors" : "Your Guarantee Commitment"}
+                    </p>
                     <div className="space-y-2">
-                      {guarantors.map((g: any, i: number) => (
-                        <div key={g.id} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
-                              {i + 1}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <p className="text-sm font-medium">{g.employees?.full_name}</p>
-                                <GuarantorStatusBadge status={g.status || "Pending"} />
+                      {guarantors.map((g: any, i: number) => {
+                        const isOwn = isOwnGuarantee(g);
+                        return (
+                          <div
+                            key={g.id}
+                            className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
+                              isOwn
+                                ? "border-primary/30 bg-primary/5"
+                                : "border-border bg-secondary/30"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                                {i + 1}
                               </div>
-                              <p className="text-xs text-muted-foreground">{g.employees?.employee_id} · {g.employees?.department} · {g.employees?.position}</p>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-medium">
+                                    {g.employees?.full_name}
+                                    {isOwn && (
+                                      <span className="ml-2 text-[10px] font-semibold text-primary">(You)</span>
+                                    )}
+                                  </p>
+                                  <GuarantorStatusBadge status={g.status || "Pending"} />
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  {g.employees?.employee_id} · {g.employees?.department} · {g.employees?.position}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                          {canEdit("Approvals") && (g.status === "Pending" || !g.status) && (
-                            <div className="flex items-center gap-2">
+                            {canActOnGuarantor(g) && (g.status === "Pending" || !g.status) && (
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  className="bg-success hover:bg-success/90 text-success-foreground h-8"
+                                  onClick={() => handleGuarantorAction(g.id, "Approved")}
+                                  disabled={updateGuarantor.isPending}
+                                >
+                                  <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="h-8"
+                                  onClick={() => handleGuarantorAction(g.id, "Rejected")}
+                                  disabled={updateGuarantor.isPending}
+                                >
+                                  <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                                </Button>
+                              </div>
+                            )}
+                            {g.status === "Approved" && (
+                              <p className="text-xs text-muted-foreground">
+                                {g.approved_at ? new Date(g.approved_at).toLocaleDateString() : ""}
+                              </p>
+                            )}
+                            {g.status === "Rejected" && canActOnGuarantor(g) && (
                               <Button
                                 size="sm"
-                                className="bg-success hover:bg-success/90 text-success-foreground h-8"
+                                variant="outline"
+                                className="h-8"
                                 onClick={() => handleGuarantorAction(g.id, "Approved")}
                                 disabled={updateGuarantor.isPending}
                               >
-                                <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve
+                                <CheckCircle className="w-3.5 h-3.5 mr-1" /> Re-approve
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                className="h-8"
-                                onClick={() => handleGuarantorAction(g.id, "Rejected")}
-                                disabled={updateGuarantor.isPending}
-                              >
-                                <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
-                              </Button>
-                            </div>
-                          )}
-                          {g.status === "Approved" && (
-                            <p className="text-xs text-muted-foreground">
-                              {g.approved_at ? new Date(g.approved_at).toLocaleDateString() : ""}
-                            </p>
-                          )}
-                          {g.status === "Rejected" && canEdit("Approvals") && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-8"
-                              onClick={() => handleGuarantorAction(g.id, "Approved")}
-                              disabled={updateGuarantor.isPending}
-                            >
-                              <CheckCircle className="w-3.5 h-3.5 mr-1" /> Re-approve
-                            </Button>
-                          )}
-                        </div>
-                      ))}
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
+
+                  {/* Auto-approval notice */}
+                  {allApproved && (
+                    <div className="mt-3 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <p className="text-xs text-emerald-600 font-medium">
+                        ✓ All guarantors approved — loan has been automatically moved to Approved status
+                      </p>
+                    </div>
+                  )}
 
                   {/* Document Button */}
                   <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border">
