@@ -64,7 +64,7 @@ export default function PayrollDeductions() {
                       <td className="px-5 py-3 text-right font-bold">{fmt(d.deduction_amount)}</td>
                       <td className="px-5 py-3"><StatusBadge status={d.status} /></td>
                       <td className="px-5 py-3 text-center">
-                        {d.status === "Scheduled" && (
+                        {d.status === "Scheduled" && canEdit("Payroll Deductions") && (
                           <Button size="sm" variant="outline" onClick={() => processMut.mutate({ id: d.id, loan_application_id: d.loan_application_id, amount: d.deduction_amount })} disabled={processMut.isPending}>
                             <CheckCircle className="w-3.5 h-3.5 mr-1" /> Process
                           </Button>

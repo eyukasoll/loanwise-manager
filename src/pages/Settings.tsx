@@ -15,6 +15,7 @@ const fiscalMonths = ["January", "February", "March", "April", "May", "June", "J
 
 export default function Settings() {
   const { toast } = useToast();
+  const { canEdit } = usePermissions();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settingsId, setSettingsId] = useState<string | null>(null);
