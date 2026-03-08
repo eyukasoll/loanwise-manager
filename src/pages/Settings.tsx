@@ -241,6 +241,11 @@ export default function Settings() {
                   <Label>Late Payment Penalty Rate (%)</Label>
                   <Input type="number" step="0.1" value={loanConfig.late_payment_penalty_rate || ""} onChange={e => setLoanConfig(s => ({ ...s, late_payment_penalty_rate: Number(e.target.value) }))} className="mt-1" />
                 </div>
+                <div>
+                  <Label>Savings Multiplier</Label>
+                  <Input type="number" step="0.5" min={1} value={loanConfig.savings_multiplier || ""} onChange={e => setLoanConfig(s => ({ ...s, savings_multiplier: Number(e.target.value) }))} className="mt-1" />
+                  <p className="text-xs text-muted-foreground mt-1">For savings-based loans: max amount = savings × this number</p>
+                </div>
               </div>
               <div className="flex justify-end pt-2">
                 <Button onClick={() => handleSave("loan")} disabled={saving || !canEdit("Settings")}>

@@ -165,6 +165,13 @@ export default function LoanTypes() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3"><Label>Interest Free</Label><Switch checked={form.interest_free} onCheckedChange={c => setForm(f => ({ ...f, interest_free: c, interest_rate: c ? 0 : f.interest_rate }))} /></div>
                 <div><Label>Interest Rate (%)</Label><Input type="number" step="0.1" value={form.interest_rate || ""} onChange={e => setForm(f => ({ ...f, interest_rate: Number(e.target.value) }))} disabled={form.interest_free} className="mt-1" /></div>
+                <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+                  <div>
+                    <Label>Savings-Based Loan</Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">Max amount = employee savings × multiplier</p>
+                  </div>
+                  <Switch checked={form.is_savings_based} onCheckedChange={c => setForm(f => ({ ...f, is_savings_based: c }))} />
+                </div>
                 <div><Label>Deduction Method</Label><Select value={form.deduction_method} onValueChange={v => setForm(f => ({ ...f, deduction_method: v }))}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Payroll">Payroll</SelectItem><SelectItem value="Manual">Manual</SelectItem><SelectItem value="Both">Both</SelectItem></SelectContent></Select></div>
                 <div><Label>Approval Level</Label><Select value={form.approval_level} onValueChange={v => setForm(f => ({ ...f, approval_level: v }))}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Department Head">Department Head</SelectItem><SelectItem value="HR + Finance">HR + Finance</SelectItem><SelectItem value="General Manager">General Manager</SelectItem></SelectContent></Select></div>
               </div>
