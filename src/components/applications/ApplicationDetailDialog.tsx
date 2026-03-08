@@ -3,9 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, ShieldOff } from "lucide-react";
+import { FileText, ShieldOff, Printer } from "lucide-react";
 import { toast } from "sonner";
 import GuaranteeDeactivationCertificate from "./GuaranteeDeactivationCertificate";
+import LoanApplicationDocument from "./LoanApplicationDocument";
 
 interface Props {
   selected: any;
@@ -15,6 +16,7 @@ interface Props {
 export default function ApplicationDetailDialog({ selected, onClose }: Props) {
   const [guarantors, setGuarantors] = useState<any[]>([]);
   const [certGuarantor, setCertGuarantor] = useState<any>(null);
+  const [docOpen, setDocOpen] = useState(false);
 
   useEffect(() => {
     if (!selected) { setGuarantors([]); return; }
@@ -46,7 +48,14 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
     <>
       <Dialog open={!!selected} onOpenChange={() => onClose()}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Loan Application Details</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              Loan Application Details
+              <Button size="sm" variant="outline" onClick={() => setDocOpen(true)}>
+                <Printer className="w-4 h-4 mr-1" /> Print Document
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
           {selected && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
@@ -121,6 +130,13 @@ export default function ApplicationDetailDialog({ selected, onClose }: Props) {
         onClose={() => setCertGuarantor(null)}
         loan={selected}
         guarantor={certGuarantor}
+      />
+
+      {/* Loan Application Document */}
+      <LoanApplicationDocument
+        open={docOpen}
+        onClose={() => setDocOpen(false)}
+        loan={selected}
       />
     </>
   );
