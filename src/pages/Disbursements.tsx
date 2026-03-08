@@ -125,7 +125,7 @@ export default function Disbursements() {
                 <p className="text-muted-foreground">{selectedLoan.loan_types?.name} · {fmt(selectedLoan.approved_amount || selectedLoan.requested_amount)}</p>
               </div>
               <div><Label>{t.disbursementDate}</Label><Input type="date" value={disbForm.date} onChange={e => setDisbForm(f => ({ ...f, date: e.target.value }))} className="mt-1" /></div>
-              <div><Label>Payment Method</Label>
+              <div><Label>{t.paymentMethod}</Label>
                 <Select value={disbForm.method} onValueChange={v => setDisbForm(f => ({ ...f, method: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
