@@ -244,6 +244,29 @@ export function useUpdateLoanApplication() {
   });
 }
 
+export function useDeleteLoanApplication() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      // Delete guarantors first
+      await supabase.from("loan_guarantors").delete().eq("loan_application_id", id);
+      // Delete documents
+      await supabase.from("loan_application_documents").delete().eq("loan_application_id", id);
+      // Delete repayment schedule
+      await supabase.from("repayment_schedule").delete().eq("loan_application_id", id);
+      // Delete the application
+      const { error } = await supabase.from("loan_applications").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["loan_applications"] });
+      qc.invalidateQueries({ queryKey: ["guaranteed_employee_ids"] });
+      toast.success("Application deleted");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
 // ======================== REPAYMENT SCHEDULE ========================
 
 export function useRepaymentSchedule(loanAppId?: string) {
