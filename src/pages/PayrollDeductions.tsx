@@ -15,6 +15,7 @@ export default function PayrollDeductions() {
   const { data: deductions = [], isLoading } = usePayrollDeductions(period);
   const generateMut = useGeneratePayrollDeductions();
   const processMut = useProcessDeduction();
+  const { canCreate, canEdit } = usePermissions();
 
   const total = deductions.reduce((s: number, d: any) => s + d.deduction_amount, 0);
   const scheduled = deductions.filter((d: any) => d.status === "Scheduled");
