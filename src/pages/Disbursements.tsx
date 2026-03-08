@@ -135,8 +135,8 @@ export default function Disbursements() {
                   </SelectContent>
                 </Select>
               </div>
-              <div><Label>Voucher No.</Label><Input value={disbForm.voucher} onChange={e => setDisbForm(f => ({ ...f, voucher: e.target.value }))} className="mt-1" /></div>
-              <div><Label>Disbursed By</Label><Input value={disbForm.disbursed_by} onChange={e => setDisbForm(f => ({ ...f, disbursed_by: e.target.value }))} className="mt-1" /></div>
+              <div><Label>{t.voucherNo}</Label><Input value={disbForm.voucher} onChange={e => setDisbForm(f => ({ ...f, voucher: e.target.value }))} className="mt-1" /></div>
+              <div><Label>{t.disbursedBy}</Label><Input value={disbForm.disbursed_by} onChange={e => setDisbForm(f => ({ ...f, disbursed_by: e.target.value }))} className="mt-1" /></div>
             </div>
           )}
           <DialogFooter>
