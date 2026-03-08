@@ -203,11 +203,15 @@ export default function Permissions() {
               </div>
 
               {/* Summary */}
-              <div className="mt-4 flex gap-6 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-info" /> View — Can see the page and data</span>
-                <span className="flex items-center gap-1.5"><Plus className="w-3.5 h-3.5 text-success" /> Create — Can add new records</span>
-                <span className="flex items-center gap-1.5"><Edit className="w-3.5 h-3.5 text-warning" /> Edit — Can modify existing records</span>
-                <span className="flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5 text-destructive" /> Delete — Can remove records</span>
+              <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-info" /> View</span>
+                <span className="flex items-center gap-1.5"><Plus className="w-3.5 h-3.5 text-success" /> Create</span>
+                <span className="flex items-center gap-1.5"><Edit className="w-3.5 h-3.5 text-warning" /> Edit</span>
+                <span className="flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5 text-destructive" /> Delete</span>
+                <span className="flex items-center gap-1.5"><Upload className="w-3.5 h-3.5 text-primary" /> Import</span>
+                <span className="flex items-center gap-1.5"><Download className="w-3.5 h-3.5 text-primary" /> Export</span>
+                <span className="flex items-center gap-1.5"><Printer className="w-3.5 h-3.5 text-muted-foreground" /> Print</span>
+                <span className="flex items-center gap-1.5"><Share2 className="w-3.5 h-3.5 text-info" /> Share</span>
               </div>
             </TabsContent>
           ))}

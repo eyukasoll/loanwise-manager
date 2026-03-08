@@ -57,5 +57,17 @@ export function usePermissions() {
   const canDelete = (module: string) =>
     permissions.find((p) => p.module === module)?.can_delete ?? false;
 
-  return { permissions, loading, canView, canCreate, canEdit, canDelete };
+  const canImport = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_import ?? false;
+
+  const canExport = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_export ?? false;
+
+  const canPrint = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_print ?? false;
+
+  const canShare = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_share ?? false;
+
+  return { permissions, loading, canView, canCreate, canEdit, canDelete, canImport, canExport, canPrint, canShare };
 }
