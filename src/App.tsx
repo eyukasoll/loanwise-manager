@@ -47,6 +47,7 @@ const App = () => (
               <Route path="/loan-types" element={guard("Loan Types", <LoanTypes />)} />
               <Route path="/applications" element={guard("Applications", <Applications />)} />
               <Route path="/approvals" element={guard("Approvals", <Approvals />)} />
+              <Route path="/guarantee-approvals" element={guard("Approvals", <GuaranteeApprovals />)} />
               <Route path="/disbursements" element={guard("Disbursements", <Disbursements />)} />
               <Route path="/repayments" element={guard("Repayment Schedule", <Repayments />)} />
               <Route path="/deductions" element={guard("Payroll Deductions", <PayrollDeductions />)} />
