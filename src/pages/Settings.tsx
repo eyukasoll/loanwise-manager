@@ -224,8 +224,11 @@ export default function Settings() {
             <TabsTrigger value="loan" className="gap-2">
               <SettingsIcon className="w-4 h-4" /> Loan Configuration
             </TabsTrigger>
-            <TabsTrigger value="email" className="gap-2">
+             <TabsTrigger value="email" className="gap-2">
               <Mail className="w-4 h-4" /> Email Settings
+            </TabsTrigger>
+            <TabsTrigger value="backup" className="gap-2">
+              <DatabaseBackup className="w-4 h-4" /> Backup & Export
             </TabsTrigger>
           </TabsList>
 
