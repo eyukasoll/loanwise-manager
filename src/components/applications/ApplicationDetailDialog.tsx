@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { fmt } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { Printer, Pencil, Trash2 } from "lucide-react";
+import ApplicationTimeline from "./ApplicationTimeline";
 import { toast } from "sonner";
 import LoanApplicationDocument from "./LoanApplicationDocument";
 import { useUpdateLoanApplication, useDeleteLoanApplication } from "@/hooks/useLoans";
