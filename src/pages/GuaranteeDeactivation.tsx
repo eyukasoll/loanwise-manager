@@ -3,12 +3,12 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ShieldOff, FileText, Filter } from "lucide-react";
+import { Search, ShieldOff, Filter, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { fmt } from "@/lib/currency";
 import { toast } from "sonner";
-import GuaranteeDeactivationCertificate from "@/components/applications/GuaranteeDeactivationCertificate";
 
 function useAllGuarantees() {
   return useQuery({
@@ -16,8 +16,23 @@ function useAllGuarantees() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("loan_guarantors")
-        .select("*, employees(full_name, employee_id, department), loan_applications(application_number, status, requested_amount, employees(full_name, employee_id), loan_types(name))")
+        .select("*, employees(full_name, employee_id, department, employment_status), loan_applications(application_number, status, requested_amount, employees(full_name, employee_id), loan_types(name))")
         .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+}
+
+function useEmployees() {
+  return useQuery({
+    queryKey: ["employees_for_guarantor"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, full_name, employee_id, department, employment_status")
+        .eq("employment_status", "Active")
+        .order("full_name");
       if (error) throw error;
       return data || [];
     },
@@ -28,14 +43,17 @@ const ACTIVE_STATUSES = ["Submitted", "Under Review", "Pending Approval", "Appro
 
 export default function GuaranteeDeactivation() {
   const { data: guarantees = [], isLoading } = useAllGuarantees();
+  const { data: employees = [] } = useEmployees();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [certData, setCertData] = useState<{ loan: any; guarantor: any } | null>(null);
+  const [releaseDialog, setReleaseDialog] = useState<any>(null);
+  const [newGuarantorId, setNewGuarantorId] = useState("");
+  const [employeeSearch, setEmployeeSearch] = useState("");
+  const [releasing, setReleasing] = useState(false);
 
   const getGuaranteeStatus = (loanStatus: string) => {
     if (["Closed", "Cancelled", "Rejected"].includes(loanStatus)) return "Eligible";
-    if (ACTIVE_STATUSES.includes(loanStatus)) return "Active";
     return "Active";
   };
 
@@ -52,18 +70,74 @@ export default function GuaranteeDeactivation() {
     return matchSearch && status === statusFilter;
   });
 
-  const handleRelease = async (g: any) => {
-    if (!confirm(`Release ${g.employees?.full_name} from guarantee on ${g.loan_applications?.application_number}?`)) return;
-    const { error } = await supabase.from("loan_guarantors").delete().eq("id", g.id);
-    if (error) {
+  // Get existing guarantor employee IDs for this loan to exclude them
+  const getExistingGuarantorIds = (loanAppId: string) => {
+    return guarantees
+      .filter((g: any) => g.loan_application_id === loanAppId)
+      .map((g: any) => g.employee_id);
+  };
+
+  const filteredEmployees = releaseDialog
+    ? employees.filter((e: any) => {
+        const existingIds = getExistingGuarantorIds(releaseDialog.loan_application_id);
+        // Exclude the borrower and existing guarantors
+        const borrowerEmployeeId = releaseDialog.loan_applications?.employees?.employee_id;
+        if (e.employee_id === borrowerEmployeeId) return false;
+        if (existingIds.includes(e.id)) return false;
+        if (!employeeSearch) return true;
+        return e.full_name.toLowerCase().includes(employeeSearch.toLowerCase()) ||
+          e.employee_id.toLowerCase().includes(employeeSearch.toLowerCase());
+      })
+    : [];
+
+  const selectedEmployee = employees.find((e: any) => e.id === newGuarantorId);
+
+  const handleRelease = async () => {
+    if (!releaseDialog) return;
+    setReleasing(true);
+
+    try {
+      // 1. Delete the old guarantor record
+      const { error: deleteError } = await supabase
+        .from("loan_guarantors")
+        .delete()
+        .eq("id", releaseDialog.id);
+      if (deleteError) throw deleteError;
+
+      // 2. If a new guarantor is selected, insert the replacement
+      if (newGuarantorId) {
+        const { error: insertError } = await supabase
+          .from("loan_guarantors")
+          .insert({
+            loan_application_id: releaseDialog.loan_application_id,
+            employee_id: newGuarantorId,
+          });
+        if (insertError) throw insertError;
+      }
+
+      // 3. Update the old guarantor's employee status to indicate they are released
+      await supabase
+        .from("employees")
+        .update({ employment_status: "Active" })
+        .eq("id", releaseDialog.employee_id);
+
+      toast.success(
+        newGuarantorId
+          ? `${releaseDialog.employees?.full_name} released and replaced by ${selectedEmployee?.full_name}`
+          : `${releaseDialog.employees?.full_name} released from guarantee`
+      );
+
+      queryClient.invalidateQueries({ queryKey: ["all_guarantees"] });
+      queryClient.invalidateQueries({ queryKey: ["guaranteed_employee_ids"] });
+      queryClient.invalidateQueries({ queryKey: ["employees_for_guarantor"] });
+      setReleaseDialog(null);
+      setNewGuarantorId("");
+      setEmployeeSearch("");
+    } catch (error) {
       toast.error("Failed to release guarantor");
-      return;
+    } finally {
+      setReleasing(false);
     }
-    toast.success(`${g.employees?.full_name} released from guarantee`);
-    queryClient.invalidateQueries({ queryKey: ["all_guarantees"] });
-    queryClient.invalidateQueries({ queryKey: ["guaranteed_employee_ids"] });
-    // Show certificate
-    setCertData({ loan: g.loan_applications, guarantor: g });
   };
 
   return (
@@ -104,6 +178,7 @@ export default function GuaranteeDeactivation() {
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Guarantor</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Employee ID</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Department</th>
+                    <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Status</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Loan App #</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Borrower</th>
                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Loan Type</th>
@@ -123,6 +198,15 @@ export default function GuaranteeDeactivation() {
                         <td className="px-5 py-3 font-medium">{g.employees?.full_name}</td>
                         <td className="px-5 py-3 font-mono text-xs">{g.employees?.employee_id}</td>
                         <td className="px-5 py-3 text-muted-foreground">{g.employees?.department}</td>
+                        <td className="px-5 py-3">
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                            g.employees?.employment_status === "Active"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {g.employees?.employment_status || "—"}
+                          </span>
+                        </td>
                         <td className="px-5 py-3 font-mono text-xs">{g.loan_applications?.application_number}</td>
                         <td className="px-5 py-3">{g.loan_applications?.employees?.full_name}</td>
                         <td className="px-5 py-3 text-muted-foreground">{g.loan_applications?.loan_types?.name}</td>
@@ -136,32 +220,26 @@ export default function GuaranteeDeactivation() {
                           )}
                         </td>
                         <td className="px-5 py-3 text-center">
-                          <div className="flex items-center justify-center gap-1">
+                          {isEligible && (
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => setCertData({ loan: g.loan_applications, guarantor: g })}
+                              className="h-7 text-xs text-destructive hover:text-destructive"
+                              onClick={() => {
+                                setReleaseDialog(g);
+                                setNewGuarantorId("");
+                                setEmployeeSearch("");
+                              }}
                             >
-                              <FileText className="w-3.5 h-3.5 mr-1" /> Certificate
+                              <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
                             </Button>
-                            {isEligible && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 text-xs text-destructive hover:text-destructive"
-                                onClick={() => handleRelease(g)}
-                              >
-                                <ShieldOff className="w-3.5 h-3.5 mr-1" /> Release
-                              </Button>
-                            )}
-                          </div>
+                          )}
                         </td>
                       </tr>
                     );
                   })}
                   {filtered.length === 0 && (
-                    <tr><td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">No guarantees found.</td></tr>
+                    <tr><td colSpan={11} className="px-5 py-12 text-center text-muted-foreground">No guarantees found.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -170,15 +248,94 @@ export default function GuaranteeDeactivation() {
         )}
       </div>
 
-      {/* Deactivation Certificate */}
-      {certData && (
-        <GuaranteeDeactivationCertificate
-          open={!!certData}
-          onClose={() => setCertData(null)}
-          loan={certData.loan}
-          guarantor={certData.guarantor}
-        />
-      )}
+      {/* Release & Replace Dialog */}
+      <Dialog open={!!releaseDialog} onOpenChange={(open) => { if (!open) { setReleaseDialog(null); setNewGuarantorId(""); setEmployeeSearch(""); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldOff className="w-5 h-5 text-destructive" />
+              Release Guarantor
+            </DialogTitle>
+          </DialogHeader>
+          {releaseDialog && (
+            <div className="space-y-4">
+              {/* Current guarantor info */}
+              <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-1">
+                <p className="text-xs text-muted-foreground">Current Guarantor</p>
+                <p className="font-medium">{releaseDialog.employees?.full_name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {releaseDialog.employees?.employee_id} · {releaseDialog.employees?.department}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Loan: {releaseDialog.loan_applications?.application_number} · Borrower: {releaseDialog.loan_applications?.employees?.full_name}
+                </p>
+              </div>
+
+              {/* New Guarantor Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-1.5">
+                  <UserPlus className="w-4 h-4 text-primary" />
+                  Select Replacement Guarantor (Optional)
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    value={employeeSearch}
+                    onChange={e => setEmployeeSearch(e.target.value)}
+                    placeholder="Search employee by name or ID..."
+                    className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-full"
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto rounded-lg border border-border">
+                  {filteredEmployees.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">No employees found</p>
+                  ) : (
+                    filteredEmployees.slice(0, 20).map((e: any) => (
+                      <div
+                        key={e.id}
+                        className={`flex items-center justify-between px-3 py-2 cursor-pointer text-sm hover:bg-secondary/50 transition-colors border-b border-border/30 last:border-0 ${
+                          newGuarantorId === e.id ? "bg-primary/10 border-primary/30" : ""
+                        }`}
+                        onClick={() => setNewGuarantorId(e.id === newGuarantorId ? "" : e.id)}
+                      >
+                        <div>
+                          <p className="font-medium">{e.full_name}</p>
+                          <p className="text-xs text-muted-foreground">{e.employee_id} · {e.department}</p>
+                        </div>
+                        {newGuarantorId === e.id && (
+                          <span className="text-xs font-medium text-primary">Selected</span>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Selected new guarantor summary */}
+              {selectedEmployee && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-1">
+                  <p className="text-xs text-primary font-medium">New Guarantor</p>
+                  <p className="font-medium">{selectedEmployee.full_name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedEmployee.employee_id} · {selectedEmployee.department}</p>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => { setReleaseDialog(null); setNewGuarantorId(""); setEmployeeSearch(""); }}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleRelease}
+                  disabled={releasing}
+                >
+                  {releasing ? "Processing..." : newGuarantorId ? "Release & Replace" : "Release Only"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
