@@ -70,6 +70,15 @@ export default function Dashboard() {
 
   return (
     <div>
+      {showWizard && settingsId && (
+        <StartupWizard
+          settingsId={settingsId}
+          onComplete={() => {
+            setWizardDismissed(true);
+            refetchSettings();
+          }}
+        />
+      )}
       <TopBar title={t.dashTitle} subtitle={t.dashSubtitle} />
       <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 animate-fade-in">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
