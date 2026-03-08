@@ -81,6 +81,7 @@ export default function Settings() {
         max_loan_to_salary_ratio: data.max_loan_to_salary_ratio || 3,
         payroll_cutoff_day: data.payroll_cutoff_day || 25,
         late_payment_penalty_rate: data.late_payment_penalty_rate || 2,
+        savings_multiplier: (data as any).savings_multiplier || 3,
       });
       setEmail({
         smtp_host: data.smtp_host || "",
