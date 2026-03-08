@@ -53,6 +53,13 @@ export default function Applications() {
   const savingsBalance = employeeSavingsBalance.get(form.employee_id) || 0;
   const savingsMaxAmount = isSavingsBased ? savingsBalance * savingsMultiplier : null;
 
+  // Auto-set requested amount for savings-based loans
+  useEffect(() => {
+    if (isSavingsBased && form.employee_id) {
+      setForm(f => ({ ...f, requested_amount: savingsBalance * savingsMultiplier }));
+    }
+  }, [isSavingsBased, form.employee_id, savingsBalance, savingsMultiplier]);
+
   const filtered = applications.filter((l: any) => {
     const name = l.employees?.full_name || "";
     return name.toLowerCase().includes(search.toLowerCase()) || l.application_number.toLowerCase().includes(search.toLowerCase());
