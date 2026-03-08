@@ -135,8 +135,8 @@ export default function Savings() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    {["Date", "Employee", "Emp ID", "Type", "Txn", "Amount", "Method", "Receipt", ""].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Amount" ? "text-right" : "text-left"}`}>{h}</th>
+                    {[t.date, t.employee, t.empId, t.type, t.txn, t.amount, t.method, t.receipt, ""].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.amount ? "text-right" : "text-left"}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
