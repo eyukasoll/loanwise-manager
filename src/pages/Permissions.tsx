@@ -127,7 +127,7 @@ export default function Permissions() {
                 </TabsTrigger>
               ))}
             </TabsList>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving || !permCanEdit("Permissions")}>
               <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Permissions"}
             </Button>
           </div>
