@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId } from "@/hooks/useLoans";
-import { Search, Plus, Eye, Edit, Trash2 } from "lucide-react";
+import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees } from "@/hooks/useLoans";
+import { Search, Plus, Eye, Edit, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmt, CURRENCY } from "@/lib/currency";
+import BulkEmployeeImport from "@/components/BulkEmployeeImport";
 
 const emptyForm = {
   employee_id: "", full_name: "", department: "", position: "", branch: "Main Office",
@@ -22,11 +23,19 @@ export default function Employees() {
   const createMut = useCreateEmployee();
   const updateMut = useUpdateEmployee();
   const deleteMut = useDeleteEmployee();
+  const bulkCreateMut = useBulkCreateEmployees();
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+
+  // Calculate next ID number for bulk import
+  const nextIdNum = (() => {
+    const last = nextId;
+    return last ? parseInt(last.replace("EMP", ""), 10) : 1;
+  })();
 
   const filtered = employees.filter((e: any) =>
     e.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -71,7 +80,10 @@ export default function Employees() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search employees..." className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
           </div>
-          <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> Import CSV</Button>
+            <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
+          </div>
         </div>
 
         {isLoading ? (
@@ -212,6 +224,20 @@ export default function Employees() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Import Dialog */}
+      <BulkEmployeeImport
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        nextIdNum={nextIdNum}
+        onImport={async (employees) => {
+          const withIds = employees.map((emp, i) => ({
+            ...emp,
+            employee_id: `EMP${String(nextIdNum + i).padStart(3, "0")}`,
+          }));
+          await bulkCreateMut.mutateAsync(withIds);
+        }}
+      />
     </div>
   );
 }

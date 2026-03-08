@@ -49,7 +49,28 @@ export function useCreateEmployee() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["employees", "next-employee-id"] }); toast.success("Employee created"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["employees"] }); qc.invalidateQueries({ queryKey: ["next-employee-id"] }); toast.success("Employee created"); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useBulkCreateEmployees() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (employees: {
+      employee_id: string; full_name: string; department: string; position: string;
+      branch?: string; date_of_employment: string; employment_status?: string;
+      monthly_salary?: number; allowances?: number; bank_account?: string;
+      phone?: string; email?: string;
+    }[]) => {
+      const { data, error } = await supabase.from("employees").insert(employees).select();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["employees"] });
+      qc.invalidateQueries({ queryKey: ["next-employee-id"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 }
