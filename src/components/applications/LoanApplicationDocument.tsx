@@ -226,7 +226,11 @@ export default function LoanApplicationDocument({ open, onClose, loan }: Props) 
 
           {/* Stamp */}
           <div style={{ textAlign: "center", marginTop: "30px", padding: "10px", border: "2px dashed #bbb", fontSize: "11px", color: "#999" }}>
-            Company Stamp / Seal
+            {company?.stamp_url ? (
+              <img src={company.stamp_url} alt="Company Stamp" style={{ height: "80px", margin: "0 auto", objectFit: "contain" }} />
+            ) : (
+              "Company Stamp / Seal"
+            )}
           </div>
 
           {/* Footer */}
