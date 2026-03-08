@@ -42,6 +42,31 @@ export default function Employees() {
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [resendingId, setResendingId] = useState<string | null>(null);
+
+  const handleResendCredentials = async (emp: any) => {
+    if (!emp.email) {
+      toast.error("This employee has no email address");
+      return;
+    }
+    setResendingId(emp.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-employee-user", {
+        body: { email: emp.email, full_name: emp.full_name, user_type: emp.user_type || "Employee User" },
+      });
+      if (error) {
+        toast.error("Failed to resend credentials");
+      } else if (data?.email_sent) {
+        toast.success(`New credentials sent to ${emp.email}`);
+      } else if (data?.success) {
+        toast.info(`Password reset to: ${data.password} (email not sent — check SMTP settings)`);
+      }
+    } catch {
+      toast.error("Failed to resend credentials");
+    } finally {
+      setResendingId(null);
+    }
+  };
 
   // Calculate next ID number for bulk import
   const nextIdNum = (() => {
