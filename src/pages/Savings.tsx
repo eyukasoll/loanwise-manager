@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import TopBar from "@/components/TopBar";
+import TablePagination, { usePagination } from "@/components/TablePagination";
 import { useEmployees } from "@/hooks/useLoans";
 import { useSavingsTransactions, useCreateSavingsTransaction, useDeleteSavingsTransaction, useBulkCreateSavingsTransactions } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
