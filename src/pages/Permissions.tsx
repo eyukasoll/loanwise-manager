@@ -81,7 +81,7 @@ export default function Permissions() {
     setPermissions((prev) =>
       prev.map((p) =>
         p.role === role && p.module === module
-          ? { ...p, can_view: checked, can_create: checked, can_edit: checked, can_delete: checked }
+          ? { ...p, can_view: checked, can_create: checked, can_edit: checked, can_delete: checked, can_import: checked, can_export: checked, can_print: checked, can_share: checked }
           : p
       )
     );
