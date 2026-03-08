@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useManualPayments, useCreateManualPayment, useLoanApplications } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { HandCoins, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
