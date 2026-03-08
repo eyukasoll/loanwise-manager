@@ -123,6 +123,21 @@ export default function GuaranteeDeactivation() {
         .update({ employment_status: "Active" })
         .eq("id", releaseDialog.employee_id);
 
+      // 4. Show release document
+      const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+      const refNo = `GDR-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999)).padStart(4, "0")}`;
+      setReleaseDoc({
+        guarantor: releaseDialog.employees,
+        borrower: releaseDialog.loan_applications?.employees,
+        application_number: releaseDialog.loan_applications?.application_number,
+        loan_type: releaseDialog.loan_applications?.loan_types?.name,
+        loan_status: releaseDialog.loan_applications?.status,
+        requested_amount: releaseDialog.loan_applications?.requested_amount,
+        replacement: selectedEmployee || null,
+        date: today,
+        refNo,
+      });
+
       toast.success(
         newGuarantorId
           ? `${releaseDialog.employees?.full_name} released and replaced by ${selectedEmployee?.full_name}`
@@ -140,6 +155,36 @@ export default function GuaranteeDeactivation() {
     } finally {
       setReleasing(false);
     }
+  };
+
+  const handlePrintRelease = () => {
+    if (!printRef.current) return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <html><head><title>Guarantee Release Document</title>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a1a1a; }
+        .header { text-align: center; border-bottom: 3px solid #1a1a1a; padding-bottom: 16px; margin-bottom: 24px; }
+        .header h1 { font-size: 22px; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .header h2 { font-size: 16px; margin: 0; color: #555; font-weight: normal; }
+        .header p { margin: 4px 0 0; font-size: 12px; color: #888; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px; }
+        .grid .label { color: #666; }
+        .grid .value { font-weight: 600; }
+        .body-text { font-size: 13px; line-height: 1.7; margin: 16px 0; }
+        .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px; font-size: 13px; }
+        .sig-line { border-top: 1px solid #333; padding-top: 6px; margin-top: 50px; }
+        .stamp { text-align: center; margin-top: 40px; padding: 12px; border: 2px dashed #aaa; font-size: 12px; color: #888; }
+        .ref { font-size: 11px; color: #888; margin-top: 24px; text-align: right; }
+        @media print { body { padding: 20px; } }
+      </style>
+      </head><body>${printRef.current.innerHTML}</body></html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
   };
 
   return (
