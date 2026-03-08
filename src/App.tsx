@@ -44,6 +44,7 @@ const App = () => (
               <Route path="/manual-payments" element={<ManualPayments />} />
               <Route path="/overdue" element={<OverdueTracking />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
