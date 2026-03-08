@@ -464,6 +464,7 @@ function ChangePasswordTab({ toast }: { toast: ReturnType<typeof useToast>["toas
             placeholder="Enter new password"
             className="mt-1"
           />
+          <PasswordStrengthIndicator password={newPassword} />
         </div>
         <div>
           <Label>Confirm New Password</Label>
