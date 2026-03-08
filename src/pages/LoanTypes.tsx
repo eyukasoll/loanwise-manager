@@ -27,6 +27,7 @@ export default function LoanTypes() {
   const createMut = useCreateLoanType();
   const updateMut = useUpdateLoanType();
   const deleteMut = useDeleteLoanType();
+  const { canCreate, canEdit, canDelete } = usePermissions();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
