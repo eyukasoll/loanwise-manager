@@ -61,8 +61,11 @@ export default function Applications() {
   }, [isSavingsBased, form.employee_id, savingsBalance, savingsMultiplier]);
 
   // Filter guarantor options: exclude the applicant and the other selected guarantor
-  const guarantorOptions1 = employees.filter((e: any) => e.id !== form.employee_id && e.id !== form.guarantor2_id);
-  const guarantorOptions2 = employees.filter((e: any) => e.id !== form.employee_id && e.id !== form.guarantor1_id);
+  // Filter guarantor options: exclude applicant, other guarantor, and already-guaranteed employees
+  const { data: guaranteedIds = new Set<string>() } = useGuaranteedEmployeeIds();
+  const freeEmployees = employees.filter((e: any) => !guaranteedIds.has(e.id));
+  const guarantorOptions1 = freeEmployees.filter((e: any) => e.id !== form.employee_id && e.id !== form.guarantor2_id);
+  const guarantorOptions2 = freeEmployees.filter((e: any) => e.id !== form.employee_id && e.id !== form.guarantor1_id);
 
   const filtered = applications.filter((l: any) => {
     const name = l.employees?.full_name || "";
