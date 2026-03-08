@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { LoanType, LoanTypeDocument } from "@/types/loan";
 import { toast } from "sonner";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt, CURRENCY } from "@/lib/currency";
 
 const emptyForm: Omit<LoanType, "id"> = {
   name: "",
@@ -218,7 +218,7 @@ export default function LoanTypes() {
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Amount & Terms</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <Label>Minimum Amount (KES) <span className="text-destructive">*</span></Label>
+                  <Label>Minimum Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
                   <Input
                     type="number"
                     value={form.minAmount || ""}
@@ -228,7 +228,7 @@ export default function LoanTypes() {
                   />
                 </div>
                 <div>
-                  <Label>Maximum Amount (KES) <span className="text-destructive">*</span></Label>
+                  <Label>Maximum Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
                   <Input
                     type="number"
                     value={form.maxAmount || ""}

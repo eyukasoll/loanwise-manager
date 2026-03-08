@@ -5,7 +5,7 @@ import { loanApplications } from "@/data/mockData";
 import { CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt } from "@/lib/currency";
 
 export default function Approvals() {
   const pending = loanApplications.filter(l => ["Pending Approval", "Under Review", "Submitted"].includes(l.status));

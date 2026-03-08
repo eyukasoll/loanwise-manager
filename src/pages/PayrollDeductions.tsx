@@ -3,7 +3,7 @@ import TopBar from "@/components/TopBar";
 import { loanApplications } from "@/data/mockData";
 import { CreditCard } from "lucide-react";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt } from "@/lib/currency";
 
 const deductions = loanApplications
   .filter(l => l.status === "Active" && l.monthlyInstallment)

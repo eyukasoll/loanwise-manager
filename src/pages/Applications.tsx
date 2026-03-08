@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt } from "@/lib/currency";
 
 export default function Applications() {
   const [search, setSearch] = useState("");

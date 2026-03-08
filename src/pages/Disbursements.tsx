@@ -5,7 +5,7 @@ import { loanApplications } from "@/data/mockData";
 import { Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt } from "@/lib/currency";
 
 export default function Disbursements() {
   const approved = loanApplications.filter(l => l.status === "Approved");

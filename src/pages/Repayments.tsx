@@ -4,7 +4,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { loanApplications, generateRepaymentSchedule } from "@/data/mockData";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt } from "@/lib/currency";
 
 export default function Repayments() {
   const activeLoans = loanApplications.filter(l => ["Active", "Disbursed"].includes(l.status));

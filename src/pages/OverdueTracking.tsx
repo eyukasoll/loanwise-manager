@@ -5,7 +5,7 @@ import StatCard from "@/components/StatCard";
 import { loanApplications } from "@/data/mockData";
 import { AlertTriangle, Clock, Ban } from "lucide-react";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt } from "@/lib/currency";
 
 export default function OverdueTracking() {
   // Simulating some overdue data
