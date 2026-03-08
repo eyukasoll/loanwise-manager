@@ -61,7 +61,7 @@ export default function LoanTypes() {
 
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error("Name is required"); return; }
-    if (form.max_amount <= 0) { toast.error("Max amount must be > 0"); return; }
+    if (!form.is_savings_based && form.max_amount <= 0) { toast.error("Max amount must be > 0"); return; }
 
     // Upload any new files
     const processedDocs = await Promise.all(
@@ -112,7 +112,7 @@ export default function LoanTypes() {
                 </div>
                 {lt.description && <p className="text-xs text-muted-foreground mb-3">{lt.description}</p>}
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-muted-foreground">Amount Range</span><span className="font-medium">{fmt(lt.min_amount)} – {fmt(lt.max_amount)}</span></div>
+                  {!lt.is_savings_based && <div className="flex justify-between"><span className="text-muted-foreground">Amount Range</span><span className="font-medium">{fmt(lt.min_amount)} – {fmt(lt.max_amount)}</span></div>}
                   <div className="flex justify-between"><span className="text-muted-foreground">Max Period</span><span className="font-medium">{lt.max_period_months} months</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Interest Rate</span><span className="font-medium">{lt.interest_free ? "Interest Free" : `${lt.interest_rate}%`}</span></div>
                   {lt.is_savings_based && <div className="flex justify-between"><span className="text-muted-foreground">Basis</span><span className="font-medium text-primary">Savings-Based</span></div>}
@@ -154,8 +154,17 @@ export default function LoanTypes() {
             <div className="space-y-3">
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Amount & Terms</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div><Label>Min Amount ({CURRENCY})</Label><Input type="number" value={form.min_amount || ""} onChange={e => setForm(f => ({ ...f, min_amount: Number(e.target.value) }))} className="mt-1" /></div>
-                <div><Label>Max Amount ({CURRENCY}) <span className="text-destructive">*</span></Label><Input type="number" value={form.max_amount || ""} onChange={e => setForm(f => ({ ...f, max_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                {!form.is_savings_based && (
+                  <>
+                    <div><Label>Min Amount ({CURRENCY})</Label><Input type="number" value={form.min_amount || ""} onChange={e => setForm(f => ({ ...f, min_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                    <div><Label>Max Amount ({CURRENCY}) <span className="text-destructive">*</span></Label><Input type="number" value={form.max_amount || ""} onChange={e => setForm(f => ({ ...f, max_amount: Number(e.target.value) }))} className="mt-1" /></div>
+                  </>
+                )}
+                {form.is_savings_based && (
+                  <div className="sm:col-span-2 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm text-muted-foreground">
+                    Max amount is calculated as: <strong>Employee Savings × Savings Multiplier</strong> (set in Settings)
+                  </div>
+                )}
                 <div><Label>Max Period (months)</Label><Input type="number" value={form.max_period_months || ""} onChange={e => setForm(f => ({ ...f, max_period_months: Number(e.target.value) }))} className="mt-1" /></div>
                 <div><Label>Max Active Loans</Label><Input type="number" value={form.max_active_loans || ""} onChange={e => setForm(f => ({ ...f, max_active_loans: Number(e.target.value) }))} className="mt-1" /></div>
               </div>
