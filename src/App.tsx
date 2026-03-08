@@ -35,6 +35,7 @@ const guard = (module: string, el: React.ReactNode) => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <LanguageProvider>
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
