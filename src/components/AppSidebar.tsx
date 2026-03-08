@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, FileText, CheckCircle, Calculator, Banknote,
   CalendarCheck, CreditCard, HandCoins, AlertTriangle, BarChart3,
-  Settings, ChevronLeft, ChevronRight, LogOut, Cog
+  Settings, ChevronLeft, ChevronRight, LogOut, Cog, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ const navItems = [
   { label: "Overdue Tracking", icon: AlertTriangle, path: "/overdue" },
   { label: "Reports", icon: BarChart3, path: "/reports" },
   { label: "Settings", icon: Cog, path: "/settings" },
+  { label: "Permissions", icon: ShieldCheck, path: "/permissions" },
 ];
 
 export default function AppSidebar() {
