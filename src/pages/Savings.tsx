@@ -15,6 +15,7 @@ import BulkSavingsImport from "@/components/BulkSavingsImport";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Savings() {
+  const { t } = useLanguage();
   const { data: transactions = [], isLoading } = useSavingsTransactions();
   const { data: employees = [] } = useEmployees();
   const createMut = useCreateSavingsTransaction();
