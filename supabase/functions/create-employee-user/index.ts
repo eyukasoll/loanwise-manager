@@ -93,27 +93,46 @@ Deno.serve(async (req) => {
     // Get company SMTP settings
     const { data: settings } = await admin
       .from("company_settings")
-      .select("company_name, smtp_host, smtp_port, smtp_email, smtp_password, email_sender_name")
+      .select("company_name, smtp_email, email_sender_name")
       .limit(1)
       .single();
 
     let emailSent = false;
 
-    if (settings?.smtp_host && settings?.smtp_email && settings?.smtp_password) {
-      try {
-        // Use Gmail API approach via SMTP relay with base64 encoding
-        const smtpHost = settings.smtp_host;
-        const smtpPort = 465; // Force SSL port for edge function compatibility
-        const smtpUser = settings.smtp_email;
-        const smtpPass = settings.smtp_password;
-        const senderName = settings.email_sender_name || settings.company_name || "System";
+    // Use Gmail API with OAuth2 refresh token
+    const gmailClientId = Deno.env.get("GMAIL_CLIENT_ID");
+    const gmailClientSecret = Deno.env.get("GMAIL_CLIENT_SECRET");
+    const gmailRefreshToken = Deno.env.get("GMAIL_REFRESH_TOKEN");
+    const senderEmail = settings?.smtp_email || "";
+    const senderName = settings?.email_sender_name || settings?.company_name || "System";
+    const companyName = settings?.company_name || "Our Platform";
 
+    if (gmailClientId && gmailClientSecret && gmailRefreshToken && senderEmail) {
+      try {
+        // Step 1: Get access token from refresh token
+        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: gmailClientId,
+            client_secret: gmailClientSecret,
+            refresh_token: gmailRefreshToken,
+            grant_type: "refresh_token",
+          }),
+        });
+        const tokenData = await tokenRes.json();
+
+        if (!tokenData.access_token) {
+          throw new Error("Failed to get access token: " + JSON.stringify(tokenData));
+        }
+
+        // Step 2: Build MIME message
         const htmlBody = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb;">
   <div style="background: white; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
-    <h1 style="color: #059669; margin-bottom: 8px; font-size: 22px;">Welcome to ${settings.company_name || "Our Platform"}!</h1>
+    <h1 style="color: #059669; margin-bottom: 8px; font-size: 22px;">Welcome to ${companyName}!</h1>
     <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
       Your employee account has been created. Use the credentials below to log in.
     </p>
@@ -139,79 +158,50 @@ Deno.serve(async (req) => {
       </p>
     </div>
     <p style="color: #9ca3af; font-size: 12px; margin-top: 24px; text-align: center;">
-      This is an automated message from ${settings.company_name || "the system"}. Please do not reply to this email.
+      This is an automated message from ${companyName}. Please do not reply to this email.
     </p>
   </div>
 </body>
 </html>`;
 
-        // Build raw MIME message
-        const boundary = "----=_Part_" + crypto.randomUUID().replace(/-/g, "");
-        const rawMessage = [
-          `From: ${senderName} <${smtpUser}>`,
+        const mimeMessage = [
+          `From: ${senderName} <${senderEmail}>`,
           `To: ${email}`,
-          `Subject: Welcome to ${settings.company_name || "Our Platform"} - Your Account Credentials`,
+          `Subject: Welcome to ${companyName} - Your Account Credentials`,
           `MIME-Version: 1.0`,
-          `Content-Type: multipart/alternative; boundary="${boundary}"`,
-          ``,
-          `--${boundary}`,
-          `Content-Type: text/plain; charset=utf-8`,
-          ``,
-          `Welcome ${full_name}! Your login credentials: Email: ${email}, Password: ${password}. Please change your password after first login.`,
-          ``,
-          `--${boundary}`,
           `Content-Type: text/html; charset=utf-8`,
           ``,
           htmlBody,
-          ``,
-          `--${boundary}--`,
         ].join("\r\n");
 
-        // Connect via TLS to port 465
-        const conn = await Deno.connectTls({ hostname: smtpHost, port: smtpPort });
-        const encoder = new TextEncoder();
-        const decoder = new TextDecoder();
+        // Base64url encode the message
+        const raw = btoa(unescape(encodeURIComponent(mimeMessage)))
+          .replace(/\+/g, "-")
+          .replace(/\//g, "_")
+          .replace(/=+$/, "");
 
-        async function readLine(): Promise<string> {
-          const buf = new Uint8Array(4096);
-          const n = await conn.read(buf);
-          return n ? decoder.decode(buf.subarray(0, n)) : "";
-        }
+        // Step 3: Send via Gmail API
+        const sendRes = await fetch(
+          "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${tokenData.access_token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ raw }),
+          }
+        );
 
-        async function send(cmd: string): Promise<string> {
-          await conn.write(encoder.encode(cmd + "\r\n"));
-          return await readLine();
-        }
-
-        // SMTP conversation
-        await readLine(); // greeting
-        await send(`EHLO localhost`);
-        
-        // AUTH LOGIN
-        await send(`AUTH LOGIN`);
-        await send(btoa(smtpUser));
-        const authResult = await send(btoa(smtpPass));
-        
-        if (!authResult.startsWith("235")) {
-          throw new Error("SMTP auth failed: " + authResult);
-        }
-
-        await send(`MAIL FROM:<${smtpUser}>`);
-        await send(`RCPT TO:<${email}>`);
-        await send(`DATA`);
-        
-        // Send message body (dot-stuffing)
-        await conn.write(encoder.encode(rawMessage + "\r\n.\r\n"));
-        const dataResult = await readLine();
-        
-        if (dataResult.startsWith("250")) {
+        const sendResult = await sendRes.json();
+        if (sendRes.ok && sendResult.id) {
           emailSent = true;
+        } else {
+          console.error("Gmail API send failed:", sendResult);
         }
-        
-        await send(`QUIT`);
-        conn.close();
-      } catch (smtpError: any) {
-        console.error("SMTP send failed:", smtpError);
+      } catch (emailError: any) {
+        console.error("Gmail API error:", emailError);
+      }
       }
     }
 
