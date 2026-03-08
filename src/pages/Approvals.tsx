@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { CheckCircle, XCircle, RotateCcw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
