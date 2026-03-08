@@ -10,6 +10,7 @@ import { fmt } from "@/lib/currency";
 import StatusBadge from "@/components/StatusBadge";
 
 export default function PayrollDeductions() {
+  const { t } = useLanguage();
   const now = new Date();
   const defaultPeriod = `${now.toLocaleString("default", { month: "long" })} ${now.getFullYear()}`;
   const [period, setPeriod] = useState(defaultPeriod);

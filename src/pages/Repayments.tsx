@@ -7,6 +7,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { fmt } from "@/lib/currency";
 
 export default function Repayments() {
+  const { t } = useLanguage();
   const { data: applications = [] } = useLoanApplications();
   const activeLoans = applications.filter((l: any) => ["Active", "Disbursed"].includes(l.status));
   const [selectedLoanId, setSelectedLoanId] = useState("");

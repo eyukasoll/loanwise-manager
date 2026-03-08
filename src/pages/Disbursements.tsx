@@ -14,6 +14,7 @@ import { fmt } from "@/lib/currency";
 import { toast } from "sonner";
 
 export default function Disbursements() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
   const genSchedule = useGenerateRepaymentSchedule();

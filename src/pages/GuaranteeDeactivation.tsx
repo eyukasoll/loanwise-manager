@@ -45,6 +45,7 @@ function useEmployees() {
 const ACTIVE_STATUSES = ["Submitted", "Under Review", "Pending Approval", "Approved", "Disbursed", "Active"];
 
 export default function GuaranteeDeactivation() {
+  const { t } = useLanguage();
   const { data: guarantees = [], isLoading } = useAllGuarantees();
   const { data: employees = [] } = useEmployees();
   const { settings: company } = useCompanySettings();

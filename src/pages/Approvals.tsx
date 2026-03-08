@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import LoanApplicationDocument from "@/components/applications/LoanApplicationDocument";
 
 export default function Approvals() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
   const { canEdit } = usePermissions();

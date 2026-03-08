@@ -8,6 +8,7 @@ import { AlertTriangle, Clock, Ban } from "lucide-react";
 import { fmt } from "@/lib/currency";
 
 export default function OverdueTracking() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
 
   const activeLoans = applications.filter((l: any) => ["Active", "Disbursed"].includes(l.status));

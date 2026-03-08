@@ -8,6 +8,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { fmt } from "@/lib/currency";
 
 export default function Reports() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { data: employees = [] } = useEmployees();
 

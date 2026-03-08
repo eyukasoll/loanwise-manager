@@ -17,6 +17,7 @@ import ApplicationsTable from "@/components/applications/ApplicationsTable";
 import ApplicationDetailDialog from "@/components/applications/ApplicationDetailDialog";
 
 export default function Applications() {
+  const { t } = useLanguage();
   const [statusFilter, setStatusFilter] = useState("all");
   const { data: applications = [], isLoading } = useLoanApplications(statusFilter);
   const { data: employees = [] } = useEmployees();

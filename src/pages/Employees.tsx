@@ -37,6 +37,7 @@ export default function Employees() {
   const deleteMut = useDeleteEmployee();
   const bulkCreateMut = useBulkCreateEmployees();
   const { canCreate, canEdit, canDelete } = usePermissions();
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fmt, CURRENCY } from "@/lib/currency";
 
 export default function ManualPayments() {
+  const { t } = useLanguage();
   const { data: payments = [], isLoading } = useManualPayments();
   const { data: applications = [] } = useLoanApplications();
   const createMut = useCreateManualPayment();
