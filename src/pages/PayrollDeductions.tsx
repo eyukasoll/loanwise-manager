@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import { useLoanApplications, usePayrollDeductions, useGeneratePayrollDeductions, useProcessDeduction } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
 import { CreditCard, RefreshCw, CheckCircle } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fmt } from "@/lib/currency";
