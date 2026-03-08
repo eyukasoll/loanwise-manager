@@ -39,6 +39,7 @@ export default function Permissions() {
   const [saving, setSaving] = useState(false);
   const [permissions, setPermissions] = useState<PermRow[]>([]);
   const [activeRole, setActiveRole] = useState(ROLES[0]);
+  const { canEdit: permCanEdit } = usePermissions();
 
   useEffect(() => {
     fetchPermissions();
