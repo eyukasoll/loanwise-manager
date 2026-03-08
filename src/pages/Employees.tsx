@@ -187,7 +187,7 @@ export default function Employees() {
       {/* View Dialog */}
       <Dialog open={!!viewEmp} onOpenChange={() => setViewEmp(null)}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Employee Details</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.employeeDetails}</DialogTitle></DialogHeader>
           {viewEmp && (
             <div className="grid grid-cols-2 gap-3 text-sm">
               {([
