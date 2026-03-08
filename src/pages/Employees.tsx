@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
-import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from "@/hooks/useLoans";
+import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId } from "@/hooks/useLoans";
 import { Search, Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -18,6 +18,7 @@ const emptyForm = {
 
 export default function Employees() {
   const { data: employees = [], isLoading } = useEmployees();
+  const { data: nextId = "EMP001" } = useNextEmployeeId();
   const createMut = useCreateEmployee();
   const updateMut = useUpdateEmployee();
   const deleteMut = useDeleteEmployee();
@@ -33,7 +34,7 @@ export default function Employees() {
     e.department.toLowerCase().includes(search.toLowerCase())
   );
 
-  const openCreate = () => { setEditingId(null); setForm(emptyForm); setFormOpen(true); };
+  const openCreate = () => { setEditingId(null); setForm({ ...emptyForm, employee_id: nextId }); setFormOpen(true); };
   const openEdit = (emp: any) => {
     setEditingId(emp.id);
     setForm({
@@ -146,8 +147,8 @@ export default function Employees() {
           <DialogHeader><DialogTitle>{editingId ? "Edit Employee" : "Add Employee"}</DialogTitle></DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label>Employee ID <span className="text-destructive">*</span></Label>
-              <Input value={form.employee_id} onChange={e => setForm(f => ({ ...f, employee_id: e.target.value }))} placeholder="EMP001" className="mt-1" />
+              <Label>Employee ID</Label>
+              <Input value={form.employee_id} readOnly disabled className="mt-1 bg-muted" />
             </div>
             <div>
               <Label>Full Name <span className="text-destructive">*</span></Label>
