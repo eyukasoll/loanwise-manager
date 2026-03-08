@@ -83,6 +83,8 @@ export default function Employees() {
     e.department.toLowerCase().includes(search.toLowerCase())
   );
 
+  const { paginatedItems, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(filtered);
+
   const openCreate = () => { setEditingId(null); setForm({ ...emptyForm, employee_id: nextId }); setFormOpen(true); };
   const openEdit = (emp: any) => {
     setEditingId(emp.id);
