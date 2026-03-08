@@ -394,3 +394,149 @@ export default function Settings() {
     </div>
   );
 }
+
+const backupTables = [
+  { key: "employees", label: "Employees", description: "All employee records" },
+  { key: "loan_applications", label: "Loan Applications", description: "All loan application data" },
+  { key: "loan_types", label: "Loan Types", description: "Loan type configurations" },
+  { key: "loan_guarantors", label: "Loan Guarantors", description: "Guarantor assignments" },
+  { key: "repayment_schedule", label: "Repayment Schedules", description: "Loan repayment entries" },
+  { key: "payroll_deductions", label: "Payroll Deductions", description: "Payroll deduction records" },
+  { key: "manual_payments", label: "Manual Payments", description: "Manual payment records" },
+  { key: "savings_transactions", label: "Savings Transactions", description: "All savings records" },
+  { key: "company_settings", label: "Company Settings", description: "Company configuration" },
+  { key: "role_permissions", label: "Role Permissions", description: "Permission matrix" },
+  { key: "audit_log", label: "Audit Log", description: "System audit trail" },
+] as const;
+
+type TableKey = (typeof backupTables)[number]["key"];
+
+function BackupExportTab({ toast }: { toast: ReturnType<typeof useToast>["toast"] }) {
+  const [exporting, setExporting] = useState<string | null>(null);
+  const [exported, setExported] = useState<Set<string>>(new Set());
+
+  const exportTable = async (tableKey: TableKey, label: string) => {
+    setExporting(tableKey);
+    try {
+      let allData: any[] = [];
+      let from = 0;
+      const batchSize = 1000;
+      while (true) {
+        const { data, error } = await supabase
+          .from(tableKey)
+          .select("*")
+          .range(from, from + batchSize - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        allData = allData.concat(data);
+        if (data.length < batchSize) break;
+        from += batchSize;
+      }
+
+      if (allData.length === 0) {
+        toast({ title: "No data", description: `${label} table is empty.` });
+        setExporting(null);
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(allData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, label);
+      XLSX.writeFile(wb, `${tableKey}_backup_${new Date().toISOString().slice(0, 10)}.xlsx`);
+
+      setExported((prev) => new Set(prev).add(tableKey));
+      toast({ title: "Export complete", description: `${label} exported (${allData.length} records).` });
+    } catch (err: any) {
+      toast({ title: "Export failed", description: err.message, variant: "destructive" });
+    }
+    setExporting(null);
+  };
+
+  const exportAll = async () => {
+    setExporting("all");
+    try {
+      const wb = XLSX.utils.book_new();
+      let totalRecords = 0;
+
+      for (const table of backupTables) {
+        let allData: any[] = [];
+        let from = 0;
+        const batchSize = 1000;
+        while (true) {
+          const { data, error } = await supabase
+            .from(table.key)
+            .select("*")
+            .range(from, from + batchSize - 1);
+          if (error) throw error;
+          if (!data || data.length === 0) break;
+          allData = allData.concat(data);
+          if (data.length < batchSize) break;
+          from += batchSize;
+        }
+        if (allData.length > 0) {
+          const ws = XLSX.utils.json_to_sheet(allData);
+          XLSX.utils.book_append_sheet(wb, ws, table.label.slice(0, 31));
+          totalRecords += allData.length;
+        }
+      }
+
+      XLSX.writeFile(wb, `full_backup_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      setExported(new Set(backupTables.map((t) => t.key)));
+      toast({ title: "Full backup complete", description: `All tables exported (${totalRecords} total records).` });
+    } catch (err: any) {
+      toast({ title: "Backup failed", description: err.message, variant: "destructive" });
+    }
+    setExporting(null);
+  };
+
+  return (
+    <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-6">
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">Backup & Export</h3>
+          <p className="text-sm text-muted-foreground">Download your data as Excel files for safekeeping</p>
+        </div>
+        <Button onClick={exportAll} disabled={exporting !== null} className="gap-2">
+          {exporting === "all" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+          {exporting === "all" ? "Exporting..." : "Export All Tables"}
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {backupTables.map((table) => (
+          <div
+            key={table.key}
+            className="flex items-center justify-between rounded-lg border border-border px-4 py-3 bg-secondary/20"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-medium flex items-center gap-2">
+                {table.label}
+                {exported.has(table.key) && <CheckCircle2 className="w-3.5 h-3.5 text-success" />}
+              </p>
+              <p className="text-xs text-muted-foreground">{table.description}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0 ml-3 h-8"
+              disabled={exporting !== null}
+              onClick={() => exportTable(table.key, table.label)}
+            >
+              {exporting === table.key ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Download className="w-3.5 h-3.5" />
+              )}
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-lg bg-muted/50 border border-border px-4 py-3">
+        <p className="text-xs text-muted-foreground">
+          <strong>Tip:</strong> Regular backups help protect your data. We recommend exporting a full backup at least once a week. Files are downloaded in Excel (.xlsx) format for easy viewing and archiving.
+        </p>
+      </div>
+    </div>
+  );
+}
