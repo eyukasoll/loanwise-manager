@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Mail, Settings as SettingsIcon, Save, Loader2 } from "lucide-react";
+import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image } from "lucide-react";
 
 const fiscalMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -19,6 +19,10 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [stampUrl, setStampUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingStamp, setUploadingStamp] = useState(false);
 
   const [company, setCompany] = useState({
     company_name: "",
@@ -55,7 +59,7 @@ export default function Settings() {
   }, []);
 
   const fetchSettings = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("company_settings")
       .select("*")
       .limit(1)
@@ -63,6 +67,8 @@ export default function Settings() {
 
     if (data) {
       setSettingsId(data.id);
+      setLogoUrl(data.logo_url || null);
+      setStampUrl((data as any).stamp_url || null);
       setCompany({
         company_name: data.company_name || "",
         company_email: data.company_email || "",
@@ -97,7 +103,6 @@ export default function Settings() {
   const handleSave = async (section: string) => {
     setSaving(true);
     let updateData: any = {};
-
     if (section === "company") updateData = { ...company };
     else if (section === "loan") updateData = { ...loanConfig };
     else if (section === "email") updateData = { ...email };
@@ -115,6 +120,50 @@ export default function Settings() {
     setSaving(false);
   };
 
+  const handleImageUpload = async (file: File, type: "logo" | "stamp") => {
+    if (!settingsId) return;
+    const setUploading = type === "logo" ? setUploadingLogo : setUploadingStamp;
+    setUploading(true);
+
+    const ext = file.name.split(".").pop();
+    const path = `company/${type}_${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("loan-documents")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("loan-documents").getPublicUrl(path);
+    const url = urlData.publicUrl;
+
+    const column = type === "logo" ? "logo_url" : "stamp_url";
+    const { error: updateError } = await supabase
+      .from("company_settings")
+      .update({ [column]: url } as any)
+      .eq("id", settingsId);
+
+    if (updateError) {
+      toast({ title: "Error saving URL", description: updateError.message, variant: "destructive" });
+    } else {
+      if (type === "logo") setLogoUrl(url); else setStampUrl(url);
+      toast({ title: `${type === "logo" ? "Logo" : "Stamp"} uploaded successfully` });
+    }
+    setUploading(false);
+  };
+
+  const handleRemoveImage = async (type: "logo" | "stamp") => {
+    if (!settingsId) return;
+    const column = type === "logo" ? "logo_url" : "stamp_url";
+    await supabase.from("company_settings").update({ [column]: null } as any).eq("id", settingsId);
+    if (type === "logo") setLogoUrl(null); else setStampUrl(null);
+    toast({ title: `${type === "logo" ? "Logo" : "Stamp"} removed` });
+  };
+
   if (loading) {
     return (
       <div>
@@ -125,6 +174,42 @@ export default function Settings() {
       </div>
     );
   }
+
+  const ImageUploadCard = ({ type, url, uploading }: { type: "logo" | "stamp"; url: string | null; uploading: boolean }) => (
+    <div className="space-y-2">
+      <Label>{type === "logo" ? "Company Logo" : "Company Stamp / Seal"}</Label>
+      <div className="border-2 border-dashed border-border rounded-lg p-4 flex flex-col items-center justify-center min-h-[160px] relative bg-secondary/20">
+        {url ? (
+          <>
+            <img src={url} alt={type} className="max-h-32 max-w-full object-contain rounded" />
+            <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleRemoveImage(type)}>
+              <X className="w-4 h-4" />
+            </Button>
+          </>
+        ) : (
+          <label className="cursor-pointer flex flex-col items-center gap-2 text-center">
+            <div className="rounded-full bg-muted p-3">
+              <Image className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <span className="text-sm text-muted-foreground">
+              {uploading ? "Uploading..." : `Click to upload ${type}`}
+            </span>
+            <span className="text-xs text-muted-foreground">PNG, JPG up to 2MB</span>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploading}
+              onChange={e => {
+                const f = e.target.files?.[0];
+                if (f) handleImageUpload(f, type);
+              }}
+            />
+          </label>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -150,6 +235,13 @@ export default function Settings() {
                 <h3 className="text-lg font-semibold text-foreground">Company Information</h3>
                 <p className="text-sm text-muted-foreground">Basic details about your organization</p>
               </div>
+
+              {/* Logo & Stamp */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ImageUploadCard type="logo" url={logoUrl} uploading={uploadingLogo} />
+                <ImageUploadCard type="stamp" url={stampUrl} uploading={uploadingStamp} />
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <Label>Company Name</Label>
@@ -220,9 +312,7 @@ export default function Settings() {
                   <Label>Fiscal Year Starts</Label>
                   <Select value={loanConfig.fiscal_year_start} onValueChange={v => setLoanConfig(s => ({ ...s, fiscal_year_start: v }))}>
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {fiscalMonths.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                    </SelectContent>
+                    <SelectContent>{fiscalMonths.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div>

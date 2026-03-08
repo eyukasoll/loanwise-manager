@@ -267,6 +267,29 @@ export function useDeleteLoanApplication() {
   });
 }
 
+export function useBulkDeleteLoanApplications() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      for (const id of ids) {
+        await supabase.from("loan_guarantors").delete().eq("loan_application_id", id);
+        await supabase.from("loan_application_documents").delete().eq("loan_application_id", id);
+        await supabase.from("repayment_schedule").delete().eq("loan_application_id", id);
+        await supabase.from("payroll_deductions").delete().eq("loan_application_id", id);
+        await supabase.from("manual_payments").delete().eq("loan_application_id", id);
+      }
+      const { error } = await supabase.from("loan_applications").delete().in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["loan_applications"] });
+      qc.invalidateQueries({ queryKey: ["guaranteed_employee_ids"] });
+      toast.success("Applications deleted");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
 // ======================== REPAYMENT SCHEDULE ========================
 
 export function useRepaymentSchedule(loanAppId?: string) {
