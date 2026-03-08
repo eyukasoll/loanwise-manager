@@ -417,6 +417,11 @@ export default function Settings() {
             <ChangePasswordTab toast={toast} />
           </TabsContent>
 
+          {/* Data Management */}
+          <TabsContent value="data-management">
+            <DataManagementTab toast={toast} canEdit={canEdit} />
+          </TabsContent>
+
           {/* User Manual */}
           <TabsContent value="manual">
             <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
