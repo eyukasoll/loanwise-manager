@@ -58,8 +58,8 @@ export default function Login() {
       </div>
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
-          <img src={logo} alt="Addis Microfinance" className="w-20 h-20 mb-4 object-contain" />
-          <h1 className="text-2xl font-bold text-foreground font-display">Addis Microfinance</h1>
+          <img src={displayLogo} alt={displayName} className="w-20 h-20 mb-4 object-contain" />
+          <h1 className="text-2xl font-bold text-foreground font-display">{displayName}</h1>
           <p className="text-muted-foreground mt-1">{t.loginTitle}</p>
         </div>
 
