@@ -25,7 +25,14 @@ const navItems = [
 export default function AppSidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, role, signOut } = useAuth();
+
+  const roleLabels: Record<string, string> = {
+    admin: "Admin",
+    manager: "Manager",
+    finance: "Finance",
+    employee: "Employee",
+  };
 
   return (
     <aside
