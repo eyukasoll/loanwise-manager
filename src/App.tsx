@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PermissionGuard from "./components/PermissionGuard";
 import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
@@ -24,6 +25,10 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const guard = (module: string, el: React.ReactNode) => (
+  <PermissionGuard module={module}>{el}</PermissionGuard>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -34,19 +39,19 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/employees" element={<Employees />} />
-              <Route path="/loan-types" element={<LoanTypes />} />
-              <Route path="/applications" element={<Applications />} />
-              <Route path="/approvals" element={<Approvals />} />
-              <Route path="/disbursements" element={<Disbursements />} />
-              <Route path="/repayments" element={<Repayments />} />
-              <Route path="/deductions" element={<PayrollDeductions />} />
-              <Route path="/manual-payments" element={<ManualPayments />} />
-              <Route path="/overdue" element={<OverdueTracking />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/permissions" element={<Permissions />} />
+              <Route path="/" element={guard("Dashboard", <Dashboard />)} />
+              <Route path="/employees" element={guard("Employees", <Employees />)} />
+              <Route path="/loan-types" element={guard("Loan Types", <LoanTypes />)} />
+              <Route path="/applications" element={guard("Applications", <Applications />)} />
+              <Route path="/approvals" element={guard("Approvals", <Approvals />)} />
+              <Route path="/disbursements" element={guard("Disbursements", <Disbursements />)} />
+              <Route path="/repayments" element={guard("Repayment Schedule", <Repayments />)} />
+              <Route path="/deductions" element={guard("Payroll Deductions", <PayrollDeductions />)} />
+              <Route path="/manual-payments" element={guard("Manual Payments", <ManualPayments />)} />
+              <Route path="/overdue" element={guard("Overdue Tracking", <OverdueTracking />)} />
+              <Route path="/reports" element={guard("Reports", <Reports />)} />
+              <Route path="/settings" element={guard("Settings", <SettingsPage />)} />
+              <Route path="/permissions" element={guard("Permissions", <Permissions />)} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
