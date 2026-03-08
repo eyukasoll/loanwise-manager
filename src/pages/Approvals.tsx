@@ -44,8 +44,8 @@ export default function Approvals() {
         ) : pending.length === 0 ? (
           <div className="bg-card rounded-xl border border-border p-12 text-center">
             <CheckCircle className="w-12 h-12 mx-auto text-success mb-3" />
-            <h3 className="font-display font-semibold text-lg">All Caught Up</h3>
-            <p className="text-muted-foreground text-sm mt-1">No pending approvals at this time.</p>
+            <h3 className="font-display font-semibold text-lg">{t.allCaughtUp}</h3>
+            <p className="text-muted-foreground text-sm mt-1">{t.noPendingApprovals}</p>
           </div>
         ) : (
           <div className="space-y-4">
