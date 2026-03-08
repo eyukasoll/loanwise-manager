@@ -53,6 +53,13 @@ export default function Applications() {
   const savingsBalance = employeeSavingsBalance.get(form.employee_id) || 0;
   const savingsMaxAmount = isSavingsBased ? savingsBalance * savingsMultiplier : null;
 
+  // Auto-set requested amount for savings-based loans
+  useEffect(() => {
+    if (isSavingsBased && form.employee_id) {
+      setForm(f => ({ ...f, requested_amount: savingsBalance * savingsMultiplier }));
+    }
+  }, [isSavingsBased, form.employee_id, savingsBalance, savingsMultiplier]);
+
   const filtered = applications.filter((l: any) => {
     const name = l.employees?.full_name || "";
     return name.toLowerCase().includes(search.toLowerCase()) || l.application_number.toLowerCase().includes(search.toLowerCase());
@@ -190,7 +197,7 @@ export default function Applications() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
-                <Input type="number" value={form.requested_amount || ""} onChange={e => setForm(f => ({ ...f, requested_amount: Number(e.target.value) }))} className="mt-1" max={savingsMaxAmount ?? undefined} />
+                <Input type="number" value={form.requested_amount || ""} onChange={e => setForm(f => ({ ...f, requested_amount: Number(e.target.value) }))} className="mt-1" readOnly={!!isSavingsBased} />
                 {isSavingsBased && savingsMaxAmount !== null && form.requested_amount > savingsMaxAmount && (
                   <p className="text-xs text-destructive mt-1">Amount exceeds max allowed ({fmt(savingsMaxAmount)})</p>
                 )}
