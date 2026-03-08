@@ -3,6 +3,7 @@ import TopBar from "@/components/TopBar";
 import { useLoanTypes, useCreateLoanType, useUpdateLoanType, useDeleteLoanType } from "@/hooks/useLoans";
 import { uploadLoanDocument } from "@/hooks/useLoans";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Plus, Edit, Trash2, FileText, Upload, X, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
