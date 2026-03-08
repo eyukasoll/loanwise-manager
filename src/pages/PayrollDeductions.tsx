@@ -52,8 +52,8 @@ export default function PayrollDeductions() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-secondary/40">
-                    {["Employee", "Loan ID", "Loan Type", "Deduction Amount", "Status", "Action"].map(h => (
-                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === "Deduction Amount" ? "text-right" : "text-left"} ${h === "Action" ? "text-center" : ""}`}>{h}</th>
+                    {[t.employee, t.loanId, t.loanType, t.deductionAmount, t.status, t.action].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${h === t.deductionAmount ? "text-right" : "text-left"} ${h === t.action ? "text-center" : ""}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
