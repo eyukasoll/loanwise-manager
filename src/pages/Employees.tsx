@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee, useNextEmployeeId, useBulkCreateEmployees } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Eye, Edit, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -31,6 +32,7 @@ export default function Employees() {
   const updateMut = useUpdateEmployee();
   const deleteMut = useDeleteEmployee();
   const bulkCreateMut = useBulkCreateEmployees();
+  const { canCreate, canEdit, canDelete } = usePermissions();
   const [search, setSearch] = useState("");
   const [viewEmp, setViewEmp] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -88,10 +90,12 @@ export default function Employees() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search employees..." className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
           </div>
-          <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> Import CSV</Button>
-            <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
-          </div>
+          {canCreate("Employees") && (
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> Import CSV</Button>
+              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
+            </div>
+          )}
         </div>
 
         {isLoading ? (
@@ -122,8 +126,8 @@ export default function Employees() {
                       <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
                       <td className="px-5 py-3 text-center flex items-center justify-center gap-1">
                         <Button variant="ghost" size="icon" onClick={() => setViewEmp(emp)}><Eye className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                        {canEdit("Employees") && <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}><Edit className="w-4 h-4" /></Button>}
+                        {canDelete("Employees") && <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                       </td>
                     </tr>
                   ))}

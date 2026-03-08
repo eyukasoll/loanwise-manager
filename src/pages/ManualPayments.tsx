@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useManualPayments, useCreateManualPayment, useLoanApplications } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { HandCoins, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -13,6 +14,7 @@ export default function ManualPayments() {
   const { data: payments = [], isLoading } = useManualPayments();
   const { data: applications = [] } = useLoanApplications();
   const createMut = useCreateManualPayment();
+  const { canCreate } = usePermissions();
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({ loan_application_id: "", amount: 0, payment_method: "Cash", receipt_number: "", received_by: "", remarks: "" });
 
@@ -29,9 +31,11 @@ export default function ManualPayments() {
     <div>
       <TopBar title="Manual Payments" subtitle="Record manual loan repayments" />
       <div className="p-6 animate-fade-in">
-        <div className="flex justify-end mb-4">
-          <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> Record Payment</Button>
-        </div>
+        {canCreate("Manual Payments") && (
+          <div className="flex justify-end mb-4">
+            <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> Record Payment</Button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useLoanTypes, useCreateLoanType, useUpdateLoanType, useDeleteLoanType } from "@/hooks/useLoans";
 import { uploadLoanDocument } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Plus, Edit, Trash2, FileText, Upload, X, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -26,6 +27,7 @@ export default function LoanTypes() {
   const createMut = useCreateLoanType();
   const updateMut = useUpdateLoanType();
   const deleteMut = useDeleteLoanType();
+  const { canCreate, canEdit, canDelete } = usePermissions();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -87,9 +89,11 @@ export default function LoanTypes() {
     <div>
       <TopBar title="Loan Types" subtitle="Configure loan type settings" />
       <div className="p-6 animate-fade-in">
-        <div className="flex justify-end mb-4">
-          <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Loan Type</Button>
-        </div>
+        {canCreate("Loan Types") && (
+          <div className="flex justify-end mb-4">
+            <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Loan Type</Button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
@@ -100,8 +104,8 @@ export default function LoanTypes() {
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-display font-semibold">{lt.name}</h3>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(lt)}><Edit className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(lt.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                    {canEdit("Loan Types") && <Button variant="ghost" size="icon" onClick={() => openEdit(lt)}><Edit className="w-4 h-4" /></Button>}
+                    {canDelete("Loan Types") && <Button variant="ghost" size="icon" onClick={() => handleDelete(lt.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                   </div>
                 </div>
                 {lt.description && <p className="text-xs text-muted-foreground mb-3">{lt.description}</p>}

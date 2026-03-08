@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication, useGenerateRepaymentSchedule } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -15,6 +16,7 @@ export default function Disbursements() {
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
   const genSchedule = useGenerateRepaymentSchedule();
+  const { canCreate } = usePermissions();
   const [disburseOpen, setDisburseOpen] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<any>(null);
   const [disbForm, setDisbForm] = useState({ date: new Date().toISOString().split("T")[0], method: "Bank Transfer", voucher: "", disbursed_by: "" });
@@ -70,7 +72,7 @@ export default function Disbursements() {
                         <p className="font-medium">{loan.employees?.full_name} <span className="text-muted-foreground text-sm ml-2">{loan.application_number}</span></p>
                         <p className="text-sm text-muted-foreground">{loan.loan_types?.name} · {fmt(loan.approved_amount || loan.requested_amount)}</p>
                       </div>
-                      <Button size="sm" onClick={() => openDisburse(loan)}><Banknote className="w-4 h-4 mr-1" /> Disburse</Button>
+                      {canCreate("Disbursements") && <Button size="sm" onClick={() => openDisburse(loan)}><Banknote className="w-4 h-4 mr-1" /> Disburse</Button>}
                     </div>
                   ))}
                 </div>

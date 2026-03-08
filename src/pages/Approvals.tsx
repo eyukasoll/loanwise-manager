@@ -2,6 +2,7 @@ import React from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useUpdateLoanApplication } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/currency";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 export default function Approvals() {
   const { data: applications = [], isLoading } = useLoanApplications();
   const updateMut = useUpdateLoanApplication();
+  const { canEdit } = usePermissions();
 
   const pending = applications.filter((l: any) => ["Pending Approval", "Under Review", "Submitted"].includes(l.status));
 
@@ -59,17 +61,19 @@ export default function Approvals() {
                   </div>
                 </div>
                 <p className="text-sm mt-3"><span className="text-muted-foreground">Purpose:</span> {loan.purpose || "—"}</p>
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
-                  <Button size="sm" className="bg-success hover:bg-success/90 text-success-foreground" onClick={() => handleAction(loan.id, "Approved")} disabled={updateMut.isPending}>
-                    <CheckCircle className="w-4 h-4 mr-1" /> Approve
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleAction(loan.id, "Rejected")} disabled={updateMut.isPending}>
-                    <XCircle className="w-4 h-4 mr-1" /> Reject
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => handleAction(loan.id, "Draft")} disabled={updateMut.isPending}>
-                    <RotateCcw className="w-4 h-4 mr-1" /> Return
-                  </Button>
-                </div>
+                {canEdit("Approvals") && (
+                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+                    <Button size="sm" className="bg-success hover:bg-success/90 text-success-foreground" onClick={() => handleAction(loan.id, "Approved")} disabled={updateMut.isPending}>
+                      <CheckCircle className="w-4 h-4 mr-1" /> Approve
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleAction(loan.id, "Rejected")} disabled={updateMut.isPending}>
+                      <XCircle className="w-4 h-4 mr-1" /> Reject
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleAction(loan.id, "Draft")} disabled={updateMut.isPending}>
+                      <RotateCcw className="w-4 h-4 mr-1" /> Return
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

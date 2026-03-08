@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TopBar from "@/components/TopBar";
 import StatusBadge from "@/components/StatusBadge";
 import { useLoanApplications, useCreateLoanApplication, useEmployees, useLoanTypes } from "@/hooks/useLoans";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Search, Plus, Eye, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -17,6 +18,7 @@ export default function Applications() {
   const { data: employees = [] } = useEmployees();
   const { data: loanTypesData = [] } = useLoanTypes();
   const createMut = useCreateLoanApplication();
+  const { canCreate } = usePermissions();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -66,7 +68,7 @@ export default function Applications() {
               <SelectContent>{statuses.map(s => <SelectItem key={s} value={s}>{s === "all" ? "All Statuses" : s}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> New Application</Button>
+          {canCreate("Applications") && <Button size="sm" onClick={() => setFormOpen(true)}><Plus className="w-4 h-4 mr-1" /> New Application</Button>}
         </div>
 
         {isLoading ? (
