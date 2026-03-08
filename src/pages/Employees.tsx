@@ -118,12 +118,12 @@ export default function Employees() {
         <div className="flex items-center justify-between mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search employees..." className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t.searchEmployees} className="h-9 pl-9 pr-4 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring w-72" />
           </div>
           {canCreate("Employees") && (
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> Import CSV</Button>
-              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Add Employee</Button>
+              <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}><Upload className="w-4 h-4 mr-1" /> {t.importCSV}</Button>
+              <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> {t.addEmployee}</Button>
             </div>
           )}
         </div>
