@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, FileText } from "lucide-react";
 import { fmt } from "@/lib/currency";
 import { Checkbox } from "@/components/ui/checkbox";
+import LoanApplicationDocument from "./LoanApplicationDocument";
 
 interface Props {
   filtered: any[];
