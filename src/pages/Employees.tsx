@@ -191,13 +191,13 @@ export default function Employees() {
           {viewEmp && (
             <div className="grid grid-cols-2 gap-3 text-sm">
               {([
-                ["Employee ID", viewEmp.employee_id], ["Name", viewEmp.full_name],
-                ["Department", viewEmp.department], ["Position", viewEmp.position],
-                ["Branch", viewEmp.branch], ["Joined", viewEmp.date_of_employment],
-                ["Salary", fmt(viewEmp.monthly_salary)], ["Allowances", fmt(viewEmp.allowances)],
-                ["Status", viewEmp.employment_status], ["Phone", viewEmp.phone || "—"],
-                ["Email", viewEmp.email || "—"], ["Bank Account", viewEmp.bank_account || "—"],
-                ["User Type", viewEmp.user_type || "—"],
+                [t.employeeId, viewEmp.employee_id], [t.name, viewEmp.full_name],
+                [t.department, viewEmp.department], [t.position, viewEmp.position],
+                [t.branch, viewEmp.branch], [t.joined, viewEmp.date_of_employment],
+                [t.salary, fmt(viewEmp.monthly_salary)], [t.allowances, fmt(viewEmp.allowances)],
+                [t.status, viewEmp.employment_status], [t.phone, viewEmp.phone || "—"],
+                [t.email, viewEmp.email || "—"], [t.bankAccount, viewEmp.bank_account || "—"],
+                [t.userType, viewEmp.user_type || "—"],
               ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-muted-foreground text-xs">{label}</p>
