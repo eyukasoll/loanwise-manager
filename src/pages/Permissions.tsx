@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Loader2, Shield, Eye, Plus, Edit, Trash2 } from "lucide-react";
+import { Save, Loader2, Shield, Eye, Plus, Edit, Trash2, Download, Upload, Printer, Share2 } from "lucide-react";
 
 const ROLES = ["Admin", "Manager", "Finance User", "Employee User"];
 
