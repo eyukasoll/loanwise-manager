@@ -278,7 +278,7 @@ export default function Settings() {
                 </div>
               </div>
               <div className="flex justify-end pt-2">
-                <Button onClick={() => handleSave("email")} disabled={saving}>
+                <Button onClick={() => handleSave("email")} disabled={saving || !canEdit("Settings")}>
                   <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Email Settings"}
                 </Button>
               </div>
