@@ -22,6 +22,7 @@ const navItems = [
   { label: "Overdue Tracking", icon: AlertTriangle, path: "/overdue" },
   { label: "Reports", icon: BarChart3, path: "/reports" },
   { label: "Settings", icon: Cog, path: "/settings" },
+  { label: "Permissions", icon: ShieldCheck, path: "/permissions" },
 ];
 
 export default function AppSidebar() {
