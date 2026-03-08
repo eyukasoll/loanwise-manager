@@ -68,7 +68,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Department chart */}
           <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-display font-semibold text-sm mb-4">Loans by Department</h3>
+            <h3 className="font-display font-semibold text-sm mb-4">{t.loansByDept}</h3>
             {deptDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={deptDistribution} barGap={4}>
