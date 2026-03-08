@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Globe } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 import logo from "@/assets/logo.png";
 
 export default function Login() {
@@ -17,6 +18,10 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { lang, setLang, t } = useLanguage();
+  const { settings } = useCompanySettings();
+
+  const displayLogo = settings?.logo_url || logo;
+  const displayName = settings?.company_name || "Addis Microfinance";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +58,8 @@ export default function Login() {
       </div>
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
-          <img src={logo} alt="Addis Microfinance" className="w-20 h-20 mb-4 object-contain" />
-          <h1 className="text-2xl font-bold text-foreground font-display">Addis Microfinance</h1>
+          <img src={displayLogo} alt={displayName} className="w-20 h-20 mb-4 object-contain" />
+          <h1 className="text-2xl font-bold text-foreground font-display">{displayName}</h1>
           <p className="text-muted-foreground mt-1">{t.loginTitle}</p>
         </div>
 
