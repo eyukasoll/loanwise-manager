@@ -228,7 +228,7 @@ export default function LoanTypes() {
                   />
                 </div>
                 <div>
-                  <Label>Maximum Amount (KES) <span className="text-destructive">*</span></Label>
+                  <Label>Maximum Amount ({CURRENCY}) <span className="text-destructive">*</span></Label>
                   <Input
                     type="number"
                     value={form.maxAmount || ""}
