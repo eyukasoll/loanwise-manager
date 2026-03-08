@@ -18,6 +18,7 @@ import ManualPayments from "./pages/ManualPayments";
 import OverdueTracking from "./pages/OverdueTracking";
 import Reports from "./pages/Reports";
 import SettingsPage from "./pages/Settings";
+import Permissions from "./pages/Permissions";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
