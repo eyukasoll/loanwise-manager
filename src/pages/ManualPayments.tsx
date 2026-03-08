@@ -22,6 +22,7 @@ export default function ManualPayments() {
   const [form, setForm] = useState({ loan_application_id: "", amount: 0, payment_method: "Cash", receipt_number: "", received_by: "", remarks: "" });
 
   const activeLoans = applications.filter((l: any) => ["Active", "Disbursed"].includes(l.status));
+  const { paginatedItems: paginatedPayments, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(payments);
 
   const handleSave = () => {
     if (!form.loan_application_id || form.amount <= 0) return;
