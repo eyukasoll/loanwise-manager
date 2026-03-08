@@ -8,6 +8,10 @@ export interface ModulePermission {
   can_create: boolean;
   can_edit: boolean;
   can_delete: boolean;
+  can_import: boolean;
+  can_export: boolean;
+  can_print: boolean;
+  can_share: boolean;
 }
 
 const roleMap: Record<string, string> = {
@@ -33,7 +37,7 @@ export function usePermissions() {
 
     supabase
       .from("role_permissions")
-      .select("module, can_view, can_create, can_edit, can_delete")
+      .select("module, can_view, can_create, can_edit, can_delete, can_import, can_export, can_print, can_share")
       .eq("role", dbRole)
       .then(({ data }) => {
         setPermissions((data as ModulePermission[]) ?? []);
@@ -53,5 +57,17 @@ export function usePermissions() {
   const canDelete = (module: string) =>
     permissions.find((p) => p.module === module)?.can_delete ?? false;
 
-  return { permissions, loading, canView, canCreate, canEdit, canDelete };
+  const canImport = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_import ?? false;
+
+  const canExport = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_export ?? false;
+
+  const canPrint = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_print ?? false;
+
+  const canShare = (module: string) =>
+    permissions.find((p) => p.module === module)?.can_share ?? false;
+
+  return { permissions, loading, canView, canCreate, canEdit, canDelete, canImport, canExport, canPrint, canShare };
 }

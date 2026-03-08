@@ -710,6 +710,10 @@ export type Database = {
           can_create: boolean
           can_delete: boolean
           can_edit: boolean
+          can_export: boolean
+          can_import: boolean
+          can_print: boolean
+          can_share: boolean
           can_view: boolean
           created_at: string
           id: string
@@ -721,6 +725,10 @@ export type Database = {
           can_create?: boolean
           can_delete?: boolean
           can_edit?: boolean
+          can_export?: boolean
+          can_import?: boolean
+          can_print?: boolean
+          can_share?: boolean
           can_view?: boolean
           created_at?: string
           id?: string
@@ -732,6 +740,10 @@ export type Database = {
           can_create?: boolean
           can_delete?: boolean
           can_edit?: boolean
+          can_export?: boolean
+          can_import?: boolean
+          can_print?: boolean
+          can_share?: boolean
           can_view?: boolean
           created_at?: string
           id?: string

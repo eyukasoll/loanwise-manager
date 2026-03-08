@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Loader2, Shield, Eye, Plus, Edit, Trash2 } from "lucide-react";
+import { Save, Loader2, Shield, Eye, Plus, Edit, Trash2, Download, Upload, Printer, Share2 } from "lucide-react";
 
 const ROLES = ["Admin", "Manager", "Finance User", "Employee User"];
 
@@ -22,6 +22,10 @@ const ACTIONS = [
   { key: "can_create", label: "Create", icon: Plus, color: "text-success" },
   { key: "can_edit", label: "Edit", icon: Edit, color: "text-warning" },
   { key: "can_delete", label: "Delete", icon: Trash2, color: "text-destructive" },
+  { key: "can_import", label: "Import", icon: Upload, color: "text-primary" },
+  { key: "can_export", label: "Export", icon: Download, color: "text-primary" },
+  { key: "can_print", label: "Print", icon: Printer, color: "text-muted-foreground" },
+  { key: "can_share", label: "Share", icon: Share2, color: "text-info" },
 ] as const;
 
 type PermRow = {
@@ -32,6 +36,10 @@ type PermRow = {
   can_create: boolean;
   can_edit: boolean;
   can_delete: boolean;
+  can_import: boolean;
+  can_export: boolean;
+  can_print: boolean;
+  can_share: boolean;
 };
 
 export default function Permissions() {
@@ -59,7 +67,7 @@ export default function Permissions() {
   const getPerm = (role: string, module: string) =>
     permissions.find((p) => p.role === role && p.module === module);
 
-  const togglePerm = (role: string, module: string, action: keyof Pick<PermRow, "can_view" | "can_create" | "can_edit" | "can_delete">) => {
+  const togglePerm = (role: string, module: string, action: keyof Omit<PermRow, "id" | "role" | "module">) => {
     setPermissions((prev) =>
       prev.map((p) =>
         p.role === role && p.module === module
@@ -73,7 +81,7 @@ export default function Permissions() {
     setPermissions((prev) =>
       prev.map((p) =>
         p.role === role && p.module === module
-          ? { ...p, can_view: checked, can_create: checked, can_edit: checked, can_delete: checked }
+          ? { ...p, can_view: checked, can_create: checked, can_edit: checked, can_delete: checked, can_import: checked, can_export: checked, can_print: checked, can_share: checked }
           : p
       )
     );
@@ -92,6 +100,10 @@ export default function Permissions() {
           can_create: perm.can_create,
           can_edit: perm.can_edit,
           can_delete: perm.can_delete,
+          can_import: perm.can_import,
+          can_export: perm.can_export,
+          can_print: perm.can_print,
+          can_share: perm.can_share,
         })
         .eq("id", perm.id);
       if (error) hasError = true;
@@ -158,8 +170,8 @@ export default function Permissions() {
                       {MODULES.map((module) => {
                         const perm = getPerm(role, module);
                         if (!perm) return null;
-                        const allChecked = perm.can_view && perm.can_create && perm.can_edit && perm.can_delete;
-                        const someChecked = perm.can_view || perm.can_create || perm.can_edit || perm.can_delete;
+                        const allChecked = perm.can_view && perm.can_create && perm.can_edit && perm.can_delete && perm.can_import && perm.can_export && perm.can_print && perm.can_share;
+                        const someChecked = perm.can_view || perm.can_create || perm.can_edit || perm.can_delete || perm.can_import || perm.can_export || perm.can_print || perm.can_share;
 
                         return (
                           <tr key={module} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
@@ -191,11 +203,15 @@ export default function Permissions() {
               </div>
 
               {/* Summary */}
-              <div className="mt-4 flex gap-6 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-info" /> View — Can see the page and data</span>
-                <span className="flex items-center gap-1.5"><Plus className="w-3.5 h-3.5 text-success" /> Create — Can add new records</span>
-                <span className="flex items-center gap-1.5"><Edit className="w-3.5 h-3.5 text-warning" /> Edit — Can modify existing records</span>
-                <span className="flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5 text-destructive" /> Delete — Can remove records</span>
+              <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-info" /> View</span>
+                <span className="flex items-center gap-1.5"><Plus className="w-3.5 h-3.5 text-success" /> Create</span>
+                <span className="flex items-center gap-1.5"><Edit className="w-3.5 h-3.5 text-warning" /> Edit</span>
+                <span className="flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5 text-destructive" /> Delete</span>
+                <span className="flex items-center gap-1.5"><Upload className="w-3.5 h-3.5 text-primary" /> Import</span>
+                <span className="flex items-center gap-1.5"><Download className="w-3.5 h-3.5 text-primary" /> Export</span>
+                <span className="flex items-center gap-1.5"><Printer className="w-3.5 h-3.5 text-muted-foreground" /> Print</span>
+                <span className="flex items-center gap-1.5"><Share2 className="w-3.5 h-3.5 text-info" /> Share</span>
               </div>
             </TabsContent>
           ))}
