@@ -147,8 +147,8 @@ export default function Employees() {
           <DialogHeader><DialogTitle>{editingId ? "Edit Employee" : "Add Employee"}</DialogTitle></DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label>Employee ID <span className="text-destructive">*</span></Label>
-              <Input value={form.employee_id} onChange={e => setForm(f => ({ ...f, employee_id: e.target.value }))} placeholder="EMP001" className="mt-1" />
+              <Label>Employee ID</Label>
+              <Input value={form.employee_id} readOnly disabled className="mt-1 bg-muted" />
             </div>
             <div>
               <Label>Full Name <span className="text-destructive">*</span></Label>
