@@ -198,7 +198,7 @@ export default function Savings() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Savings Type</Label>
+                <Label>{t.savingsType}</Label>
                 <Select value={form.savings_type} onValueChange={v => setForm(f => ({ ...f, savings_type: v }))}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
