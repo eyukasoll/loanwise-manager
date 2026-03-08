@@ -55,6 +55,7 @@ export default function GuaranteeDeactivation() {
   const [employeeSearch, setEmployeeSearch] = useState("");
   const [releasing, setReleasing] = useState(false);
   const [releaseDoc, setReleaseDoc] = useState<any>(null);
+  const [certGuarantee, setCertGuarantee] = useState<any>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
   const getGuaranteeStatus = (loanStatus: string) => {
