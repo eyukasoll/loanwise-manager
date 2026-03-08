@@ -112,16 +112,18 @@ export default function Savings() {
         </div>
 
         {/* Actions */}
-        {canCreate("Savings") && (
-          <div className="flex gap-2 justify-end">
-            <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
-              <Upload className="w-4 h-4 mr-1" /> Import CSV
-            </Button>
-            <Button size="sm" onClick={() => setFormOpen(true)}>
-              <Plus className="w-4 h-4 mr-1" /> New Transaction
-            </Button>
+        <div className="flex gap-2 justify-end">
+            {canImport("Savings") && (
+              <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
+                <Upload className="w-4 h-4 mr-1" /> Import CSV
+              </Button>
+            )}
+            {canCreate("Savings") && (
+              <Button size="sm" onClick={() => setFormOpen(true)}>
+                <Plus className="w-4 h-4 mr-1" /> New Transaction
+              </Button>
+            )}
           </div>
-        )}
 
         {/* Table */}
         {isLoading ? (
