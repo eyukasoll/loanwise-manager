@@ -107,6 +107,9 @@ export default function ApplicationDetailDialog({ selected, onClose, canEdit = f
           </DialogHeader>
           {selected && !editMode && (
             <div className="space-y-4">
+              {/* Status Timeline */}
+              <ApplicationTimeline loan={selected} />
+
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {([
                   ["Application ID", selected.application_number], ["Date", selected.application_date],
