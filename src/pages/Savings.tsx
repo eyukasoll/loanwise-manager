@@ -45,6 +45,8 @@ export default function Savings() {
   const totalWithdrawals = transactions.filter((t: any) => t.transaction_type === "Withdrawal").reduce((s: number, t: any) => s + Number(t.amount), 0);
   const netBalance = totalDeposits - totalWithdrawals;
 
+  const { paginatedItems: paginatedTxns, currentPage, pageSize, totalItems, startIndex, setCurrentPage, setPageSize } = usePagination(transactions);
+
   const handleSave = () => {
     if (!form.employee_id || form.amount <= 0) return;
     createMut.mutate({
