@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image, DatabaseBackup, Download, CheckCircle2, UploadCloud, AlertTriangle, FileSpreadsheet } from "lucide-react";
+import { Building2, Mail, Settings as SettingsIcon, Save, Loader2, Upload, X, Image, DatabaseBackup, Download, CheckCircle2, UploadCloud, AlertTriangle, FileSpreadsheet, Lock } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
   AlertDialog,
@@ -243,6 +243,9 @@ export default function Settings() {
             <TabsTrigger value="backup" className="gap-2">
               <DatabaseBackup className="w-4 h-4" /> Backup & Export
             </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2">
+              <Lock className="w-4 h-4" /> Security
+            </TabsTrigger>
           </TabsList>
 
           {/* Company Details */}
@@ -402,11 +405,86 @@ export default function Settings() {
           <TabsContent value="backup">
             <BackupExportTab toast={toast} />
           </TabsContent>
+          {/* Security - Change Password */}
+          <TabsContent value="security">
+            <ChangePasswordTab toast={toast} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
   );
 }
+function ChangePasswordTab({ toast }: { toast: ReturnType<typeof useToast>["toast"] }) {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!newPassword || !confirmPassword) {
+      toast({ title: "Error", description: "Please fill in all fields.", variant: "destructive" });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: "Error", description: "New password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "New passwords do not match.", variant: "destructive" });
+      return;
+    }
+
+    setSaving(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setSaving(false);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Password updated", description: "Your password has been changed successfully." });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+  };
+
+  return (
+    <div className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-foreground">Change Password</h3>
+        <p className="text-sm text-muted-foreground">Update your account password</p>
+      </div>
+      <div className="max-w-md space-y-4">
+        <div>
+          <Label>New Password</Label>
+          <Input
+            type="password"
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+            placeholder="Enter new password"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label>Confirm New Password</Label>
+          <Input
+            type="password"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            placeholder="Re-enter new password"
+            className="mt-1"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end pt-2">
+        <Button onClick={handleChangePassword} disabled={saving}>
+          <Lock className="w-4 h-4 mr-2" /> {saving ? "Updating..." : "Update Password"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 
 const backupTables = [
   { key: "employees", label: "Employees", description: "All employee records" },
