@@ -15,11 +15,7 @@ const COLORS = [
   "hsl(280, 60%, 55%)", "hsl(0, 72%, 51%)"
 ];
 
-const fmt = (n: number) => {
-  if (n >= 1000000) return `KES ${(n / 1000000).toFixed(1)}M`;
-  if (n >= 1000) return `KES ${(n / 1000).toFixed(0)}K`;
-  return `KES ${n}`;
-};
+import { fmt as fmtFull, fmtShort as fmt } from "@/lib/currency";
 
 export default function Dashboard() {
   const activeLoans = loanApplications.filter(l => l.status === "Active");

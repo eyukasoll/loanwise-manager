@@ -8,7 +8,7 @@ const manualPayments = [
   { id: "MP-002", date: "2025-06-30", employee: "David Odhiambo", loanId: "LA-2025-003", amount: 13500, method: "Bank Transfer", receipt: "TRF-8832", receivedBy: "Finance Dept" },
 ];
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt } from "@/lib/currency";
 
 export default function ManualPayments() {
   return (

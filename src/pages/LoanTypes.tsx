@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { LoanType, LoanTypeDocument } from "@/types/loan";
 import { toast } from "sonner";
 
-const fmt = (n: number) => `KES ${n.toLocaleString()}`;
+import { fmt, CURRENCY } from "@/lib/currency";
 
 const emptyForm: Omit<LoanType, "id"> = {
   name: "",
