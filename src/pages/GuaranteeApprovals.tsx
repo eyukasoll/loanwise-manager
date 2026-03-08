@@ -27,6 +27,7 @@ function GuarantorStatusBadge({ status }: { status: string }) {
 }
 
 export default function GuaranteeApprovals() {
+  const { t } = useLanguage();
   const { data: applications = [], isLoading } = useLoanApplications();
   const { role } = useAuth();
   const { data: currentEmployee } = useCurrentEmployee();
