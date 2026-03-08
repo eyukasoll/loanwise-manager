@@ -59,6 +59,7 @@ export default function Employees() {
       employment_status: emp.employment_status, monthly_salary: emp.monthly_salary,
       allowances: emp.allowances, bank_account: emp.bank_account || "",
       phone: emp.phone || "", email: emp.email || "",
+      user_type: emp.user_type || "Employee User",
     });
     setFormOpen(true);
   };
