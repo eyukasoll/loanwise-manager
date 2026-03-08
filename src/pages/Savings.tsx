@@ -183,7 +183,7 @@ export default function Savings() {
       {/* New Transaction Dialog */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Record Savings Transaction</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t.recordSavingsTransaction}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
               <Label>Employee <span className="text-destructive">*</span></Label>
