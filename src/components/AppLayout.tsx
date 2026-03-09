@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import AppSidebar from "./AppSidebar";
+import AISupportChat from "./AISupportChat";
 import { Menu, X } from "lucide-react";
 
 export default function AppLayout() {
