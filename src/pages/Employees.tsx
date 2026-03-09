@@ -236,6 +236,16 @@ export default function Employees() {
               <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="John Doe" className="mt-1" />
             </div>
             <div>
+              <Label>Gender</Label>
+              <Select value={form.gender} onValueChange={v => setForm(f => ({ ...f, gender: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select gender" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <Label>Department <span className="text-destructive">*</span></Label>
               <Input value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))} placeholder="Engineering" className="mt-1" />
             </div>
