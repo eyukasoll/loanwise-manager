@@ -124,7 +124,8 @@ export default function Reports() {
             </div>
           </TabsContent>
 
-          </TabsContent>
+
+
 
           <TabsContent value="gender">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
