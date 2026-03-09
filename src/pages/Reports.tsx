@@ -124,6 +124,79 @@ export default function Reports() {
             </div>
           </TabsContent>
 
+          </TabsContent>
+
+          <TabsContent value="gender">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* Gender Distribution Pie */}
+              <div className="bg-card rounded-xl border border-border p-5">
+                <h3 className="font-display font-semibold text-sm mb-4">Employee Gender Distribution</h3>
+                {genderData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie data={genderData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                        {genderData.map((_, i) => (
+                          <Cell key={i} fill={GENDER_COLORS[i % GENDER_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">No data</div>
+                )}
+              </div>
+
+              {/* Gender Loan Bar Chart */}
+              <div className="bg-card rounded-xl border border-border p-5">
+                <h3 className="font-display font-semibold text-sm mb-4">Loan Amount by Gender</h3>
+                {Object.keys(genderLoanMap).length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={Object.values(genderLoanMap)}>
+                      <XAxis dataKey="gender" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
+                      <Tooltip formatter={(v: number) => fmt(v)} />
+                      <Bar dataKey="amount" name="Disbursed" fill="hsl(217, 72%, 48%)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="outstanding" name="Outstanding" fill="hsl(340, 75%, 55%)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">No data</div>
+                )}
+              </div>
+            </div>
+
+            {/* Gender Summary Table */}
+            <div className="bg-card rounded-xl border border-border p-5">
+              <h3 className="font-display font-semibold text-sm mb-4">Gender-wise Summary</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border bg-secondary/40">
+                    {["Gender", "Employees", "Active Loans", "Total Disbursed", "Outstanding"].map(h => (
+                      <th key={h} className={`px-5 py-3 font-medium text-muted-foreground text-xs ${["Total Disbursed", "Outstanding"].includes(h) ? "text-right" : "text-left"} ${["Employees", "Active Loans"].includes(h) ? "text-center" : ""}`}>{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {Object.entries(genderCount).map(([gender, count]) => {
+                      const loan = genderLoanMap[gender] || { count: 0, amount: 0, outstanding: 0 };
+                      return (
+                        <tr key={gender} className="border-b border-border/50">
+                          <td className="px-5 py-2.5 font-medium">{gender}</td>
+                          <td className="px-5 py-2.5 text-center">{count}</td>
+                          <td className="px-5 py-2.5 text-center">{loan.count}</td>
+                          <td className="px-5 py-2.5 text-right">{fmt(loan.amount)}</td>
+                          <td className="px-5 py-2.5 text-right">{fmt(loan.outstanding)}</td>
+                        </tr>
+                      );
+                    })}
+                    {Object.keys(genderCount).length === 0 && <tr><td colSpan={5} className="text-center py-8 text-muted-foreground">No data</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </TabsContent>
+
           <TabsContent value="financial">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <div className="stat-card"><p className="text-xs text-muted-foreground">Total Disbursed</p><p className="text-xl font-bold font-display mt-1">{fmt(totalDisbursed)}</p></div>
