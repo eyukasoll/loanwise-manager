@@ -146,6 +146,7 @@ export type Database = {
           employee_id: string
           employment_status: string
           full_name: string
+          gender: string | null
           id: string
           monthly_salary: number
           phone: string | null
@@ -164,6 +165,7 @@ export type Database = {
           employee_id: string
           employment_status?: string
           full_name: string
+          gender?: string | null
           id?: string
           monthly_salary?: number
           phone?: string | null
@@ -182,6 +184,7 @@ export type Database = {
           employee_id?: string
           employment_status?: string
           full_name?: string
+          gender?: string | null
           id?: string
           monthly_salary?: number
           phone?: string | null

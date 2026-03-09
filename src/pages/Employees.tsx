@@ -27,6 +27,7 @@ const emptyForm = {
   employee_id: "", full_name: "", department: "", position: "", branch: "Main Office",
   date_of_employment: "", employment_status: "Active", monthly_salary: 0,
   allowances: 0, bank_account: "", phone: "", email: "", user_type: "Employee User",
+  gender: "",
 };
 
 export default function Employees() {
@@ -95,6 +96,7 @@ export default function Employees() {
       allowances: emp.allowances, bank_account: emp.bank_account || "",
       phone: emp.phone || "", email: emp.email || "",
       user_type: emp.user_type || "Employee User",
+      gender: emp.gender || "",
     });
     setFormOpen(true);
   };
@@ -144,6 +146,7 @@ export default function Employees() {
                      <th className="text-left px-3 py-3 font-medium text-muted-foreground text-xs w-10">#</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employeeId}</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.name}</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Gender</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.department}</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.position}</th>
                      <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.salary}</th>
@@ -156,10 +159,11 @@ export default function Employees() {
                    {paginatedItems.map((emp: any, idx: number) => (
                      <tr key={emp.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
                        <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
-                       <td className="px-5 py-3 font-mono text-xs">{emp.employee_id}</td>
-                       <td className="px-5 py-3 font-medium">{emp.full_name}</td>
-                       <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
-                       <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
+                        <td className="px-5 py-3 font-mono text-xs">{emp.employee_id}</td>
+                        <td className="px-5 py-3 font-medium">{emp.full_name}</td>
+                        <td className="px-5 py-3 text-muted-foreground">{emp.gender || "—"}</td>
+                        <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
+                        <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
                        <td className="px-5 py-3 text-right">{fmt(emp.monthly_salary)}</td>
                        <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
                        <td className="px-5 py-3">
@@ -182,7 +186,7 @@ export default function Employees() {
                      </tr>
                    ))}
                    {filtered.length === 0 && (
-                     <tr><td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
+                     <tr><td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">No employees found. Click "Add Employee" to get started.</td></tr>
                    )}
                  </tbody>
                </table>
@@ -198,14 +202,15 @@ export default function Employees() {
           <DialogHeader><DialogTitle>{t.employeeDetails}</DialogTitle></DialogHeader>
           {viewEmp && (
             <div className="grid grid-cols-2 gap-3 text-sm">
-              {([
-                [t.employeeId, viewEmp.employee_id], [t.name, viewEmp.full_name],
-                [t.department, viewEmp.department], [t.position, viewEmp.position],
-                [t.branch, viewEmp.branch], [t.joined, viewEmp.date_of_employment],
-                [t.salary, fmt(viewEmp.monthly_salary)], [t.allowances, fmt(viewEmp.allowances)],
-                [t.status, viewEmp.employment_status], [t.phone, viewEmp.phone || "—"],
-                [t.email, viewEmp.email || "—"], [t.bankAccount, viewEmp.bank_account || "—"],
-                [t.userType, viewEmp.user_type || "—"],
+               {([
+                 [t.employeeId, viewEmp.employee_id], [t.name, viewEmp.full_name],
+                 ["Gender", viewEmp.gender || "—"],
+                 [t.department, viewEmp.department], [t.position, viewEmp.position],
+                 [t.branch, viewEmp.branch], [t.joined, viewEmp.date_of_employment],
+                 [t.salary, fmt(viewEmp.monthly_salary)], [t.allowances, fmt(viewEmp.allowances)],
+                 [t.status, viewEmp.employment_status], [t.phone, viewEmp.phone || "—"],
+                 [t.email, viewEmp.email || "—"], [t.bankAccount, viewEmp.bank_account || "—"],
+                 [t.userType, viewEmp.user_type || "—"],
               ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-muted-foreground text-xs">{label}</p>
@@ -229,6 +234,16 @@ export default function Employees() {
             <div>
               <Label>Full Name <span className="text-destructive">*</span></Label>
               <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="John Doe" className="mt-1" />
+            </div>
+            <div>
+              <Label>Gender</Label>
+              <Select value={form.gender} onValueChange={v => setForm(f => ({ ...f, gender: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select gender" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Department <span className="text-destructive">*</span></Label>
