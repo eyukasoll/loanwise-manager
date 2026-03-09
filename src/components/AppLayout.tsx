@@ -40,6 +40,8 @@ export default function AppLayout() {
       <div className="lg:ml-[250px] transition-all duration-300 pt-14 lg:pt-0">
         <Outlet />
       </div>
+
+      <AISupportChat />
     </div>
   );
 }
