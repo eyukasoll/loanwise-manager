@@ -2,7 +2,7 @@ import React from "react";
 import TopBar from "@/components/TopBar";
 import { useLoanApplications, useEmployees } from "@/hooks/useLoans";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { useLanguage } from "@/i18n/LanguageContext";
 import StatusBadge from "@/components/StatusBadge";
 import { fmt } from "@/lib/currency";
