@@ -27,6 +27,7 @@ const emptyForm = {
   employee_id: "", full_name: "", department: "", position: "", branch: "Main Office",
   date_of_employment: "", employment_status: "Active", monthly_salary: 0,
   allowances: 0, bank_account: "", phone: "", email: "", user_type: "Employee User",
+  gender: "",
 };
 
 export default function Employees() {
