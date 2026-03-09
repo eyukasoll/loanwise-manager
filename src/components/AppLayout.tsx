@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import AppSidebar from "./AppSidebar";
+import AISupportChat from "./AISupportChat";
 import { Menu, X } from "lucide-react";
 
 export default function AppLayout() {
@@ -39,6 +40,8 @@ export default function AppLayout() {
       <div className="lg:ml-[250px] transition-all duration-300 pt-14 lg:pt-0">
         <Outlet />
       </div>
+
+      <AISupportChat />
     </div>
   );
 }
