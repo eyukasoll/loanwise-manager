@@ -96,6 +96,7 @@ export default function Employees() {
       allowances: emp.allowances, bank_account: emp.bank_account || "",
       phone: emp.phone || "", email: emp.email || "",
       user_type: emp.user_type || "Employee User",
+      gender: emp.gender || "",
     });
     setFormOpen(true);
   };
