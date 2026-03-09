@@ -34,6 +34,26 @@ export default function Reports() {
     empMap[empId].outstanding += l.outstanding_balance || 0;
   });
 
+  // Gender distribution
+  const genderCount: Record<string, number> = {};
+  employees.forEach((e: any) => {
+    const g = e.gender || "Not Specified";
+    genderCount[g] = (genderCount[g] || 0) + 1;
+  });
+  const genderData = Object.entries(genderCount).map(([name, value]) => ({ name, value }));
+  const GENDER_COLORS = ["hsl(217, 72%, 48%)", "hsl(340, 75%, 55%)", "hsl(45, 80%, 50%)"];
+
+  // Gender-wise loan data
+  const genderLoanMap: Record<string, { gender: string; count: number; amount: number; outstanding: number }> = {};
+  applications.filter((l: any) => ["Active", "Closed", "Disbursed"].includes(l.status)).forEach((l: any) => {
+    const emp = employees.find((e: any) => e.id === l.employee_id);
+    const g = emp?.gender || "Not Specified";
+    if (!genderLoanMap[g]) genderLoanMap[g] = { gender: g, count: 0, amount: 0, outstanding: 0 };
+    genderLoanMap[g].count++;
+    genderLoanMap[g].amount += l.approved_amount || l.requested_amount || 0;
+    genderLoanMap[g].outstanding += l.outstanding_balance || 0;
+  });
+
   return (
     <div>
       <TopBar title={t.rptTitle} subtitle={t.rptSubtitle} />
@@ -42,6 +62,7 @@ export default function Reports() {
           <TabsList className="mb-6">
             <TabsTrigger value="operational">Operational</TabsTrigger>
             <TabsTrigger value="employee">Employee</TabsTrigger>
+            <TabsTrigger value="gender">Gender</TabsTrigger>
             <TabsTrigger value="financial">Financial</TabsTrigger>
             <TabsTrigger value="management">Management</TabsTrigger>
           </TabsList>
