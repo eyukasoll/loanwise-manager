@@ -146,6 +146,7 @@ export default function Employees() {
                      <th className="text-left px-3 py-3 font-medium text-muted-foreground text-xs w-10">#</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.employeeId}</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.name}</th>
+                     <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">Gender</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.department}</th>
                      <th className="text-left px-5 py-3 font-medium text-muted-foreground text-xs">{t.position}</th>
                      <th className="text-right px-5 py-3 font-medium text-muted-foreground text-xs">{t.salary}</th>
