@@ -159,10 +159,11 @@ export default function Employees() {
                    {paginatedItems.map((emp: any, idx: number) => (
                      <tr key={emp.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
                        <td className="px-3 py-3 text-muted-foreground text-xs">{startIndex + idx + 1}</td>
-                       <td className="px-5 py-3 font-mono text-xs">{emp.employee_id}</td>
-                       <td className="px-5 py-3 font-medium">{emp.full_name}</td>
-                       <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
-                       <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
+                        <td className="px-5 py-3 font-mono text-xs">{emp.employee_id}</td>
+                        <td className="px-5 py-3 font-medium">{emp.full_name}</td>
+                        <td className="px-5 py-3 text-muted-foreground">{emp.gender || "—"}</td>
+                        <td className="px-5 py-3 text-muted-foreground">{emp.department}</td>
+                        <td className="px-5 py-3 text-muted-foreground">{emp.position}</td>
                        <td className="px-5 py-3 text-right">{fmt(emp.monthly_salary)}</td>
                        <td className="px-5 py-3"><StatusBadge status={emp.employment_status} /></td>
                        <td className="px-5 py-3">
